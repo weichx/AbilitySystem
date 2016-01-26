@@ -1,12 +1,15 @@
 ﻿using UnityEngine;
 using KDTree;
 using System.Collections.Generic;
+//using Vectrosity;
 
 public class AINodeManager : MonoBehaviour {
 
     const string objectName = "AINodeRoot";
     public AINode[] nodes;
     public bool drawNodes;
+    public float originX;
+    public float originZ;
     protected KDTree<AINode> kdTree;
     private static AINodeManager _instance;
 
@@ -16,27 +19,27 @@ public class AINodeManager : MonoBehaviour {
         }
         BuildNeighbors();
         kdTree = new KDTree<AINode>(3);
-        for(int i = 0; i < nodes.Length; i++) {
+        for (int i = 0; i < nodes.Length; i++) {
             Vector3 position = nodes[i].position;
             var point = new double[] { position.x, position.y, position.z };
             kdTree.AddPoint(point, nodes[i]);
         }
     }
 
-    void Update() {
-        if (Input.GetMouseButtonDown(0)) {
-            Ray worldRay = Camera.main.ScreenPointToRay(Input.mousePosition);
-            RaycastHit hit;
-            if(Physics.Raycast(worldRay, out hit)) {
-                Vector3 worldPoint = hit.point;
-                AINode nearest = NearestNode(hit.point);
-                if (nearest != null) {
-                    nearest.color = Color.blue;
-                    nearest.selected = true;
-                }
-            }
-        }
-    }
+    //void Update() {
+    //    if (Input.GetMouseButtonDown(0)) {
+    //        Ray worldRay = Camera.main.ScreenPointToRay(Input.mousePosition);
+    //        RaycastHit hit;
+    //        if(Physics.Raycast(worldRay, out hit)) {
+    //            Vector3 worldPoint = hit.point;
+    //            AINode nearest = NearestNode(hit.point);
+    //            if (nearest != null) {
+    //                nearest.color = Color.blue;
+    //                nearest.selected = true;
+    //            }
+    //        }
+    //    }
+    //}
 
     public static AINodeManager Instance {
         get {
@@ -46,6 +49,14 @@ public class AINodeManager : MonoBehaviour {
             }
             return _instance;
         }
+    }
+
+    public static float OriginX { 
+        get {return Instance.originX; }
+    }
+
+    public static float OriginZ {
+        get { return Instance.originZ; }
     }
 
     public AINode NearestNode(Vector3 point, float range = -1) {
@@ -99,7 +110,7 @@ public class AINodeManager : MonoBehaviour {
         //double drawing, but its just a debug view
         for (int i = 0; i < nodes.Length; i++) {
             Gizmos.color = nodes[i].color;
-            Gizmos.DrawSphere(nodes[i].position, 1f);
+            Gizmos.DrawWireCube(nodes[i].position, Vector3.one);
             AINode[] neighbors = nodes[i].neighbors;
             for (int j = 0; j < neighbors.Length; j++) {
                 Gizmos.DrawLine(nodes[i].position, neighbors[j].position);
@@ -119,3 +130,76 @@ public class AINodeManager : MonoBehaviour {
     }
 
 }
+
+/*
+Minimum Requirements to start AI
+
+Nodes annotated with cover
+pathfinding
+annotated choke points
+
+    start with the brute since its the easiest
+
+
+Influence Map
+    Project each unit's influence
+
+    Tension region focal points (if more than one)
+    Vulnerability Map
+    Scout Map
+
+
+Tactically Important Terrain
+
+In / Near Cover (from what?, in general?)
+Flank Protection
+Wide range of view
+Lower Visibility (Trees)?
+Special (Marked in editor)
+Line of Sight
+Line of Fire
+Focus
+
+States
+    Scout
+    Combat
+    Recovery
+    Survive
+
+General Engagement
+    Camp
+    Joust
+    Circle Of Death
+    Guerilla
+    BackStabber
+    Opportunist
+    Fist Fight / Brute
+    Peek-a-boo
+    Rush - joust
+    Sniper
+            
+Position change -- taken lots of damage, dealt little
+var open = set of nodes to evaluate (priority queue)
+var closed = set of nodes already evaluated
+
+    add root node to open
+
+    loop
+        current = lowest f cost node in open set
+        remove current from open
+        add current to closed
+
+        if current is target node return (path found)
+
+        for each neighbor of current
+            if not traversable || in closed set; continue
+
+        if new path to neighbor is shorter or neighbor not in open
+            set cost of neighbor
+            set parent of neighbor to current
+            if neighbor is not in open
+                add neighbor to open
+
+
+
+*/

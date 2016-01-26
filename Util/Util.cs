@@ -29,6 +29,19 @@ public static class Util {
         return angle;
     }
 
+    public static float WrapAngle180Offset(float angle, float offset) {
+        if (angle > 180f + offset) {
+            return -(360f - angle);
+        }
+        else if (angle < -180f + offset) {
+            return angle + 360f;
+        }
+        else if (angle == -180 + offset) {
+            return 180f + offset;
+        }
+        return angle;
+    }
+
     public static float WrapRadianPI(float radians) {
         if (radians > Mathf.PI) {
             return -((Mathf.PI * 2) - radians);
@@ -52,12 +65,44 @@ public static class Util {
     }
 }
 
+public static class TransformExtensions {
+    public static void Reset(this Transform t) {
+        t.rotation = Quaternion.identity;
+        t.position = Vector3.zero;
+        t.localScale = Vector3.one;
+    }
+
+    public static void ResetLocal(this Transform t) {
+        t.localRotation = Quaternion.identity;
+        t.localPosition = Vector3.zero;
+        t.localScale = Vector3.one;
+    }
+
+    public static float DistanceTo(this Transform self, Transform other) {
+        return (other.position - self.position).magnitude;
+    }
+
+    public static float DistanceToSquared(this Transform self, Transform other) {
+        return (other.position - self.position).sqrMagnitude;
+    }
+
+    public static float DistanceToSquared(this Transform self, Vector3 other) {
+        return (other - self.position).sqrMagnitude;
+    }
+}
+
+
 public static class DictionaryExtensions {
 
     public static U Get<T, U>(this Dictionary<T, U> dict, T key) where U : class {
         U val;
         dict.TryGetValue(key, out val);
         return val;
+    }
+
+    public static U AddAndReturn<T, U>(this Dictionary<T, U> dict, T key, U value) {
+        dict.Add(key, value);
+        return value;
     }
 }
 
@@ -85,6 +130,14 @@ public static class Vector3Extensions {
 
     public static float Dot(this Vector3 self, Vector3 other) {
         return Vector3.Dot(self, other);
+    }
+
+    public static float DistanceTo(this Vector3 self, Vector3 other) {
+        return (other - self).magnitude;
+    }
+
+    public static float DistanceToSquared(this Vector3 self, Vector3 other) {
+        return (other - self).sqrMagnitude;
     }
 }
 

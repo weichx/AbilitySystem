@@ -42,6 +42,16 @@ public class GameCamera : MonoBehaviour {
         CalculateTranslation();
     }
 
+    public bool GetEnvironmentPoint(Vector2 screenPoint, ref Vector3 output) {
+        var ray = Camera.main.ScreenPointToRay(screenPoint);
+        RaycastHit hit;
+        if(Physics.Raycast(ray, out hit)) {
+            output = hit.point;
+            return true;
+        }
+        return false;
+    }
+
     public void DetermineFocus() {
         if (Input.GetKey(KeyCode.F)) {
             //Selection.GetCurrentSelectionTransform();
