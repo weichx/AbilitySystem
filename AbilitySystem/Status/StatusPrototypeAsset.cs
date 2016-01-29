@@ -12,7 +12,6 @@ public class StatusPrototypeAsset : ScriptableObject, IStatusPrototype {
     [SerializeField]
     protected bool isRefreshable;
 
-
     public StatusDelegate onApply = new StatusDelegate(typeof(OnStatusAppliedHandler));
     //public StatusDelegate onUpdate = new StatusDelegate(typeof(OnStatusUpdatedHandler));
     //public StatusDelegate onRefresh = new StatusDelegate(typeof(OnStatusRefreshedHandler));

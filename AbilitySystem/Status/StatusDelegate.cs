@@ -19,10 +19,10 @@ public class StatusDelegate : ISerializationCallbackReceiver {
     public void OnAfterDeserialize() {
         if (attrType == typeof(object)) return;
         for (int i = 0; i < typeNames.Length; i++) {
-            var function = Reflector.FindActionWithAttribute<Status>(attrType.GetType(), typeNames[i], methodNames[i], typeof(Status));
-            if (function != null) {
-                callback += function;
-            }
+            //var function = Reflector.FindActionWithAttribute<Status>(attrType.GetType(), typeNames[i], methodNames[i], typeof(Status));
+            //if (function != null) {
+            //    callback += function;
+            //}
         }
     }
 

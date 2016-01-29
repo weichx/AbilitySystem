@@ -116,24 +116,34 @@ public class EntityAttribute : ModifiableAttribute<Entity> {
 
 }
 
+[Serializable]
+public class ModifiableAttribute {
 
-public class ModifiableAttribute : AbstractModifiableAttribute {
-
+    public string id;
     protected Func<float> GetBaseValue;
+    protected float value;
+    protected List<AttributeModifier> modifiers;
+    MethodPointer<Entity, float, float> ptr;
+    [SerializeField] protected MethodPointer formulaMetadata;
+    [SerializeField] protected float baseValue;
 
-    public ModifiableAttribute(Func<float> baseValueFn = null) {
+    public ModifiableAttribute(string id, Func<float> baseValueFn = null) {
+        this.id = id;
         GetBaseValue = baseValueFn ?? (() => { return 0f; });
         baseValue = value = GetBaseValue();
+        //Reflector.Register(baseValueFn);
     }
 
-    public ModifiableAttribute(float value) :base(value) {
+    public ModifiableAttribute(string id, float value = 0) {
+        this.id = id;
+        this.value = value;
         GetBaseValue = () => { return value; };
     }
 
     public virtual float Update() {
-        //GetBaseValue = Reflector.FindMethodByTuple(methodLookup, typeof(float));
         if (GetBaseValue == null) return -1f;
         value = baseValue = GetBaseValue();
+        //value = ptr.Invoke(Entity, baseValue);
         for (int i = 0; i < modifiers.Count; i++) {
             AttributeModifier modifier = modifiers[i];
             value += modifier.ModifyValue(value, baseValue);
@@ -142,27 +152,17 @@ public class ModifiableAttribute : AbstractModifiableAttribute {
         return value;
     }
 
-    public static string yay = "yay";
-    //[Formula]
-    public static float MethodTest1() { return 0; }
-    public static float MethodTest2() { return 0; }
-    public static float MethodTest3() { return 0; }
-    public static float MethodTest4() { return 0; }
-    public static float MethodTest5() { return 0; }
-    public static float MethodTest6() { return 0; }
-    public static float MethodTest7() { return 0; }
-    public static float MethodTest8() { return 0; }
-    public static float MethodTest9() { return 0; }
-    public static float MethodTest10() { return 0; }
-    public static float MethodTest11() { return 0; }
-    public static float MethodTest12() { return 0; }
-    public static float MethodTest13() { return 0; }
-    public static float MethodTest14() { return 0; }
-    public static float MethodTest15() { return 0; }
-    public static float MethodTest16() { return 0; }
-    public static float MethodTest17() { return 0; }
-    public static float MethodTest18() { Debug.Log(yay); return 2f; }
-    public static float MethodTest19() { Debug.Log(yay); return 2f; }
-    public static float MethodTest20() { Debug.Log(yay); return 2f; }
+    public void OnAfterDeserialized() {
+        ptr.OnAfterDeserialize();
+        ///if !ptr.fn ptr.fn = blah
+    }
+
+    public float Value {
+        get { return value; }
+    }
+
+    public ModifiableAttribute Clone() {
+        return new ModifiableAttribute(id, GetBaseValue);
+    }
 
 }

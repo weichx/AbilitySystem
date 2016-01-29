@@ -1,18 +1,21 @@
 ﻿using System;
 using System.Reflection;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
-using Debug = UnityEngine.Debug;
 using System.Linq.Expressions;
-using System.Runtime.InteropServices;
 
 public static class Reflector {
 
     private static readonly List<Assembly> filteredAssemblies;
     private static List<MethodInfo> methodSet;
+    private static Dictionary<string, Delegate> pointerLookup;
+
+    //Should be able to look up a method by signature
+    //Should only create 1 delegate per method pointer
+    //Should be able to enumerate all methods with signature/attribute
 
     static Reflector() {
+        pointerLookup = new Dictionary<string, Delegate>();
         methodSet = new List<MethodInfo>();
         filteredAssemblies = new List<Assembly>();
         var assemblies = AppDomain.CurrentDomain.GetAssemblies();
@@ -25,6 +28,7 @@ public static class Reflector {
         FindPublicStaticMethods();
     }
 
+    //todo probably add an attribute requirement as well to narrow search space even more
     private static void FindPublicStaticMethods() {
         methodSet = new List<MethodInfo>();
         for (int i = 0; i < filteredAssemblies.Count; i++) {
@@ -36,57 +40,70 @@ public static class Reflector {
         }
     }
 
-    public static Action<T> FindActionWithAttribute<T>(Type attrType, string typeName, string methodName, params Type[] parameters) {
-        return FindMethodWithAttribute(attrType, typeName, methodName, null, parameters) as Action<T>;
+    //public static Action<T> FindActionWithAttribute<T>(Type attrType, string typeName, string methodName, params Type[] parameters) {
+    //    return FindMethodWithAttribute(attrType, typeName, methodName, null, parameters) as Action<T>;
+    //}
+
+    //public static Action<T, U> FindActionWithAttribute<T, U>(Type attrType, string typeName, string methodName, params Type[] parameters) {
+    //    return FindMethodWithAttribute(attrType, typeName, methodName, null, parameters) as Action<T, U>;
+    //}
+
+    //public static Action<T, U, V> FindActionWithAttribute<T, U, V>(Type attrType, string typeName, string methodName, params Type[] parameters) {
+    //    return FindMethodWithAttribute(attrType, typeName, methodName, null, parameters) as Action<T, U, V>;
+    //}
+
+    //public static Func<T> FindFuncWithAttribute<T>(Type attrType, string typeName, string methodName, Type retnType, params Type[] parameters) {
+    //    return FindMethodWithAttribute(attrType, typeName, methodName, retnType, parameters) as Func<T>;
+    //}
+
+    //public static Func<T, U> FindFuncWithAttribute<T, U>(Type attrType, string typeName, string methodName, Type retnType, params Type[] parameters) {
+    //    return FindMethodWithAttribute(attrType, typeName, methodName, retnType, parameters) as Func<T, U>;
+    //}
+
+    //public static Func<T, U, V> FindFuncWithAttribute<T, U, V>(Type attrType, string typeName, string methodName, Type retnType, params Type[] parameters) {
+    //    return FindMethodWithAttribute(attrType, typeName, methodName, retnType, parameters) as Func<T, U, V>;
+    //}
+
+    public static Delegate FindMethodForPointer(MethodPointer pointer) {
+        var signature = pointer.ToString();
+        var fn = pointerLookup.Get(signature);
+        if (fn != null) return fn;
+        Type type = TypeCache.GetType(pointer.type);
+        Type retnType = TypeCache.GetType(pointer.retnType);
+        Type[] parameters = TypeCache.StringsToTypes(pointer.argumentTypes);
+        return FindMethod(type, pointer.method, retnType, parameters);
     }
 
-    public static Action<T, U> FindActionWithAttribute<T, U>(Type attrType, string typeName, string methodName, params Type[] parameters) {
-        return FindMethodWithAttribute(attrType, typeName, methodName, null, parameters) as Action<T, U>;
-    }
-
-    public static Action<T, U, V> FindActionWithAttribute<T, U, V>(Type attrType, string typeName, string methodName, params Type[] parameters) {
-        return FindMethodWithAttribute(attrType, typeName, methodName, null, parameters) as Action<T, U, V>;
-    }
-
-    public static Func<T> FindFuncWithAttribute<T>(Type attrType, string typeName, string methodName, Type retnType, params Type[] parameters) {
-        return FindMethodWithAttribute(attrType, typeName, methodName, retnType, parameters) as Func<T>;
-    }
-
-    public static Func<T, U> FindFuncWithAttribute<T, U>(Type attrType, string typeName, string methodName, Type retnType, params Type[] parameters) {
-        return FindMethodWithAttribute(attrType, typeName, methodName, retnType, parameters) as Func<T, U>;
-    }
-
-    public static Func<T, U, V> FindFuncWithAttribute<T, U, V>(Type attrType, string typeName, string methodName, Type retnType, params Type[] parameters) {
-        return FindMethodWithAttribute(attrType, typeName, methodName, retnType, parameters) as Func<T, U, V>;
-    }
-
-    public static Delegate FindMethodWithAttribute(Type attrType, string typeName, string methodName, Type retnType = null, params Type[] parameters) {
-        if (retnType == null) retnType = typeof(void);
-        for (int i = 0; i < methodSet.Count; i++) {
-            var method = methodSet[i];
-            if (method.DeclaringType.Name == typeName && method.Name == methodName) {
-                if (HasAttribute(method, attrType) && MatchesSignature(method, retnType, parameters)) {
-                    return CreateDelegate(method);
-                }
-            }
-        }
-        return null;
-    }
-
-    public static List<MethodPointer> FindMethodPointersWithAttribute(Type attrType, Type retnType = null, params Type[] parameters) {
+    public static List<MethodPointer> FindMethodPointersWithAttribute<T>(Type retnType, params Type[] parameterTypes) where T : Attribute {
         var list = new List<MethodPointer>();
+        var attrType = typeof(T);
         for (int i = 0; i < methodSet.Count; i++) {
-            var method = methodSet[i];
-            if (HasAttribute(method, attrType) && MatchesSignature(method, retnType, parameters)) {
-                list.Add(new MethodPointer(method.DeclaringType.Name, method.Name));
+            MethodInfo methodInfo = methodSet[i];
+            if (HasAttribute(methodInfo, attrType) && MatchesSignature(methodInfo, retnType, parameterTypes)) {
+                list.Add(new MethodPointer(methodInfo));
             }
         }
         return list;
     }
 
-    private static bool MatchesSignature(MethodInfo methodInfo, Type retnType, Type[] parameters) {
+    private static Delegate FindMethod(Type type, string methodName, Type retnType = null, params Type[] arguements) {
+        if (retnType == null) retnType = typeof(void);
+        //todo not sure if its faster to user cached method types..probably is
+        var methods = type.GetMethods(BindingFlags.Public | BindingFlags.Static);
+        for (int i = 0; i < methods.Length; i++) {
+            var method = methods[i];
+            if (method.Name == methodName && MatchesSignature(method, retnType, arguements)) {
+                return CreateDelegate(method);
+            }
+        }
+        return null;
+    }
+
+    #region private methods
+    private static bool MatchesSignature(MethodInfo methodInfo, Type retnType, Type[] parameters = null) {
         if (retnType == null) retnType = typeof(void);
         if (methodInfo.ReturnType != retnType) return false;
+        if (parameters == null) return true;
         var methodParameters = methodInfo.GetParameters();
         if (methodParameters.Length != parameters.Length) return false;
         for (int i = 0; i < methodParameters.Length; i++) {
@@ -102,7 +119,7 @@ public static class Reflector {
         return (attrs != null && attrs.Length > 0);
     }
 
-    static Delegate CreateDelegate(MethodInfo method) {
+    private static Delegate CreateDelegate(MethodInfo method) {
         List<Type> args = new List<Type>(method.GetParameters().Select(p => p.ParameterType));
         Type delegateType;
         if (method.ReturnType == typeof(void)) {
@@ -113,17 +130,6 @@ public static class Reflector {
             delegateType = Expression.GetFuncType(args.ToArray());
         }
         return Delegate.CreateDelegate(delegateType, null, method);
-    }
-
-    [Serializable]
-    public class MethodPointer {
-        public string type;
-        public string method;
-
-        public MethodPointer(string type, string method) {
-            this.type = type;
-            this.method = method;
-        }
     }
 
     private static bool FilterAssembly(Assembly assembly) {
@@ -146,4 +152,5 @@ public static class Reflector {
         && assembly.FullName.IndexOf("SMDiagnostics") == -1
         && !string.IsNullOrEmpty(assembly.Location);
     }
+    #endregion
 }

@@ -16,8 +16,8 @@ public class Resource {
     //resource name + "Cost"
 
     public Resource() {
-        minAttr = new ModifiableAttribute(0f);
-        maxAttr = new ModifiableAttribute(float.MaxValue);
+        minAttr = new ModifiableAttribute("Min", 0f);
+        maxAttr = new ModifiableAttribute("Max", float.MaxValue);
     }
 
     public void Set(float value) {

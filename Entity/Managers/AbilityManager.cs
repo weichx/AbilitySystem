@@ -22,9 +22,9 @@ public class AbilityManager : MonoBehaviour {
             //entity.eventManager.AddListener<(UseResources);
         }
         //todo array should be stored 
-        LoadAbilities(new string[] {
-            "Frostbolt", "Fireball", "Fireblast"
-        });
+        //LoadAbilities(new string[] {
+        //    "Frostbolt", "Fireball", "Fireblast"
+        //});
     }
 
     public void Cast(string abilityId) {
@@ -67,10 +67,10 @@ public class AbilityManager : MonoBehaviour {
     }
 
     public void AddAbility(string abilityId) {
-        if (abilities.Get(abilityId) != null) return;
-        AbilityPrototype prototype = masterAbilityDatabase.Get(abilityId);
-        if (prototype == null) throw new AbilityNotFoundException(abilityId);
-        abilities.Add(abilityId, prototype.CreateAbility(entity));
+        //if (abilities.Get(abilityId) != null) return;
+        //AbilityPrototype prototype = masterAbilityDatabase.Get(abilityId);
+        //if (prototype == null) throw new AbilityNotFoundException(abilityId);
+        //abilities.Add(abilityId, prototype.CreateAbility(entity));
     }
 
     public void RemoveAbility(string abilityId) {
@@ -96,34 +96,34 @@ public class AbilityManager : MonoBehaviour {
         get { return (IsCasting) ? castQueue.current.TotalCastTime : 0f; }
     }
 
-    private void LoadAbilities(string[] abilityIds) {
-        LoadResources();
-        abilities = new Dictionary<string, Ability>();
-        if (abilityIds != null) {
-            for (int i = 0; i < abilityIds.Length; i++) {
-                AbilityPrototype proto = null;
-                string id = abilityIds[i];
-                if (masterAbilityDatabase.TryGetValue(id, out proto)) {
-                    abilities[id] = proto.CreateAbility(entity);
-                }
-                else {
-                    throw new AbilityNotFoundException(id);
-                }
-                //todo apply any default or character modifiers that should go with this ability here
-                //they are likely serialized somewhere else and will need to be loaded / created
-            }
-        }
-    }
+    //private void LoadAbilities(string[] abilityIds) {
+    //    LoadResources();
+    //    abilities = new Dictionary<string, Ability>();
+    //    if (abilityIds != null) {
+    //        for (int i = 0; i < abilityIds.Length; i++) {
+    //            AbilityPrototype proto = null;
+    //            string id = abilityIds[i];
+    //            if (masterAbilityDatabase.TryGetValue(id, out proto)) {
+    //                abilities[id] = proto.CreateAbility(entity);
+    //            }
+    //            else {
+    //                throw new AbilityNotFoundException(id);
+    //            }
+    //            //todo apply any default or character modifiers that should go with this ability here
+    //            //they are likely serialized somewhere else and will need to be loaded / created
+    //        }
+    //    }
+    //}
 
-    private static Dictionary<string, AbilityPrototype> masterAbilityDatabase;
-    private static void LoadResources() {
-        if (masterAbilityDatabase != null) return;
-        masterAbilityDatabase = new Dictionary<string, AbilityPrototype>();
-        AbilityPrototype[] prototypes = Resources.LoadAll<AbilityPrototype>("");
-        for (int i = 0; i < prototypes.Length; i++) {
-            masterAbilityDatabase[prototypes[i].Id] = prototypes[i];
-        }
-    }
+    //private static Dictionary<string, AbilityPrototype> masterAbilityDatabase;
+    //private static void LoadResources() {
+    //    if (masterAbilityDatabase != null) return;
+    //    masterAbilityDatabase = new Dictionary<string, AbilityPrototype>();
+    //    AbilityPrototype[] prototypes = Resources.LoadAll<AbilityPrototype>("");
+    //    for (int i = 0; i < prototypes.Length; i++) {
+    //        masterAbilityDatabase[prototypes[i].Id] = prototypes[i];
+    //    }
+    //}
 }
 
 public class AbilityNotFoundException : Exception {

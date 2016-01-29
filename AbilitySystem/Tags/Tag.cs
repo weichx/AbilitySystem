@@ -7,9 +7,11 @@ public struct Tag {
     public readonly static Tag Null = new Tag("___NULL___");
 
     public string name;
+    public int hash;
 
     public Tag(string name) {
         this.name = name;
+        hash = name.GetHashCode();
     }
 
     public static TagCollection operator |(Tag tag1, Tag tag2) {

@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-public class Timer {
+public struct Timer {
 
     private float startTime;
     private float timeout;
@@ -12,7 +12,8 @@ public class Timer {
     }
 
     public Timer(float timeout = 1) {
-        Reset(timeout);
+        this.timeout = timeout;
+        startTime = TotalElapsedTime;
     }
 
     public bool ReadyWithReset(float timeout) {

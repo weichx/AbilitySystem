@@ -1,6 +1,6 @@
-﻿using System;
-using UnityEngine;
+﻿//using System;
+//using UnityEngine;
 
-public class ArcaneBarrage : AbilityPrototype {
+//public class ArcaneBarrage : AbilityPrototype {
 
-}
+//}

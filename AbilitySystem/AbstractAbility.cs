@@ -32,9 +32,9 @@ public abstract class AbstractAbility {
         castTimer = new Timer();
         castType = CastType.Cast;
         castState = CastState.Invalid;
-        range = attributes.AddAndReturn("Range", new ModifiableAttribute(40f));
-        castTime = attributes.AddAndReturn("CastTime", new ModifiableAttribute(2f));
-        cooldown = attributes.AddAndReturn("Cooldown", new ModifiableAttribute(0f));
+        //range = attributes.AddAndReturn("Range", new ModifiableAttribute(40f));
+        //castTime = attributes.AddAndReturn("CastTime", new ModifiableAttribute(2f));
+        //cooldown = attributes.AddAndReturn("Cooldown", new ModifiableAttribute(0f));
         //attributes.AddAndReturn("TickTime", new TickTime(0.5f)); im not happy with how this is handled
     }
 
@@ -47,13 +47,13 @@ public abstract class AbstractAbility {
     }
 
     public bool IsUsable() {
-        for (int i = 0; i < requirements.Count; i++) {
-            if (!requirements[i].CanStartCast(caster, this)) {
-                //todo log this to game console when there is one
-                UnityEngine.Debug.Log(requirements[i].FailureMessage);
-                return false;
-            }
-        }
+        //for (int i = 0; i < requirements.Count; i++) {
+        //    if (!requirements[i].CanStartCast(caster, this)) {
+        //        //todo log this to game console when there is one
+        //        UnityEngine.Debug.Log(requirements[i].FailureMessage);
+        //        return false;
+        //    }
+        //}
         return true;
     }
 
@@ -70,12 +70,12 @@ public abstract class AbstractAbility {
         CastType actualCastMode = castType;
         if (requirementCheckTimer.ReadyWithReset(RequirementCheckInterval)) {
             for (int i = 0; i < requirements.Count; i++) {
-                if (!requirements[i].CanContinueCast(caster, this)) {
-                    //todo log this to game console when there is one
-                    UnityEngine.Debug.Log(requirements[i].FailureMessage);
-                    castState = CastState.Invalid;
-                    return castState;
-                }
+                //if (!requirements[i].CanContinueCast(caster, this)) {
+                //    //todo log this to game console when there is one
+                //    UnityEngine.Debug.Log(requirements[i].FailureMessage);
+                //    castState = CastState.Invalid;
+                //    return castState;
+                //}
             }
         }
 
