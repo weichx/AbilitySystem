@@ -6,35 +6,35 @@ using System;
 public class GameEvent { }
 
 //todo flesh this out more
-public class EvtMngr : MonoBehaviour {
+//public class EvtMngr : MonoBehaviour {
 
-    public delegate void EventDelegate<T>(T e = null) where T : GameEvent;
-    private Dictionary<Type, object> dict;
+//    public delegate void EventDelegate<T>(T e = null) where T : GameEvent;
+//    private Dictionary<Type, object> dict;
 
-    public void AddEventListener<T>(EventDelegate<T> del) where T : GameEvent {
-        Type type = typeof(T);
-        object evtDel;
-        if (dict.TryGetValue(type, out evtDel)) {
-            EventDelegate<T> evtDelReal = evtDel as EventDelegate<T>;
-            evtDelReal += del;
-        }
-        else {
-            dict[type] = del;
-        }
-    }
+//    public void AddEventListener<T>(EventDelegate<T> del) where T : GameEvent {
+//        Type type = typeof(T);
+//        object evtDel;
+//        if (dict.TryGetValue(type, out evtDel)) {
+//            EventDelegate<T> evtDelReal = evtDel as EventDelegate<T>;
+//            evtDelReal += del;
+//        }
+//        else {
+//            dict[type] = del;
+//        }
+//    }
 
-    public void TriggerEvent(GameEvent evt) {
-        AddEventListener<AbilityDatabaseLoaded>((e) => { });
-        TriggerEvent(new AbilityDatabaseLoaded());
-        TriggerEvent<AbilityDatabaseLoaded>();
-    }
+//    public void TriggerEvent(GameEvent evt) {
+//        AddEventListener<AbilityDatabaseLoaded>((e) => { });
+//        TriggerEvent(new AbilityDatabaseLoaded());
+//        TriggerEvent<AbilityDatabaseLoaded>();
+//    }
 
-    public void TriggerEvent<T>() where T : GameEvent {
-        Type t = typeof(T);
-        EventDelegate<T> del = dict[t] as EventDelegate<T>;
-        del.Invoke();
-    }
-}
+//    public void TriggerEvent<T>() where T : GameEvent {
+//        Type t = typeof(T);
+//        EventDelegate<T> del = dict[t] as EventDelegate<T>;
+//        del.Invoke();
+//    }
+//}
 
 public class EventManager : MonoBehaviour {
     public bool limitQueueProcessTime = false;
@@ -51,7 +51,7 @@ public class EventManager : MonoBehaviour {
     private Dictionary<Delegate, bool> onceLookups = new Dictionary<Delegate, bool>();
 
     static EventManager() {
-        instance = FindObjectOfType<EventManager>();
+        //instance = FindObjectOfType<EventManager>();
         if(instance == null) {
             GameObject evtHost = new GameObject();
             evtHost.name = "EventManager";

@@ -10,7 +10,11 @@ public static class ScriptableObjectUtility {
     [MenuItem("Assets/Scriptable Object")]
     public static void CreateScriptableObject() {
         CreateAsset<ScriptableObject>("Scriptable Object");
+    }
 
+    [MenuItem("Assets/Requirement Prototype")]
+    public static void CreateAbilityRequirement() {
+        CreateAsset<RequirementPrototype>("Ability Requirement");
     }
 
     [MenuItem("Assets/Ability Prototype")]

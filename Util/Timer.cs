@@ -1,6 +1,4 @@
-﻿using UnityEngine;
-
-public struct Timer {
+﻿public class Timer {
 
     private float startTime;
     private float timeout;

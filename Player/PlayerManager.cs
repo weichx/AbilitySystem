@@ -1,16 +1,18 @@
 ﻿using UnityEngine;
 
-public class PlayerManager {
+namespace AbilitySystem {
+    public class PlayerManager {
 
-    public readonly static Entity playerEntity;
-    public readonly static GameObject playerRoot;
-    public readonly static Transform playerTransform;
+        public readonly static Entity playerEntity;
+        public readonly static GameObject playerRoot;
+        public readonly static Transform playerTransform;
 
-    public static Entity target;
+        public static Entity target;
 
-    static PlayerManager() {
-        playerRoot = GameObject.FindGameObjectWithTag("Player");
-        playerEntity = playerRoot.GetComponent<Entity>();
-        playerTransform = playerRoot.transform;
+        static PlayerManager() {
+            playerRoot = GameObject.FindGameObjectWithTag("Player");
+            playerEntity = playerRoot.GetComponent<Entity>();
+            playerTransform = playerRoot.transform;
+        }
     }
 }

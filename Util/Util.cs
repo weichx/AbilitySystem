@@ -66,6 +66,7 @@ public static class Util {
 }
 
 public static class TransformExtensions {
+
     public static void Reset(this Transform t) {
         t.rotation = Quaternion.identity;
         t.position = Vector3.zero;
