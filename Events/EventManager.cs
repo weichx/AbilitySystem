@@ -50,18 +50,32 @@ public class EventManager : MonoBehaviour {
     private Dictionary<Delegate, NonGenericEventDelegate> delegateLookup = new Dictionary<Delegate, NonGenericEventDelegate>();
     private Dictionary<Delegate, bool> onceLookups = new Dictionary<Delegate, bool>();
 
-    static EventManager() {
-        //instance = FindObjectOfType<EventManager>();
-        if(instance == null) {
-            GameObject evtHost = new GameObject();
-            evtHost.name = "EventManager";
-            evtHost.isStatic = true;
-            instance = evtHost.AddComponent<EventManager>();
-        }
-    }
+    //static EventManager() {
+    //    //instance = FindObjectOfType<EventManager>();
+    //    if(instance == null) {
+    //        GameObject evtHost = new GameObject();
+    //        evtHost.name = "EventManager";
+    //        evtHost.isStatic = true;
+    //        instance = evtHost.AddComponent<EventManager>();
+    //    }
+    //}
 
     public static EventManager Instance {
-        get { return instance; }
+        get {
+            if (instance == null) {
+                var root = GameObject.FindGameObjectWithTag("MainEventManager");
+                if (root == null) {
+                    root = new GameObject("EventManager");
+                    root.tag = "MainEventManager";
+                    root.isStatic = true;
+                }
+                instance = root.GetComponent<EventManager>();
+                if(instance == null) {
+                    instance = root.AddComponent<EventManager>();
+                }
+            }
+            return instance;
+        }
     }
 
     private NonGenericEventDelegate AddDelegate<T>(EventDelegate<T> del) where T : GameEvent {

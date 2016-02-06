@@ -30,7 +30,7 @@
     }
 
     public bool Ready {
-        get { return timeout > 0f && TotalElapsedTime - startTime > timeout; }
+        get { return timeout >= 0f && TotalElapsedTime - startTime > timeout; }
     }
 
     public float Timeout {

@@ -5,6 +5,6 @@ public class Projectile : MonoBehaviour {
     public float speed;
 
     void Update() {
-        transform.position += transform.right * speed * Time.deltaTime;
+        transform.position += transform.forward * speed * Time.deltaTime;
     }
 }

@@ -3,61 +3,56 @@ using UnityEngine;
 using System.Collections.Generic;
 
 namespace AbilitySystem {
+
+    [Serializable]
+    public struct SpellSlotAssignment {
+        public string spellId;
+        public string slotId;
+        public string actionBarId;
+    }
+
     [RequireComponent(typeof(Entity))] //there might be a way to not require entity
     public class AbilityManager : MonoBehaviour {
+        public float baseGlobalCooldown = 1.5f;
 
-        [HideInInspector]
-        public Entity entity;
+        public List<string> abilityNames;
+        public List<SpellSlotAssignment> slotAssignments;
 
-        public float baseGlobalCooldown = 1f;
+        [HideInInspector] public List<Ability> abilities;
+        [HideInInspector] public Entity entity;
 
-        public Dictionary<string, Ability> abilities;
-        public Timer gcdTimer;
-        public CastQueue castQueue;
+        protected Timer gcdTimer;
+        protected CastQueue castQueue;
 
         void Start() {
             castQueue = new CastQueue();
             gcdTimer = new Timer(baseGlobalCooldown);
             entity = GetComponent<Entity>();
-            var rm = GetComponent<ResourceManager>();
-            if (rm != null) {
-                //entity.eventManager.AddListener<(UseResources);
-            }
-            //todo array should be stored 
-            LoadAbilities(new string[] {
-                "Throw Sphere", "Frostbolt"//, "Fireball", "Fireblast"
-            });
-            AddAbility("Throw Sphere");
+            LoadAbilities();
         }
 
         public void Cast(string abilityId) {
-            Ability ability = abilities.Get(abilityId);
+            Ability ability = GetAbility(abilityId);
             if (ability == null) throw new AbilityNotFoundException(abilityId);
             if (ability.IsUsable()) {
                 castQueue.Enqueue(ability);
             }
-            else {
-                Debug.Log("That ability failed some requirements");
+        }
+
+        public void Cast(Ability ability) {
+            if (ability == null || ability.caster != entity) return;
+            if (ability.IsUsable()) {
+                castQueue.Enqueue(ability);
             }
         }
 
         public void Update() {
-            foreach(var key in abilities.Keys) { 
-                abilities[key].UpdateAttributes();
-            }
-            if(Input.GetMouseButtonDown(0)) {
-                var ability = abilities["Throw Sphere"];
-                if (ability.IsUsable()) {
-                    castQueue.Enqueue(ability);
-                    GetComponent<DebugAbility>().SetAbility(ability);
-                }
+            //todo maybe only do this ever ~10 frames
+            for(int i = 0; i < abilities.Count; i++) {
+                abilities[i].UpdateAttributes();
             }
             castQueue.UpdateCast();
         }
-
-        //entity.OnAbilityUsedWithTag(TagCollection, callback, once?
-        //entity.OnAbilityUsed(abilityName)
-        //entity.OnAbilityUsed<T>();
 
         public bool InterruptCast() { //todo add parameter for cast interrupter class 
             if (IsCasting) {
@@ -76,51 +71,69 @@ namespace AbilitySystem {
             return current != null;
         }
 
-        public void AddAbility(string abilityId) {
-            if (abilities.Get(abilityId) != null) return;
-            AbilityPrototype prototype = masterAbilityDatabase.Get(abilityId);
-            if (prototype == null) throw new AbilityNotFoundException(abilityId);
-            abilities.Add(abilityId, prototype.CreateAbility(entity));
-        }
-
-        public void RemoveAbility(string abilityId) {
-            abilities.Remove(abilityId);
-        }
-
-        public Ability GetAbility(string abilityId) {
-            return abilities.Get(abilityId);
-        }
-
         public bool IsCasting {
             get {
-              //  Ability ability = castQueue.current;
-                return true;// ability != null && ability.castState == CastState.Casting;
+                Ability ability = castQueue.current;
+                return ability != null && ability.IsCasting;
             }
         }
 
         public float ElapsedCastTime {
-            get { return 0; } // return (IsCasting) ? castQueue.current.ElapsedCastTime : 0; }
+            get { return (IsCasting) ? castQueue.current.ElapsedCastTime : 0; }
         }
 
         public float TotalCastTime {
-            get { return 0; } // (IsCasting) ? castQueue.current.TotalCastTime : 0f; }
+            get { return (IsCasting) ? castQueue.current.TotalCastTime : 0f; }
         }
 
-        private void LoadAbilities(string[] abilityIds) {
+        public float CastProgress {
+            get {
+                if (IsCasting) {
+                    return ElapsedCastTime / TotalCastTime;
+                }
+                return 0f;
+            }
+        }
+
+        //public void AddAbility(string abilityId) {
+        //    if (abilities.Get(abilityId) != null) return;
+        //    AbilityPrototype prototype = masterAbilityDatabase.Get(abilityId);
+        //    if (prototype == null) throw new AbilityNotFoundException(abilityId);
+        //    abilities.Add(abilityId, prototype.CreateAbility(entity));
+        //}
+
+        public bool HasAbility(string abilityName) {
+            for (int i = 0; i < abilities.Count; i++) {
+                if (abilities[i].name == abilityName) return true;
+            }
+            return false;
+        }
+
+        public Ability GetAbility(string abilityId) {
+            if(abilities == null) {
+                LoadAbilities();
+            }
+            for (int i = 0; i < abilities.Count; i++) {
+                if (abilities[i].name == abilityId) return abilities[i];
+            }
+            return null;
+        }
+
+        private void LoadAbilities() {
             LoadResources();
-            abilities = new Dictionary<string, Ability>();
-            if (abilityIds != null) {
-                for (int i = 0; i < abilityIds.Length; i++) {
-                    AbilityPrototype proto = null;
-                    string id = abilityIds[i];
-                    if (masterAbilityDatabase.TryGetValue(id, out proto)) {
-                        abilities[id] = proto.CreateAbility(entity);
-                    }
-                    else {
-                        throw new AbilityNotFoundException(id);
-                    }
-                    //todo apply any default or character modifiers that should go with this ability here
-                    //they are likely serialized somewhere else and will need to be loaded / created
+
+            abilityNames = abilityNames ?? new List<string>();
+            abilities = abilities ?? new List<Ability>();
+            entity = entity ?? GetComponent<Entity>();
+            for (int i = 0; i < abilityNames.Count; i++) {
+                if (string.IsNullOrEmpty(abilityNames[i])) continue;
+                if (GetAbility(abilityNames[i]) != null) continue;
+                AbilityPrototype proto = null;
+                if (masterAbilityDatabase.TryGetValue(abilityNames[i], out proto)) {
+                    abilities.Add(proto.CreateAbility(entity));
+                }
+                else {
+                    throw new AbilityNotFoundException(abilityNames[i]);
                 }
             }
         }

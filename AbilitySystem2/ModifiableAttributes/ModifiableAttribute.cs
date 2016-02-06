@@ -15,6 +15,9 @@ namespace AbilitySystem {
             baseValue = toClone.baseValue;
             methodPointer = new MethodPointer<T, float, float>(toClone.GetMethodPointer());
             value = toClone.value;
+            if(toClone.modifiers == null) {
+                toClone.modifiers = new List<AttributeModifier<T>>();
+            }
             modifiers = new List<AttributeModifier<T>>(toClone.modifiers.Count);
             for(int i = 0; i < modifiers.Count; i++) {
                 modifiers[i] = new AttributeModifier<T>(toClone.modifiers[i].id, toClone.modifiers[i]);

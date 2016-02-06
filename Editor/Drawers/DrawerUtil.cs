@@ -27,6 +27,18 @@ namespace AbilitySystem {
             return  formattedList.ToArray();
         }
 
+        public static string[] GetFloatFormulaOptions<T>(params Type[] parameters) where T : FormulaAttribute {
+            Array.Resize(ref parameters, parameters.Length + 1);
+            parameters[parameters.Length - 1] = typeof(float);
+            var pointerList = Reflector.FindMethodPointersWithAttribute<T>(typeof(float), parameters);
+            var formattedList = pointerList.Select((ptr) => {
+                return ptr.ToString();
+            }).ToList();
+
+            formattedList.Insert(0, "-- None --");
+            return formattedList.ToArray();
+        }
+
         public static int GetMatchingIndex(string signature, string[] options) {
             if (signature == null) return 0;
             for (int i = 1; i < options.Length; i++) {

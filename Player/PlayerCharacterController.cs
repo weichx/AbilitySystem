@@ -7,7 +7,6 @@ namespace AbilitySystem {
     public class PlayerCharacterController : MonoBehaviour {
 
         public float speed = 3f;
-
         private TrackballCamera characterCamera;
         private CharacterController controller;
         private Animator animator;
@@ -22,6 +21,7 @@ namespace AbilitySystem {
         }
 
         void Update() {
+
             state = GetMovementState();
 
             switch (state) {

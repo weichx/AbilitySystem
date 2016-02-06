@@ -4,19 +4,19 @@
         public Ability current;
         private Ability queued;
         private Timer gcdTimer;
-       // private Timer queuedExpire;
+        private Timer queuedExpire;
 
         public CastQueue() {
             gcdTimer = new Timer(); //todo gcd needs to be configurable
-          //  queuedExpire = new Timer(0.2f);
+            queuedExpire = new Timer(0.2f);
         }
 
         public Ability UpdateCast() {
             Ability retn = current;
 
-            //if (queuedExpire.ReadyWithReset(0.2f)) {
-            //    queued = null;
-            //}
+            if (queuedExpire.ReadyWithReset(0.2f)) {
+                queued = null;
+            }
 
             if (current == null) return null;
             
@@ -46,7 +46,7 @@
         }
 
         private float GetGlobalCooldownTime(Ability ability) {
-            float baseGCD = 1.5f; //todo replace with ability.caster.GetGlobalCooldown(); or similar
+            float baseGCD = ability.caster.abilityManager.baseGlobalCooldown;
             return baseGCD + ability.GetAttributeValue("GCDAdjustment");
         }
 

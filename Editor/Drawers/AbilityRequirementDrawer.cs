@@ -35,7 +35,7 @@ namespace AbilitySystem {
             var editorRect = new EditorRect(rect);
             editorRect.Width(12f);
             EditorGUI.LabelField(editorRect.Width(120), "Requirement Id");
-            EditorGUI.LabelField(editorRect.WidthMinus(100), "Requirement Prototype");
+            EditorGUI.LabelField(editorRect.WidthMinus(100), "Prototype");
             EditorGUI.LabelField(editorRect.currentRect, "Applies To");
         }
 

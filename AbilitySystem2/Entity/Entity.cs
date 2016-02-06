@@ -2,17 +2,6 @@
 
 namespace AbilitySystem {
 
-    public class EntityEditorExtensions {
-
-        public static bool Check(Entity entity) {
-            return entity.movedThisFrame;
-        }
-
-        public static bool Check2(Entity entity) {
-            return entity.showThing;
-        }
-    }
-
     [DisallowMultipleComponent]
     [RequireComponent(typeof(StatusManager))]
     [RequireComponent(typeof(AbilityManager))]
@@ -25,8 +14,6 @@ namespace AbilitySystem {
         [HideInInspector] public ResourceManager resourceManager;
 
         public float selectronHeight = 1f;
-
-        public bool showThing = true;
 
         public Faction faction;
         [SerializeField] protected Entity target;
@@ -75,6 +62,13 @@ namespace AbilitySystem {
             get { return tag == "Player"; }
         }
 
+        public bool IsCasting {
+            get { return abilityManager.IsCasting; }
+        }
+
+        //public bool IsChanneling {
+        //    get { return abilityManager.IsChanneling; }
+        //}
     }
 }
 //figure out how to use formulas nicely, ie assign in editor (prefab reference? scriptable object? reflection? nothing?)

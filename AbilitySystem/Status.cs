@@ -50,7 +50,7 @@ namespace AbilitySystem {
                 stacks++;
                 //OnStackAdded(); ??
             }
-            properties.Merge(newPropertySet);
+           // properties.Merge(newPropertySet);
             durationTimer.Reset(); //todo to what value?
         }
 

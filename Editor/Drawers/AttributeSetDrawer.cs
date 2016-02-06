@@ -6,7 +6,7 @@ using UnityEditorInternal;
 using System;
 
 namespace AbilitySystem {
-    
+
     [CustomPropertyDrawer(typeof(AbilityAttributeSet), true)]
     public class AttributeSetDrawer : ReorderableDrawer {
         private string[] attributeFormulaOptions;
@@ -25,7 +25,7 @@ namespace AbilitySystem {
 
             var idRect = rect.Width(120f);
             prop.Set("id", EditorGUI.TextField(idRect, prop.Get<string>("id")));
-            
+
             var methodPointer = prop.Property("serializedMethodPointer");
             string[] options = GetOptions(property);
 
@@ -34,9 +34,10 @@ namespace AbilitySystem {
 
             int idx = EditorGUI.Popup(rect.WidthMinus(50), currentIndex, options);
             if (currentIndex != idx) {
-                if(idx == 0) {
+                if (idx == 0) {
                     methodPointer.Set("signature", "");
-                } else {
+                }
+                else {
                     methodPointer.Set("signature", attributeFormulaOptions[idx].ToString());
                 }
             }
@@ -66,12 +67,15 @@ namespace AbilitySystem {
                 position = new Rect(position) { y = position.y + EditorGUIUtility.singleLineHeight };
 
                 property = inputProperty.FindPropertyRelative("attrs");
-                GetOptions(inputProperty);
+                if (property.arraySize > 0) {
+                    GetOptions(property.GetArrayElementAtIndex(0));
+                }
                 var list = GetList(property);
                 var height = 0f;
                 for (var i = 0; i < property.arraySize; i++) {
                     height = Mathf.Max(height, EditorGUI.GetPropertyHeight(property.GetArrayElementAtIndex(i)));
                 }
+
                 list.elementHeight = height;
                 list.DoList(position);
             }
@@ -79,15 +83,15 @@ namespace AbilitySystem {
 
         private string[] GetOptions(SerializedProperty inputProperty) {
             if (attributeFormulaOptions != null) return attributeFormulaOptions;
-            attributeFormulaOptions = DrawerUtil.GetFloatFormulaOptions<FormulaAttribute>(inputProperty);
+            attributeFormulaOptions = DrawerUtil.GetFloatFormulaOptions<FormulaAttribute>(typeof(Ability));
             return attributeFormulaOptions;
         }
 
         public override float GetPropertyHeight(SerializedProperty property, GUIContent label) {
-            if(!expanded) return EditorGUIUtility.singleLineHeight;
+            if (!expanded) return EditorGUIUtility.singleLineHeight;
             return GetList(property.FindPropertyRelative("attrs")).GetHeight() + EditorGUIUtility.singleLineHeight;
         }
-        
+
     }
 
 

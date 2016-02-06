@@ -17,8 +17,8 @@ namespace AbilitySystem {
         }
 
         [Formula]
-        public static float Formula3(Ability entity, float baseValue) {
-            return baseValue * 3f;
+        public static float Cooldown(Ability entity, float baseValue) {
+            return UnityEngine.Mathf.Sin(UnityEngine.Time.time);
         }
 
     }

@@ -4,7 +4,8 @@ using UnityEngine;
 
 namespace AbilitySystem {
 
-    [Serializable]
+    //[Serializable] serializing this causes problems with constructors not being called right
+    //fail :( will need to figure this out soon
     public class Ability {
 
         public readonly string name;
@@ -20,6 +21,7 @@ namespace AbilitySystem {
         public readonly AbilityAttribute chargeUseCooldown;
 
         public readonly List<AbilityRequirement> requirements;
+        protected PropertySet properties;
 
         public bool IgnoreGCD;
 
@@ -46,16 +48,26 @@ namespace AbilitySystem {
             UpdateAttributes();         
         }
 
-        public void Use() {
+        public bool Use() {
+            if(!CheckRequirements(RequirementType.CastStart)) {
+                return false;
+            }
+            properties = new PropertySet();
             castState = CastState.Targeting;
-            prototype.OnUse(this, caster);
-            prototype.OnTargetSelectionStarted(this, caster);
+            prototype.OnUse(this, properties);
+            prototype.OnTargetSelectionStarted(this, properties);
             Update();
+            return true;
         }
 
         public void UpdateAttributes() {
             attributes.UpdateAll(this);
-            SetChargeCount((int)charges.UpdateValue(this));
+            if (charges != null) {
+                SetChargeCount((int)charges.UpdateValue(this));
+            }
+            else {
+                Debug.Log(caster.name + " NULL :(");
+            }
         }
 
         public void SetChargeCount(int chargeCount) {
@@ -112,16 +124,24 @@ namespace AbilitySystem {
 
         public void CancelCast() {
             castState = CastState.Invalid;
-            prototype.OnCastCancelled(this, caster);
+            prototype.OnCastCancelled(this, properties);
         }
 
         public void InterruptCast() {
             castState = CastState.Invalid;
-            prototype.OnCastInterrupted(this, caster);
+            prototype.OnCastInterrupted(this, properties);
+        }
+
+        public bool IsCasting {
+            get { return castState == CastState.Casting; }
         }
 
         public float ElapsedCastTime {
             get { return castState == CastState.Casting ? castTimer.ElapsedTime : 0f; }
+        }
+
+        public float TotalCastTime {
+            get { return castTime.CachedValue; }
         }
 
         public bool IsInstant {
@@ -132,9 +152,9 @@ namespace AbilitySystem {
         public CastState Update() {
             CastMode actualCastMode = castMode;
             if (castState == CastState.Targeting) {
-                if (prototype.OnTargetSelectionUpdated(this, caster)) {
-                    prototype.OnTargetSelectionCompleted(this, caster);
-                    prototype.OnCastStarted(this, caster);
+                if (prototype.OnTargetSelectionUpdated(this, properties)) {
+                    prototype.OnTargetSelectionCompleted(this, properties);
+                    prototype.OnCastStarted(this, properties);
                     float actualCastTime = castTime.UpdateValue(this);
                     castTimer.Reset(actualCastTime);
                     castState = CastState.Casting;
@@ -165,7 +185,7 @@ namespace AbilitySystem {
 
             if (castState == CastState.Completed) {
                 if (CheckRequirements(RequirementType.CastComplete)) {
-                    prototype.OnCastCompleted(this, caster);
+                    prototype.OnCastCompleted(this, properties);
                     ConsumeCharge();
                     castState = CastState.Invalid;
                     return CastState.Completed;
@@ -178,10 +198,11 @@ namespace AbilitySystem {
         }
 
         protected void ConsumeCharge() {
+            properties = new PropertySet();
             float cd = cooldown.UpdateValue(this);
             for (int i = 0; i < chargeTimers.Count; i++) {
                 if (chargeTimers[i].ReadyWithReset(cd)) {
-                    prototype.OnChargeConsumed(this, caster);
+                    prototype.OnChargeConsumed(this, properties);
                     return;
                 }
             }
