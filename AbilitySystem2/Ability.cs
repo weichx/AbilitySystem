@@ -25,9 +25,12 @@ namespace AbilitySystem {
 
         public bool IgnoreGCD;
 
-        [SerializeField] protected Timer castTimer;
-        [SerializeField] protected CastState castState;
-        [SerializeField] protected AbilityAttributeSet attributes;
+        [SerializeField]
+        protected Timer castTimer;
+        [SerializeField]
+        protected CastState castState;
+        [SerializeField]
+        protected AbilityAttributeSet attributes;
 
         protected List<Timer> chargeTimers;
 
@@ -45,11 +48,11 @@ namespace AbilitySystem {
             tags = new TagCollection(prototype.tags);
             requirements = prototype.requirementSet.CloneToList();
             chargeTimers = new List<Timer>();
-            UpdateAttributes();         
+            UpdateAttributes();
         }
 
         public bool Use() {
-            if(!CheckRequirements(RequirementType.CastStart)) {
+            if (!CheckRequirements(RequirementType.CastStart)) {
                 return false;
             }
             properties = new PropertySet();
@@ -75,7 +78,7 @@ namespace AbilitySystem {
             if (chargeCount == oldChargeCount) return;
             if (chargeCount > oldChargeCount) {
                 float value = cooldown.CachedValue;
-                if(value <= 0) {
+                if (value <= 0) {
                     value = 0.0001f;
                 }
                 for (int i = oldChargeCount; i < chargeCount; i++) {
@@ -93,6 +96,19 @@ namespace AbilitySystem {
                 if (chargeTimers[i].Ready) available++;
             }
             return available;
+        }
+
+        public float NextChargeReadyTime() {
+            float time = float.MaxValue;
+            for (int i = 0; i < chargeTimers.Count; i++) {
+                if (chargeTimers[i].Ready) {
+                    return 0;
+                }
+                else if (chargeTimers[i].TimeToReady < time) {
+                    time = chargeTimers[i].TimeToReady;
+                }
+            }
+            return time;
         }
 
         ///<summary>
@@ -132,6 +148,16 @@ namespace AbilitySystem {
             prototype.OnCastInterrupted(this, properties);
         }
 
+        public bool OnCooldown {
+            get { return charges.CachedValue > 0 && AvailableCharges() == 0; }
+        }
+
+        public float RemainingCooldown {
+            get {
+                if (!OnCooldown) return 0;
+                return NextChargeReadyTime();
+            }
+        }
         public bool IsCasting {
             get { return castState == CastState.Casting; }
         }

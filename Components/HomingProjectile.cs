@@ -6,7 +6,7 @@ using AbilitySystem;
 public class HomingProjectile : AbilityInitializer {
 
     public float speed;
-    public float baseCollisionRange;
+    public float collisionRange;
     public Transform target;
     
     public override void Initialize(Ability ability, PropertySet properties) {
@@ -18,7 +18,10 @@ public class HomingProjectile : AbilityInitializer {
             }
         }
         speed = ability.GetAttributeValue("Projectile Speed");
-        baseCollisionRange = ability.GetAttributeValue("Collision Range");
+        AbilityAttribute collisionRangeAttr = ability.GetAttribute("Collision Range");
+        if(collisionRangeAttr != null) {
+            collisionRange = collisionRangeAttr.CachedValue;
+        }
     }
 
     public void Update() {
@@ -27,8 +30,12 @@ public class HomingProjectile : AbilityInitializer {
         transform.LookAt(target);
         transform.position += movement;
         float distSqr = transform.DistanceToSquared(target);
-        if(distSqr <= baseCollisionRange * baseCollisionRange) {
-            Debug.Log("HIT");
+        if(distSqr <= collisionRange * collisionRange) {
+            target = null;
+            var evtManager = GetComponent<EventManager>();
+            if (evtManager != null) {
+                evtManager.QueueEvent(new AbilityHitEvent());
+            }
         }
     }
 }

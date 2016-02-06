@@ -3,7 +3,7 @@
 public class DestroyAfterDelay : MonoBehaviour {
 
     public float delay;
-    public GameObject obj;
+    public GameObject toDestroy;
 
     private Timer timer;
 
@@ -13,8 +13,8 @@ public class DestroyAfterDelay : MonoBehaviour {
 
     void Update() {
         if(timer.Ready) {
-            if (obj == null) obj = gameObject;
-            Destroy(obj);
+            if (toDestroy == null) toDestroy = gameObject;
+            Destroy(toDestroy);
         }
     }
 }

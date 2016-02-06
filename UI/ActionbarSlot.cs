@@ -9,8 +9,9 @@ public class ActionbarSlot : UISlotBase {
     public string abilityId;
     public KeyCode keyBind;
 
-    private UISlotCooldown m_Cooldown;
+    private Image cooldownImage;
     private Text keybindText;
+    private Text cooldownText;
 
     [NonSerialized]
     public Ability ability;
@@ -24,6 +25,8 @@ public class ActionbarSlot : UISlotBase {
             hoverTargetGraphic = transform.Find("Hover").GetComponent<Image>();
         }
         base.Start();
+        cooldownImage = transform.Find("Cooldown").GetComponent<Image>();
+        cooldownText = transform.Find("CooldownText").GetComponent<Text>();
         keybindText = transform.Find("KeybindText").GetComponent<Text>();
         SetKeybind(keyBind);
     }
@@ -32,7 +35,9 @@ public class ActionbarSlot : UISlotBase {
         keybindText.text = KeyCodeToString(key);
     }
 
-    
+    public void Update() {
+        DoCooldown();
+    }
 
     public void SetAbility(Ability ability) {
         this.ability = ability;
@@ -42,6 +47,19 @@ public class ActionbarSlot : UISlotBase {
         else {
             abilityId = ability.name;
             SetIcon(ability.prototype.icon);
+        }
+    }
+
+    public void DoCooldown() { //todo do global cd
+        if(ability != null && ability.OnCooldown) {
+            cooldownImage.enabled = true;
+            float remaining = ability.RemainingCooldown;
+            cooldownImage.fillAmount = ability.RemainingCooldown / ability.cooldown.CachedValue;
+            cooldownText.text = ability.RemainingCooldown.ToString("0.0");
+        }
+        else {
+            cooldownImage.enabled = false;
+            cooldownText.text = "";
         }
     }
 

@@ -33,6 +33,20 @@
         get { return timeout >= 0f && TotalElapsedTime - startTime > timeout; }
     }
 
+    public float CompletedPercent {
+        get {
+            if (timeout <= 0) return 0;
+            return UnityEngine.Mathf.Clamp((TotalElapsedTime - startTime) / timeout, 0, float.MaxValue);
+        }
+    }
+
+    public float TimeToReady {
+        get {
+            if (timeout <= 0) return 0;
+            return timeout - (TotalElapsedTime - startTime);
+        }
+    }
+
     public float Timeout {
         get { return timeout; }
         set { timeout = value; }

@@ -6,17 +6,18 @@ namespace AbilitySystem {
     [RequireComponent(typeof(StatusManager))]
     [RequireComponent(typeof(AbilityManager))]
     [RequireComponent(typeof(ResourceManager))]
+    [RequireComponent(typeof(TargetManager))]
     public class Entity : MonoBehaviour {
 
         [HideInInspector] public StatusManager statusManager;
         [HideInInspector] public EventManager eventManager;
         [HideInInspector] public AbilityManager abilityManager;
         [HideInInspector] public ResourceManager resourceManager;
+        [HideInInspector] public TargetManager targetManager;
 
         public float selectronHeight = 1f;
 
         public Faction faction;
-        [SerializeField] protected Entity target;
 
         public bool movedThisFrame;
         private Vector3 lastPosition;
@@ -30,16 +31,12 @@ namespace AbilitySystem {
             statusManager = GetComponent<StatusManager>();
             abilityManager = GetComponent<AbilityManager>();
             resourceManager = GetComponent<ResourceManager>();
+            targetManager = GetComponent<TargetManager>();
         }
 
         public Entity Target {
-            get { return target; }
-            set { SetTarget(value); }
-        }
-
-        public void SetTarget(Entity target) {
-            this.target = target;
-            //emit events etc
+            get { return targetManager.currentTarget; }
+            set { targetManager.SetTarget(value); }
         }
 
         public Vector3 CollisionPoint {

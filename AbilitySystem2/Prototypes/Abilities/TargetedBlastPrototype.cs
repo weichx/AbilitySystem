@@ -2,16 +2,14 @@
 
 namespace AbilitySystem {
 
-    //todo enforce these attributes
-    [RequireAbilityAttr("Projectile Speed")]
-    public class SingleTargetAbilityPrototype : AbilityPrototype {
+    public class TargetedBlastPrototype : AbilityPrototype {
 
-        public GameObject projectile;
+        public GameObject spell;
 
         public override void OnTargetSelectionStarted(Ability ability, PropertySet properties) {
             Entity caster = ability.caster;
             Entity target = caster.Target;
-            if(target == null) {
+            if (target == null) {
                 ability.CancelCast();
                 return;
             }
@@ -19,8 +17,10 @@ namespace AbilitySystem {
         }
 
         public override void OnCastCompleted(Ability ability, PropertySet properties) {
-            Transform transform = ability.caster.transform;
-            GameObject gameObject = Instantiate(projectile, transform.position, transform.rotation) as GameObject;
+            Transform transform = properties.Get<Entity>("Target").transform;
+            Vector3 toTarget = ability.caster.transform.position.DirectionTo(transform.position);
+            Vector3 blastPosition = transform.position - toTarget.normalized;
+            GameObject gameObject = Instantiate(spell, blastPosition, Quaternion.identity) as GameObject;
             AbilityInitializer initializer = gameObject.GetComponent<AbilityInitializer>();
             if (initializer != null) {
                 initializer.Initialize(ability, properties);

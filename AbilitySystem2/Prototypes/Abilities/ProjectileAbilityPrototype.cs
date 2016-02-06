@@ -9,9 +9,8 @@ namespace AbilitySystem {
         public override void OnCastCompleted(Ability ability, PropertySet properties) {
             Entity caster = ability.caster;
             GameObject obj = Instantiate(projectile, caster.transform.position, caster.transform.rotation) as GameObject;
-            var proj = obj.GetComponent<Projectile>();
+            var proj = obj.GetComponent<HomingProjectile>();
             proj.speed = ability.GetAttribute("ProjectileSpeed").UpdateValue(ability);
-            ability.GetAttribute("ProjectileSpeed").AddModifier(new AttributeModifier<Ability>("ProjectileSpeedBonus", 2));
         }
     }
 }

@@ -67,7 +67,7 @@ namespace AbilitySystem {
         }
 
         public bool MeetsRequirement(Ability ability, RequirementType type) {
-            if (supressed || (type & appliesTo) != 0) return true;
+            if (prototype == null || supressed || (type & appliesTo) != 0) return true;
 
             bool requirementMet = prototype.MeetsRequirement(ability);
 
