@@ -15,8 +15,10 @@ public class ActionbarSlot : UISlotBase {
 
     [NonSerialized]
     public Ability ability;
+    public AbilityManager abilityManager;
 
     protected override void Start() {
+        abilityManager = PlayerManager.playerEntity.GetComponent<AbilityManager>();    
         if (iconGraphic == null) {
             Transform iconTransform = transform.Find("Icon");
             iconGraphic = iconTransform.GetComponent<Image>();
@@ -50,17 +52,29 @@ public class ActionbarSlot : UISlotBase {
         }
     }
 
-    public void DoCooldown() { //todo do global cd
-        if(ability != null && ability.OnCooldown) {
-            cooldownImage.enabled = true;
-            float remaining = ability.RemainingCooldown;
-            cooldownImage.fillAmount = ability.RemainingCooldown / ability.cooldown.CachedValue;
-            cooldownText.text = ability.RemainingCooldown.ToString("0.0");
+    public void DoCooldown() { 
+        if(ability == null) {
+            if (cooldownImage != null) cooldownImage.enabled = false;
+            if (cooldownText != null) cooldownText.text = "";
         }
         else {
-            cooldownImage.enabled = false;
-            cooldownText.text = "";
+            if (ability.OnCooldown) {
+                cooldownImage.enabled = true;
+                float remaining = ability.RemainingCooldown;
+                cooldownImage.fillAmount = ability.RemainingCooldown / ability.cooldown.CachedValue;
+                cooldownText.text = ability.RemainingCooldown.ToString("0.0");
+            }
+            else if (abilityManager.OnGlobalCooldown) {
+                cooldownImage.enabled = true;
+                cooldownImage.fillAmount = abilityManager.RemainingGCDTime;
+            }
+            else {
+                cooldownImage.enabled = false;
+                cooldownText.text = "";
+            }
         }
+
+       
     }
 
     public void SetAbility(string abilityId) {

@@ -41,7 +41,12 @@ namespace AbilitySystem {
 
         protected override void OnItemAdded(ReorderableList list) {
             var prop = AddItemToList(list);
-            prop.FindPropertyRelative("id").stringValue = "Requirement " + list.index;
+            string name = "Requirement " + list.index;
+            var proto = prop.FindPropertyRelative("prototype");
+            if(proto != null && proto.objectReferenceValue != null) {
+                name = proto.objectReferenceValue.name;
+            }
+            prop.FindPropertyRelative("id").stringValue = name;
         }
     }
 }

@@ -18,6 +18,14 @@ public class PCInputManager {
         get { return Input.GetKey(KeyCode.Q) || Input.GetKey(KeyCode.E); }
     }
 
+    public static bool StrafingLeft {
+        get { return Input.GetKey(KeyCode.Q); }
+    }
+
+    public static bool StrafingRight {
+        get { return Input.GetKey(KeyCode.E); }
+    }
+
     public static bool ForwardStrafing {
         get { return Strafing && Forward; }
     }

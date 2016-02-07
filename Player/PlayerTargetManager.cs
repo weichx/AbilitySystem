@@ -16,6 +16,10 @@ namespace AbilitySystem {
                 SetTarget(null);
             }
 
+            if(Input.GetKeyDown(KeyCode.Tab)) {
+                
+            }
+
             if (!Input.GetMouseButtonDown(0)) return;
             RaycastHit hit;
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);

@@ -14,9 +14,9 @@
         startTime = TotalElapsedTime;
     }
 
-    public bool ReadyWithReset(float timeout) {
+    public bool ReadyWithReset(float resetTimeout = -1) {
         if (Ready) {
-            Reset(timeout);
+            Reset((resetTimeout >= 0) ? resetTimeout : timeout);
             return true;
         }
         else {

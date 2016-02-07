@@ -3,13 +3,13 @@ using AbilitySystem;
 
 [RequireAbilityAttr("Projectile Speed")]
 [RequireAbilityAttr("Collision Range")]
-public class HomingProjectile : AbilityInitializer {
+public class HomingProjectile : MonoBehaviour, IAbilityInitializer {
 
     public float speed;
     public float collisionRange;
     public Transform target;
     
-    public override void Initialize(Ability ability, PropertySet properties) {
+    public virtual void Initialize(Ability ability, PropertySet properties) {
         target = properties.Get<Transform>("Target");
         if(target == null) {
             var targetEntity = properties.Get<Entity>("Target");
