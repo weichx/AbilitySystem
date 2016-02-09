@@ -18,8 +18,10 @@ namespace AbilitySystem {
         public List<string> abilityNames;
         public List<SpellSlotAssignment> slotAssignments;
 
-        [HideInInspector] public List<Ability> abilities;
-        [HideInInspector] public Entity entity;
+        [HideInInspector]
+        public List<Ability> abilities;
+        [HideInInspector]
+        public Entity entity;
 
         protected Timer gcdTimer;
         protected CastQueue castQueue;
@@ -48,7 +50,7 @@ namespace AbilitySystem {
 
         public void Update() {
             //todo maybe only do this ever ~10 frames
-            for(int i = 0; i < abilities.Count; i++) {
+            for (int i = 0; i < abilities.Count; i++) {
                 abilities[i].UpdateAttributes();
             }
             castQueue.UpdateCast();
@@ -120,9 +122,8 @@ namespace AbilitySystem {
             }
             return false;
         }
-
         public Ability GetAbility(string abilityId) {
-            if(abilities == null) {
+            if (!abilitiesLoaded) {
                 LoadAbilities();
             }
             for (int i = 0; i < abilities.Count; i++) {
@@ -131,18 +132,20 @@ namespace AbilitySystem {
             return null;
         }
 
+        private bool abilitiesLoaded = false;
         private void LoadAbilities() {
             LoadResources();
-
+            abilitiesLoaded = true;
             abilityNames = abilityNames ?? new List<string>();
             abilities = abilities ?? new List<Ability>();
             entity = entity ?? GetComponent<Entity>();
             for (int i = 0; i < abilityNames.Count; i++) {
                 if (string.IsNullOrEmpty(abilityNames[i])) continue;
                 if (GetAbility(abilityNames[i]) != null) continue;
-                AbilityPrototype proto = null;
+                Ability proto = null;
                 if (masterAbilityDatabase.TryGetValue(abilityNames[i], out proto)) {
-                    abilities.Add(proto.CreateAbility(entity));
+                    var check = proto.CreateAbility(entity);
+                    abilities.Add(check);
                 }
                 else {
                     throw new AbilityNotFoundException(abilityNames[i]);
@@ -150,11 +153,11 @@ namespace AbilitySystem {
             }
         }
 
-        private static Dictionary<string, AbilityPrototype> masterAbilityDatabase;
+        private static Dictionary<string, Ability> masterAbilityDatabase;
         private static void LoadResources() {
             if (masterAbilityDatabase != null) return;
-            masterAbilityDatabase = new Dictionary<string, AbilityPrototype>();
-            AbilityPrototype[] prototypes = Resources.LoadAll<AbilityPrototype>("Abilities");
+            masterAbilityDatabase = new Dictionary<string, Ability>();
+            Ability[] prototypes = Resources.LoadAll<Ability>("Abilities");
             for (int i = 0; i < prototypes.Length; i++) {
                 masterAbilityDatabase[prototypes[i].name] = prototypes[i];
             }

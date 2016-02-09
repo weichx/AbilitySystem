@@ -6,50 +6,47 @@ namespace AbilitySystem {
 
     //[Serializable] serializing this causes problems with constructors not being called right
     //fail :( will need to figure this out soon
-    public class Ability {
+    public class Ability : AbilityPrototype {
+        public Sprite icon;
+        public CastMode castMode;
 
-        public readonly string name;
-        public readonly Entity caster;
-        public readonly CastMode castMode;
-        public readonly TagCollection tags;
-        public readonly AbilityPrototype prototype;
+        [Visible("ShowIgnoreGCD")] public bool IgnoreGCD;
 
-        public readonly AbilityAttribute cooldown;
-        public readonly AbilityAttribute castTime;
-        public readonly AbilityAttribute channelTime;
-        public readonly AbilityAttribute channelTicks;
-        public readonly AbilityAttribute charges;
-        public readonly AbilityAttribute chargeUseCD;
+        [Space()]
+        [Visible("ShowCastTime")] public AbilityAttribute castTime;
+        [Visible("ShowChannelTime")] public AbilityAttribute channelTime;
+        [Visible("ShowChannelTime")] public AbilityAttribute channelTicks;
+        public AbilityAttribute cooldown;
+        public AbilityAttribute charges;
+        //public AbilityAttribute chargeUseCooldown;
 
-        public readonly List<AbilityRequirement> requirements;
+        [Space()]
+        public TagCollection tags;
+        public AbilityRequirementSet requirementSet;
+        public AbilityAttributeSet attributes;
 
-        public bool IgnoreGCD;
+        [HideInInspector] public Entity caster;
 
         protected Timer castTimer;
         protected Timer channelTimer;
         protected CastState castState;
 
-        protected AbilityAttributeSet attributes;
         protected PropertySet properties;
         protected List<Timer> chargeTimers;
 
-        public Ability(Entity caster, AbilityPrototype prototype) {
-            this.caster = caster;
-            this.prototype = prototype;
-            name = prototype.name;
-            castMode = prototype.castMode;
-            ClonePrototypeAttributes();
+        void OnEnable() {
             castTimer = new Timer();
             channelTimer = new Timer();
-            castTime = new AbilityAttribute("CastTime", prototype.castTime);
-            channelTime = new AbilityAttribute("ChannelTime", prototype.channelTime);
-            channelTicks = new AbilityAttribute("ChannelTicks", prototype.channelTicks);
-            cooldown = new AbilityAttribute("Cooldown", prototype.cooldown);
-            charges = new AbilityAttribute("Charges", prototype.charges);
-            tags = new TagCollection(prototype.tags);
-            requirements = prototype.requirementSet.CloneToList();
+            //requirements = .requirementSet.CloneToList();
             chargeTimers = new List<Timer>();
             UpdateAttributes();
+        }
+
+        public virtual Ability CreateAbility(Entity caster) {
+            var retn = Instantiate(this);
+            retn.caster = caster;
+            retn.name = name;
+            return retn;
         }
 
         public bool Use() {
@@ -58,9 +55,8 @@ namespace AbilitySystem {
             }
             properties = new PropertySet();
             castState = CastState.Targeting;
-            prototype.OnUse(this, properties);
-            prototype.OnTargetSelectionStarted(this, properties);
-          //  Update();
+            OnUse(this, properties);
+            OnTargetSelectionStarted(properties);
             return true;
         }
 
@@ -137,19 +133,19 @@ namespace AbilitySystem {
         }
 
         public void CancelCast() {
-            if(castState == CastState.Targeting) {
-                prototype.OnTargetSelectionCancelled(this, properties);
+            if (castState == CastState.Targeting) {
+                OnTargetSelectionCancelled(properties);
             }
             castState = CastState.Invalid;
-            prototype.OnCastCancelled(this, properties);
+            OnCastCancelled(properties);
         }
 
         public void InterruptCast() {
             if (castState == CastState.Targeting) {
-                prototype.OnTargetSelectionCancelled(this, properties);
+                OnTargetSelectionCancelled(properties);
             }
             castState = CastState.Invalid;
-            prototype.OnCastInterrupted(this, properties);
+            OnCastInterrupted(properties);
         }
 
         public bool OnCooldown {
@@ -176,13 +172,13 @@ namespace AbilitySystem {
 
         public float TotalCastTime {
             get {
-                if(IsCasting) {
+                if (IsCasting) {
                     return castTimer.Timeout;
                 }
-                else if(castMode == CastMode.Channel) {
+                else if (castMode == CastMode.Channel) {
                     return channelTicks.CachedValue;
                 }
-                else if(castMode == CastMode.Cast) {
+                else if (castMode == CastMode.Cast) {
                     return castTime.CachedValue;
                 }
                 else {
@@ -199,8 +195,8 @@ namespace AbilitySystem {
         public CastState Update() {
             CastMode actualCastMode = castMode;
             if (castState == CastState.Targeting) {
-                if (prototype.OnTargetSelectionUpdated(this, properties)) {
-                    if(castMode == CastMode.Channel) {
+                if (OnTargetSelectionUpdated(properties)) {
+                    if (castMode == CastMode.Channel) {
                         float actualChannelTime = channelTime.UpdateValue(this);
                         castTimer.Reset(actualChannelTime);
                         channelTimer.Reset(actualChannelTime / channelTicks.UpdateValue(this));
@@ -210,8 +206,8 @@ namespace AbilitySystem {
                         castTimer.Reset(actualCastTime);
                         actualCastMode = (actualCastTime <= 0f) ? CastMode.Instant : castMode;
                     }
-                    prototype.OnTargetSelectionCompleted(this, properties);
-                    prototype.OnCastStarted(this, properties);
+                    OnTargetSelectionCompleted(properties);
+                    OnCastStarted(properties);
                     castState = CastState.Casting;
                 }
             }
@@ -231,7 +227,7 @@ namespace AbilitySystem {
                     case CastMode.Channel:
                         if (castTimer.Ready || channelTimer.ReadyWithReset()) {
                             Debug.Log("Tick: " + castTimer.ElapsedTime);
-                            prototype.OnChannelTick(this, properties);
+                            OnChannelTick(properties);
                         }
                         castState = castTimer.Ready ? CastState.Completed : CastState.Casting;
                         break;
@@ -242,7 +238,7 @@ namespace AbilitySystem {
 
             if (castState == CastState.Completed) {
                 if (CheckRequirements(RequirementType.CastComplete)) {
-                    prototype.OnCastCompleted(this, properties);
+                    OnCastCompleted(properties);
                     ConsumeCharge();
                     castState = CastState.Invalid;
                     return CastState.Completed;
@@ -259,13 +255,14 @@ namespace AbilitySystem {
             float cd = cooldown.UpdateValue(this);
             for (int i = 0; i < chargeTimers.Count; i++) {
                 if (chargeTimers[i].ReadyWithReset(cd)) {
-                    prototype.OnChargeConsumed(this, properties);
+                    OnChargeConsumed(properties);
                     return;
                 }
             }
         }
 
         protected bool CheckRequirements(RequirementType requirementType) {
+            List<AbilityRequirement> requirements = requirementSet.requirements;
             for (int i = 0; i < requirements.Count; i++) {
                 if (!requirements[i].MeetsRequirement(this, requirementType)) {
                     return false;
@@ -304,17 +301,16 @@ namespace AbilitySystem {
             return attr.CachedValue;
         }
 
-        protected void ClonePrototypeAttributes() {
-            if (prototype.attributeSet == null) {
-                attributes = new AbilityAttributeSet();
-            }
-            else {
-                attributes = new AbilityAttributeSet();
-                for (int i = 0; i < prototype.attributeSet.Count; i++) {
-                    var toClone = prototype.attributeSet.attrs[i];
-                    attributes.attrs.Add(new AbilityAttribute(toClone.id, toClone));
-                }
-            }
+        public static bool ShowCastTime(Ability ability) {
+            return ability.castMode == CastMode.Cast || ability.castMode == CastMode.CastToChannel;
+        }
+
+        public static bool ShowChannelTime(Ability ability) {
+            return ability.castMode == CastMode.Channel || ability.castMode == CastMode.CastToChannel;
+        }
+
+        public static bool ShowIgnoreGCD(Ability ability) {
+            return ability.castMode == CastMode.Instant;
         }
     }
 }

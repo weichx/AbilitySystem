@@ -2,36 +2,35 @@
 
 namespace AbilitySystem {
 
-    public class TargetedChannelAbilityPrototype : AbilityPrototype {
+    public class TargetedChannelAbilityPrototype : Ability {
 
         public GameObject spell;
 
-        public override void OnTargetSelectionStarted(Ability ability, PropertySet properties) {
-            Entity caster = ability.caster;
+        public override void OnTargetSelectionStarted(PropertySet properties) {
             Entity target = caster.Target;
             if (target == null) {
-                ability.CancelCast();
+                CancelCast();
                 return;
             }
             properties.Set("Target", target);
         }
 
-        public override void OnCastStarted(Ability ability, PropertySet properties) {
+        public override void OnCastStarted(PropertySet properties) {
             Transform transform = properties.Get<Entity>("Target").transform;
-            GameObject gameObject = Instantiate(spell, ability.caster.transform.position, Quaternion.identity) as GameObject;
+            GameObject gameObject = Instantiate(spell, caster.transform.position, Quaternion.identity) as GameObject;
             properties.Set("SpellInstanceGameObject", gameObject);
             IAbilityInitializer initializer = gameObject.GetComponent<IAbilityInitializer>();
             if (initializer != null) {
-                initializer.Initialize(ability, properties);
+                initializer.Initialize(this, properties);
             }
         }
 
-        public override void OnCastCancelled(Ability ability, PropertySet properties) {
-            base.OnCastCancelled(ability, properties);
+        public override void OnCastCancelled(PropertySet properties) {
+            base.OnCastCancelled(properties);
         }
 
-        public override void OnCastCompleted(Ability ability, PropertySet properties) {
-            DestroySpell(ability, properties);
+        public override void OnCastCompleted(PropertySet properties) {
+            DestroySpell(this, properties);
         }
 
         public void DestroySpell(Ability ability, PropertySet properties) {

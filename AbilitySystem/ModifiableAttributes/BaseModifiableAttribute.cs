@@ -13,6 +13,7 @@ namespace AbilitySystem {
 
         [SerializeField] protected float baseValue;
         [SerializeField] protected MethodPointer serializedMethodPointer;
+        [SerializeField] protected List<AttributeModifier> serializedModifiers;
 
         public AbstractModifiableAttribute() {
             value = 0f;
@@ -52,12 +53,19 @@ namespace AbilitySystem {
         //    modifiers.Clear();
         //}
 
-        public void OnBeforeSerialize() { }
+        public void OnBeforeSerialize() {
+            //todo serialize modifiers
+        }
 
         public void OnAfterDeserialize() {
             CreateTypedMethodPointer();
+            if(serializedModifiers == null) {
+                serializedModifiers = new List<AttributeModifier>();
+            }
+            DeserializeModifiers();
         }
 
+        protected abstract void DeserializeModifiers();
         protected abstract void CreateTypedMethodPointer();
     }
 }

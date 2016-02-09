@@ -8,7 +8,7 @@ namespace AbilitySystem {
     public class ModifiableAttribute<T> : AbstractModifiableAttribute {
 
         protected MethodPointer<T, float, float> methodPointer;
-        [SerializeField] protected List<AttributeModifier<T>> modifiers; 
+        [SerializeField] protected List<AttributeModifier<T>> modifiers = new List<AttributeModifier<T>>(); 
 
         public ModifiableAttribute(string id, ModifiableAttribute<T> toClone) {
             this.id = id;
@@ -70,6 +70,12 @@ namespace AbilitySystem {
             }
         }
 
+        protected override void DeserializeModifiers() {
+            if (modifiers == null) modifiers = new List<AttributeModifier<T>>();
+            for (int i = 0; i < serializedModifiers.Count;i++) {
+                modifiers.Add(new AttributeModifier<T>(serializedModifiers[i]));
+            }
+        }
     }
 
     [Serializable]
@@ -129,6 +135,13 @@ namespace AbilitySystem {
                 methodPointer = new MethodPointer<T, U, float, float>(serializedMethodPointer);
             }
         }
+
+        protected override void DeserializeModifiers() {
+            if (modifiers == null) modifiers = new List<AttributeModifier<T, U>>();
+            for (int i = 0; i < serializedModifiers.Count; i++) {
+                modifiers.Add(new AttributeModifier<T, U>(serializedModifiers[i]));
+            }
+        }
     }
 
     [Serializable]
@@ -186,6 +199,13 @@ namespace AbilitySystem {
         protected override void CreateTypedMethodPointer() {
             if (methodPointer == null) {
                 methodPointer = new MethodPointer<T, U, V, float, float>(serializedMethodPointer);
+            }
+        }
+
+        protected override void DeserializeModifiers() {
+            if (modifiers == null) modifiers = new List<AttributeModifier<T, U, V>>();
+            for (int i = 0; i < serializedModifiers.Count; i++) {
+                modifiers.Add(new AttributeModifier<T, U, V>(serializedModifiers[i]));
             }
         }
     }

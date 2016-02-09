@@ -2,14 +2,14 @@
 
 namespace AbilitySystem {
 
-    public class PointListAbilityPrototype : AbilityPrototype {
+    public class PointListAbilityPrototype : Ability {
 
         public GameObject spell;
         public GameObject pointMarkerPrefab;
         public Projector pointSelector;
         public int totalPoints;
 
-        public override void OnTargetSelectionStarted(Ability ability, PropertySet properties) {
+        public override void OnTargetSelectionStarted(PropertySet properties) {
             Projector gameObject = Instantiate(pointSelector) as Projector;
             var projector = gameObject.GetComponent<Projector>();
             properties.Set("Projector", projector);
@@ -18,7 +18,7 @@ namespace AbilitySystem {
             properties.Set("UsedPoints", 0);
         }
 
-        public override bool OnTargetSelectionUpdated(Ability ability, PropertySet properties) {
+        public override bool OnTargetSelectionUpdated(PropertySet properties) {
             int usedPoints = properties.Get<int>("UsedPoints");
             if (totalPoints == usedPoints) return true;
             Projector projector = properties.Get<Projector>("Projector");
@@ -32,42 +32,51 @@ namespace AbilitySystem {
                     GameObject[] markers = properties.Get<GameObject[]>("Markers");
                     //lift the point slightly off the ground
                     points[usedPoints] = hit.point + (Vector3.up * 0.1f);
-                    markers[usedPoints] = SpawnAndInitialize(pointMarkerPrefab, ability, properties, hit.point);
+                    markers[usedPoints] = SpawnAndInitialize(pointMarkerPrefab, this, properties, hit.point);
                     properties.Set("UsedPoints", ++usedPoints);
                 }
             }
 
             if (Input.GetMouseButtonDown(1)) {
-                ability.CancelCast();
+                CancelCast();
             }
             return false;
 
         }
 
-        public void Cleanup(Ability ability, PropertySet properties) {
+        public void Cleanup(PropertySet properties) {
             Projector projector = properties.Get<Projector>("Projector");
             if (projector != null) Destroy(projector);
             properties.Delete<Projector>("Projector");    
         }
 
-        public override void OnTargetSelectionCancelled(Ability ability, PropertySet properties) {
-            Cleanup(ability, properties);
+        public override void OnTargetSelectionCancelled(PropertySet properties) {
+            Cleanup(properties);
             GameObject[] markers = properties.Get<GameObject[]>("Markers");
             for (int i = 0; i < markers.Length; i++) {
-                DestructAndDespawn(markers[i], ability, properties);
+                DestructAndDespawn(markers[i], this, properties);
             }
             properties.Delete<GameObject[]>("Markers");
         }
 
-        public override void OnTargetSelectionCompleted(Ability ability, PropertySet properties) {
-            Cleanup(ability, properties);
+        public override void OnTargetSelectionCompleted(PropertySet properties) {
+            Cleanup(properties);
         }
 
-        public override void OnCastCompleted(Ability ability, PropertySet properties) {
-            SpawnAndInitialize(spell, ability, properties);
+        public override void OnCastCancelled(PropertySet properties) {
+            Cleanup(properties);
             GameObject[] markers = properties.Get<GameObject[]>("Markers");
             for (int i = 0; i < markers.Length; i++) {
-                DestructAndDespawn(markers[i], ability, properties);
+                DestructAndDespawn(markers[i], this, properties);
+            }
+            properties.Delete<GameObject[]>("Markers");
+        }
+
+        public override void OnCastCompleted(PropertySet properties) {
+            SpawnAndInitialize(spell, this, properties);
+            GameObject[] markers = properties.Get<GameObject[]>("Markers");
+            for (int i = 0; i < markers.Length; i++) {
+                DestructAndDespawn(markers[i], this, properties);
             }
             properties.Delete<GameObject[]>("Markers");
         }
