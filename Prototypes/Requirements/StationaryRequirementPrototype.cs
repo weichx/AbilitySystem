@@ -20,7 +20,7 @@ namespace AbilitySystem {
                 requirementLog = GameObject.Find("RequirementLog").GetComponent<RequirementLog>();
             }
             if (requirementLog != null) {
-                requirementLog.SetMessage("That ability requires a target");
+                requirementLog.SetMessage("That ability cannot be cast while moving");
             }
         }
     }

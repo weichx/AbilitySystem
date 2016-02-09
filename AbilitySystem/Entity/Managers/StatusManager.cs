@@ -20,89 +20,97 @@ namespace AbilitySystem {
 
     }
 
+    public enum StatusState {
+        Expired, Dispelled, Active
+    }
+
     public class StatusManager : MonoBehaviour {
 
-        public readonly List<Status> statusList;
+        public List<StatusEffect> statusList;
         public Entity entity;
 
-        public void AddStatus(Entity caster, string statusName, float duration = -1f, PropertySet properties = null) {
-            //var proto = StatusDatabase.GetPrototype(statusName);
-            //if (proto == null) throw new StatusNotFoundException(statusName);
-            //var existingStatus = GetStatus(statusName, caster);
-            //if (existingStatus != null) {
-            //    existingStatus.Refresh(properties);
-            //}
-            //else {
-            //    var status = new Status(entity, caster, proto, properties);
-            //    status.Apply();
-            //    statusList.Add(status);
-            //}
+        public void Start() {
+            entity = GetComponent<Entity>();
+            statusList = new List<StatusEffect>();
         }
 
         public void Update() {
-            return;
-            //for (int i = 0; i < statusList.Count; i++) {
-            //    var status = statusList[i];
-            //    status.Update();
-            //    if (status.IsDispelled) {
-            //        status.Dispel();
-            //        status.Remove();
-            //        statusList.RemoveAt(--i);
-            //    }
-            //    else if (status.IsExpired) {
-            //        status.Expire();
-            //        status.Remove();
-            //        statusList.RemoveAt(--i);
-            //    }
-            //}
+            for (int i = 0; i < statusList.Count; i++) {
+                StatusEffect status = statusList[i];
+                status.Update();
+                if (status.ReadyForRemoval) {
+                    status.Remove();
+                    statusList.RemoveAt(--i);
+                }
+            }
         }
 
-        public Status GetStatus(string statusName, Entity caster) {
-            //for (int i = 0; i < statusList.Count; i++) {
-            //    if (statusList[i].caster == caster && statusList[i].Name == statusName) {
-            //        return statusList[i];
-            //    }
-            //}
+        public void AddStatus(Ability ability, StatusEffectPrototype prototype) {
+            StatusEffect status = prototype.CreateStatus(ability, entity);
+            StatusEffect existing = statusList.Find((StatusEffect s) => {
+                return s.name == prototype.name && s.caster == ability.caster || s.IsUnique;
+            });
+            if(existing != null && existing.IsRefreshable) {
+                existing.Refresh();
+            }
+            else if(existing != null) {
+                existing.Remove();
+                statusList.Remove(existing);
+                status.Apply();
+                statusList.Add(status);
+            }
+            else {
+                status.Apply();
+                statusList.Add(status);
+            }
+        }
+
+        public bool DispelStatus(Entity caster, string statusName) {
+            StatusEffect effect = statusList.Find((status) => {
+                return status.caster == caster && status.name == statusName;
+            });
+            if (effect != null) {
+                effect.Dispel();
+                if(effect.state != StatusState.Active) {
+                    statusList.Remove(effect);
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        public bool RemoveStatus(Entity caster, string statusName) {
+            StatusEffect effect = statusList.Find((status) => {
+                return status.caster == caster && status.name == statusName;
+            });
+            if(effect != null) {
+                statusList.Remove(effect);
+                effect.Remove();
+                return true;
+            }
+            return false;
+        }
+
+        public bool HasStatus(Entity caster, string statusName) {
+            return true;
+        }
+
+        public bool HasStatusWithTag(Tag tag) {
+            return true;
+        }
+
+        public StatusEffect GetStatus(Entity caster, string statusName) {
             return null;
         }
 
-        public List<Status> GetStatuses(string statusName) {
-            var retn = new List<Status>();
-            //for (int i = 0; i < statusList.Count; i++) {
-            //    if (statusList[i].Name == statusName) {
-            //        retn.Add(statusList[i]);
-            //    }
-            //}
-            return retn;
+        public StatusEffect GetStatus(string statusName) {
+            return null;
         }
 
-        public bool HasStatus(string statusName, Entity caster) {
-            //for (int i = 0; i < statusList.Count; i++) {
-            //    if (statusList[i].caster == caster && statusList[i].Name == statusName) {
-            //        return true;
-            //    }
-            //}
-            return false;
+        public StatusEffect[] GetAllStatusesWithTag(Tag tag) {
+            return null;
         }
 
-        public bool HasStatus(string statusName) {
-            //for (int i = 0; i < statusList.Count; i++) {
-            //    if (statusList[i].Name == statusName) {
-            //        return true;
-            //    }
-            //}
-            return false;
-        }
-
-        protected void Refresh(Status status, PropertySet propertySet) {
-
-            //if (status.prototype.IsRefreshable) {
-
-            //}
-            //else {
-
-            //}
-        }
     }
 
     public class StatusNotFoundException : System.Exception {

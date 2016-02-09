@@ -5,6 +5,7 @@ namespace AbilitySystem {
     public class TargetedBlastPrototype : AbilityPrototype {
 
         public GameObject spell;
+        public StatusEffectPrototype status;
 
         public override void OnTargetSelectionStarted(Ability ability, PropertySet properties) {
             Entity caster = ability.caster;

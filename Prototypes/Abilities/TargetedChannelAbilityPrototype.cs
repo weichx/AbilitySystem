@@ -26,11 +26,19 @@ namespace AbilitySystem {
             }
         }
 
+        public override void OnCastCancelled(Ability ability, PropertySet properties) {
+            base.OnCastCancelled(ability, properties);
+        }
+
         public override void OnCastCompleted(Ability ability, PropertySet properties) {
+            DestroySpell(ability, properties);
+        }
+
+        public void DestroySpell(Ability ability, PropertySet properties) {
             GameObject spellInstance = properties.Get<GameObject>("SpellInstanceGameObject");
-            if(spellInstance != null) {
+            if (spellInstance != null) {
                 IAbilityDestructor destructor = spellInstance.GetComponent<IAbilityDestructor>();
-                if(destructor != null) {
+                if (destructor != null) {
                     destructor.Destruct(ability, properties);
                 }
                 Destroy(spellInstance);

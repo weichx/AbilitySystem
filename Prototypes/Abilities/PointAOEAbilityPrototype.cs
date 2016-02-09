@@ -11,6 +11,8 @@ namespace AbilitySystem {
             Projector gameObject = Instantiate(aoeTargetSelector) as Projector;
             var projector = gameObject.GetComponent<Projector>();
             properties.Set("Projector", projector);
+            var obj = CreateInstance<AbilityPrototype>();
+            obj.name = "FUUUUUCKKKK";
         }
 
         public override bool OnTargetSelectionUpdated(Ability ability, PropertySet properties) {
@@ -61,6 +63,7 @@ namespace AbilitySystem {
             if (initializer != null) {
                 initializer.Initialize(ability, properties);
             }
+            //target.AddStatusEffect(ability, statusPrototype);
         }
     }
 
