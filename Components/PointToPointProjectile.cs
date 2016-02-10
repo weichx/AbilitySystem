@@ -12,7 +12,7 @@ public class PointToPointProjectile : MonoBehaviour, IAbilityInitializer {
     public float spawnHeight;
     public float originXZOffsetRadius;
 
-    public void Initialize(Ability ability, PropertySet properties) {
+    public void Initialize(Ability ability) {
         targetPoint = (ability as PointAOEAbilityPrototype).targetPoint;
         Vector2 offset = Random.insideUnitCircle * originXZOffsetRadius;
         originPoint = targetPoint + (Vector3.up * spawnHeight);

@@ -4,43 +4,42 @@ namespace AbilitySystem {
 
     public class TargetedChannelAbilityPrototype : Ability {
 
-        public GameObject spell;
+        public GameObject spellPrefab;
+        [Writable(false)] public GameObject spellInstance;
+        [Writable(false)] public Entity target;
 
-        public override void OnTargetSelectionStarted(PropertySet properties) {
-            Entity target = caster.Target;
+        public override void OnTargetSelectionStarted() {
+            target = caster.Target;
             if (target == null) {
                 CancelCast();
                 return;
             }
-            properties.Set("Target", target);
         }
 
-        public override void OnCastStarted(PropertySet properties) {
-            Transform transform = properties.Get<Entity>("Target").transform;
-            GameObject gameObject = Instantiate(spell, caster.transform.position, Quaternion.identity) as GameObject;
-            properties.Set("SpellInstanceGameObject", gameObject);
-            IAbilityInitializer initializer = gameObject.GetComponent<IAbilityInitializer>();
+        public override void OnCastStarted() {
+            Transform targetTransform = target.transform;
+            spellInstance = Instantiate(spellPrefab, caster.transform.position, Quaternion.identity) as GameObject;
+            IAbilityInitializer initializer = spellInstance.GetComponent<IAbilityInitializer>();
             if (initializer != null) {
-                initializer.Initialize(this, properties);
+                initializer.Initialize(this);
             }
         }
 
-        public override void OnCastCancelled(PropertySet properties) {
-            base.OnCastCancelled(properties);
+        public override void OnCastCancelled() {
+            DestroySpell(this);
         }
 
-        public override void OnCastCompleted(PropertySet properties) {
-            DestroySpell(this, properties);
+        public override void OnCastCompleted() {
+            DestroySpell(this);
         }
 
-        public void DestroySpell(Ability ability, PropertySet properties) {
-            GameObject spellInstance = properties.Get<GameObject>("SpellInstanceGameObject");
+        public void DestroySpell(Ability ability) {
             if (spellInstance != null) {
                 IAbilityDestructor destructor = spellInstance.GetComponent<IAbilityDestructor>();
                 if (destructor != null) {
-                    destructor.Destruct(ability, properties);
+                    destructor.Destruct(ability);
                 }
-                Destroy(spellInstance);
+                Destroy(spellInstance.gameObject);
             }
         }
     }

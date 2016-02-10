@@ -10,12 +10,12 @@ namespace AbilitySystem {
 
         [HideInInspector] public Vector3 targetPoint;
 
-        public override void OnTargetSelectionStarted(PropertySet properties) {
+        public override void OnTargetSelectionStarted() {
             Projector gameObject = Instantiate(aoeTargetSelectorPrefab) as Projector;
             projector = gameObject.GetComponent<Projector>();
         }
 
-        public override bool OnTargetSelectionUpdated(PropertySet properties) {
+        public override bool OnTargetSelectionUpdated() {
             Ray mouseRay = Camera.main.ScreenPointToRay(Input.mousePosition);
             RaycastHit hit;
             if (Physics.Raycast(mouseRay, out hit, 1000, (1 << 9))) {
@@ -44,20 +44,19 @@ namespace AbilitySystem {
 
         }
 
-        public override void OnTargetSelectionCompleted(PropertySet properties) {
+        public override void OnTargetSelectionCompleted() {
             if (projector != null) Destroy(projector.gameObject);
         }
 
-        public override void OnTargetSelectionCancelled(PropertySet properties) {
+        public override void OnTargetSelectionCancelled() {
             if (projector != null) Destroy(projector.gameObject);
         }
 
-        public override void OnCastCompleted(PropertySet properties) {
+        public override void OnCastCompleted() {
             GameObject gameObject = Instantiate(spell, targetPoint, Quaternion.identity) as GameObject;
-            Debug.Log(targetPoint + " " + gameObject.transform.position);
             IAbilityInitializer initializer = gameObject.GetComponent<IAbilityInitializer>();
             if (initializer != null) {
-                initializer.Initialize(this, properties);
+                initializer.Initialize(this);
             }
         }
     }

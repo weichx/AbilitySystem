@@ -5,25 +5,23 @@ namespace AbilitySystem {
     public class TargetedBlastPrototype : Ability {
 
         public GameObject spell;
-        public StatusEffectPrototype status;
+        [Writable(false)] Entity target;
 
-        public override void OnTargetSelectionStarted(PropertySet properties) {
-            Entity target = caster.Target;
+        public override void OnTargetSelectionStarted() {
+             target = caster.Target;
             if (target == null) {
                 CancelCast();
                 return;
             }
-            properties.Set("Target", target);
         }
 
-        public override void OnCastCompleted(PropertySet properties) {
-            Transform transform = properties.Get<Entity>("Target").transform;
-            Vector3 toTarget = caster.transform.position.DirectionTo(transform.position);
-            Vector3 blastPosition = transform.position - toTarget.normalized;
+        public override void OnCastCompleted() {
+            Vector3 toTarget = caster.transform.position.DirectionTo(target.transform.position);
+            Vector3 blastPosition = target.transform.position - toTarget.normalized;
             GameObject gameObject = Instantiate(spell, blastPosition, Quaternion.identity) as GameObject;
             IAbilityInitializer initializer = gameObject.GetComponent<IAbilityInitializer>();
             if (initializer != null) {
-                initializer.Initialize(this, properties);
+                initializer.Initialize(this);
             }
         }
     }

@@ -31,7 +31,6 @@ namespace AbilitySystem {
         protected Timer channelTimer;
         protected CastState castState;
 
-        protected PropertySet properties;
         protected List<Timer> chargeTimers;
 
         void OnEnable() {
@@ -53,10 +52,9 @@ namespace AbilitySystem {
             if (!CheckRequirements(RequirementType.CastStart)) {
                 return false;
             }
-            properties = new PropertySet();
             castState = CastState.Targeting;
-            OnUse(this, properties);
-            OnTargetSelectionStarted(properties);
+            OnUse();
+            OnTargetSelectionStarted();
             return true;
         }
 
@@ -134,18 +132,18 @@ namespace AbilitySystem {
 
         public void CancelCast() {
             if (castState == CastState.Targeting) {
-                OnTargetSelectionCancelled(properties);
+                OnTargetSelectionCancelled();
             }
             castState = CastState.Invalid;
-            OnCastCancelled(properties);
+            OnCastCancelled();
         }
 
         public void InterruptCast() {
             if (castState == CastState.Targeting) {
-                OnTargetSelectionCancelled(properties);
+                OnTargetSelectionCancelled();
             }
             castState = CastState.Invalid;
-            OnCastInterrupted(properties);
+            OnCastInterrupted();
         }
 
         public bool OnCooldown {
@@ -195,7 +193,7 @@ namespace AbilitySystem {
         public CastState Update() {
             CastMode actualCastMode = castMode;
             if (castState == CastState.Targeting) {
-                if (OnTargetSelectionUpdated(properties)) {
+                if (OnTargetSelectionUpdated()) {
                     if (castMode == CastMode.Channel) {
                         float actualChannelTime = channelTime.UpdateValue(this);
                         castTimer.Reset(actualChannelTime);
@@ -206,8 +204,8 @@ namespace AbilitySystem {
                         castTimer.Reset(actualCastTime);
                         actualCastMode = (actualCastTime <= 0f) ? CastMode.Instant : castMode;
                     }
-                    OnTargetSelectionCompleted(properties);
-                    OnCastStarted(properties);
+                    OnTargetSelectionCompleted();
+                    OnCastStarted();
                     castState = CastState.Casting;
                 }
             }
@@ -227,7 +225,7 @@ namespace AbilitySystem {
                     case CastMode.Channel:
                         if (castTimer.Ready || channelTimer.ReadyWithReset()) {
                             Debug.Log("Tick: " + castTimer.ElapsedTime);
-                            OnChannelTick(properties);
+                            OnChannelTick();
                         }
                         castState = castTimer.Ready ? CastState.Completed : CastState.Casting;
                         break;
@@ -238,7 +236,7 @@ namespace AbilitySystem {
 
             if (castState == CastState.Completed) {
                 if (CheckRequirements(RequirementType.CastComplete)) {
-                    OnCastCompleted(properties);
+                    OnCastCompleted();
                     ConsumeCharge();
                     castState = CastState.Invalid;
                     return CastState.Completed;
@@ -251,11 +249,10 @@ namespace AbilitySystem {
         }
 
         protected void ConsumeCharge() {
-            properties = new PropertySet();
             float cd = cooldown.UpdateValue(this);
             for (int i = 0; i < chargeTimers.Count; i++) {
                 if (chargeTimers[i].ReadyWithReset(cd)) {
-                    OnChargeConsumed(properties);
+                    OnChargeConsumed();
                     return;
                 }
             }

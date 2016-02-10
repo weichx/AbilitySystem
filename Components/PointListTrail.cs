@@ -10,8 +10,10 @@ public class PointListTrail : MonoBehaviour, IAbilityInitializer {
     public float arrivalThreshold = 0.1f;
     protected int currentIndex = 0;
 
-    public void Initialize(Ability ability, PropertySet properties) {
-        pointList = properties.Get<Vector3[]>("PointList");
+    public void Initialize(Ability ability) {
+        PointListAbilityPrototype pointListAbility = ability as PointListAbilityPrototype;
+        pointList = pointListAbility.pointList;
+
         if (startAtFirstPoint) {
             transform.position = pointList[0];
             currentIndex = 1;

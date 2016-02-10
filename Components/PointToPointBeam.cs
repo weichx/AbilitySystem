@@ -11,8 +11,8 @@ public class PointToPointBeam : MonoBehaviour, IAbilityInitializer {
     public Transform contact;
     public Transform particleScale;
 
-    public void Initialize(Ability ability, PropertySet properties) {
-        target = properties.Get<Entity>("Target").transform;
+    public void Initialize(Ability ability) {
+        target = (ability as TargetedChannelAbilityPrototype).target.transform;
         origin = ability.caster.transform;
         lineRenderer = GetComponent<LineRenderer>();
     }

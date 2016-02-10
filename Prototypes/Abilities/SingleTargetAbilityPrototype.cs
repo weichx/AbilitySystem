@@ -7,22 +7,22 @@ namespace AbilitySystem {
     public class SingleTargetAbilityPrototype : Ability {
 
         public GameObject projectile;
+        public Entity target;
 
-        public override void OnTargetSelectionStarted(PropertySet properties) {
-            Entity target = caster.Target;
+        public override void OnTargetSelectionStarted() {
+            target = caster.Target;
             if(target == null) {
                 CancelCast();
                 return;
             }
-            properties.Set("Target", target);
         }
 
-        public override void OnCastCompleted(PropertySet properties) {
+        public override void OnCastCompleted() {
             Transform transform = caster.transform;
             GameObject gameObject = Instantiate(projectile, transform.position, transform.rotation) as GameObject;
             IAbilityInitializer initializer = gameObject.GetComponent<IAbilityInitializer>();
             if (initializer != null) {
-                initializer.Initialize(this, properties);
+                initializer.Initialize(this);
             }
         }
     }
