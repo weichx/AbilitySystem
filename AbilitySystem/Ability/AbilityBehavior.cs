@@ -4,20 +4,10 @@ using UnityEngine;
 
 namespace AbilitySystem {
 
-    [Serializable]
-    public class ActionList {
-        [SerializeField]
-        public AbilityAction[] actions;
-    }
-
-    //[Serializable] serializing this causes problems with constructors not being called right
-    //fail :( will need to figure this out soon
-    public class Ability : ScriptableObject {
+    public class AbilityBehavior : MonoBehaviour, IAbilityRelated {
         public Sprite icon;
         public CastMode castMode;
-
-        public ScriptableObject[] baseArray = {  };
-
+        
         [Visible("ShowIgnoreGCD")]
         public bool IgnoreGCD;
 
@@ -36,8 +26,6 @@ namespace AbilitySystem {
         public TagCollection tags;
         public AbilityRequirementSet requirementSet;
         public AbilityAttributeSet attributes;
-
-        [Space()]
         public ActionList actionList;
 
         [HideInInspector]
@@ -49,14 +37,30 @@ namespace AbilitySystem {
 
         protected List<Timer> chargeTimers;
 
+        void Reset() {
+            transform.hideFlags = HideFlags.HideInInspector;
+        }
+
         void OnEnable() {
             castTimer = new Timer();
             channelTimer = new Timer();
             chargeTimers = new List<Timer>();
             UpdateAttributes();
+            if(transform.childCount != 0) {
+                Debug.LogError("Abilities should never have children or non-ability components.");
+            }
+            //MonoBehaviour[] components = GetComponents<MonoBehaviour>();
+            //for(int i = 0; i < components.Length; i++) {
+              //  if (components[i] == this) continue;
+               // if((components[i] as AbilityComponent) == null) {
+               //     Debug.LogError("Abilities should never have other components attached, removing " 
+               //         + components[i].name + " from " + name);
+                    //Destroy(components[i]);
+               // }
+            //}
         }
 
-        public virtual Ability CreateAbility(Entity caster) {
+        public virtual AbilityBehavior CreateAbility(Entity caster) {
             var retn = Instantiate(this);
             retn.caster = caster;
             retn.name = name;
@@ -74,10 +78,10 @@ namespace AbilitySystem {
         }
 
         public void UpdateAttributes() {
-            attributes.UpdateAll(this);
-            if (charges != null) {
-                SetChargeCount((int)charges.UpdateValue(this));
-            }
+            //attributes.UpdateAll(this);
+            //if (charges != null) {
+            //    SetChargeCount((int)charges.UpdateValue(this));
+            //}
         }
 
         public void SetChargeCount(int chargeCount) {
@@ -134,7 +138,7 @@ namespace AbilitySystem {
         }
 
         public int TotalCharges() {
-            return (int)charges.UpdateValue(this);
+            return 1;// (int)charges.UpdateValue(this);
         }
 
         public bool ChargeReady() {
@@ -162,7 +166,7 @@ namespace AbilitySystem {
         }
 
         public bool OnCooldown {
-            get { return charges.UpdateValue(this) > 0 && AvailableCharges() == 0; }
+            get { return false; }// charges.UpdateValue(this) > 0 && AvailableCharges() == 0; }
         }
 
         public float RemainingCooldown {
@@ -201,7 +205,7 @@ namespace AbilitySystem {
         }
 
         public bool IsInstant {
-            get { return castMode == CastMode.Instant || castTime.UpdateValue(this) <= 0f; }
+            get { return false; } // castMode == CastMode.Instant || castTime.UpdateValue(this) <= 0f; }
         }
 
         //todo this should be throttled to 60 fps
@@ -210,12 +214,12 @@ namespace AbilitySystem {
             if (castState == CastState.Targeting) {
                 if (OnTargetSelectionUpdated()) {
                     if (castMode == CastMode.Channel) {
-                        float actualChannelTime = channelTime.UpdateValue(this);
+                        float actualChannelTime = 1;// channelTime.UpdateValue(this);
                         castTimer.Reset(actualChannelTime);
-                        channelTimer.Reset(actualChannelTime / channelTicks.UpdateValue(this));
+                        //channelTimer.Reset(actualChannelTime / channelTicks.UpdateValue(this));
                     }
                     else {
-                        float actualCastTime = castTime.UpdateValue(this);
+                        float actualCastTime = 1;// castTime.UpdateValue(this);
                         castTimer.Reset(actualCastTime);
                         actualCastMode = (actualCastTime <= 0f) ? CastMode.Instant : castMode;
                     }
@@ -264,7 +268,7 @@ namespace AbilitySystem {
         }
 
         protected void ConsumeCharge() {
-            float cd = cooldown.UpdateValue(this);
+            float cd = 1f;// cooldown.UpdateValue(this);
             for (int i = 0; i < chargeTimers.Count; i++) {
                 if (chargeTimers[i].ReadyWithReset(cd)) {
                     OnChargeConsumed();
@@ -276,9 +280,9 @@ namespace AbilitySystem {
         protected bool CheckRequirements(RequirementType requirementType) {
             List<AbilityRequirement> requirements = requirementSet.requirements;
             for (int i = 0; i < requirements.Count; i++) {
-                if (!requirements[i].MeetsRequirement(this, requirementType)) {
-                    return false;
-                }
+                //if (!requirements[i].MeetsRequirement(this, requirementType)) {
+                //    return false;
+                //}
             }
             return true;
         }

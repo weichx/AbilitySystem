@@ -17,9 +17,9 @@ public static class ScriptableObjectUtility {
         CreateAsset<RequirementPrototype>("Ability Requirement");
     }
 
-    [MenuItem("Assets/Ability Prototype")]
-    public static void CreateAbilityPrototype() {
-        CreateAsset<AbilityPrototype>("Ability Prototype");
+    [MenuItem("Assets/Ability")]
+    public static void CreateAbility() {
+        CreateAsset<Ability>("Ability");
     }
 
     public static void CreateAsset<T>(string assetName = null) where T : ScriptableObject {

@@ -87,6 +87,21 @@ namespace AbilitySystem {
             return list;
         }
 
+        public static List<Type> FindSubClasses<T>() {
+            var retn = new List<Type>();
+            var type = typeof(T);
+            for(int i = 0; i < filteredAssemblies.Count; i++) {
+                var assembly = filteredAssemblies[i];
+                var types = assembly.GetTypes();
+                for(int t = 0; t < types.Length; t++) {
+                    if(types[t].IsSubclassOf(type)) {
+                        retn.Add(types[t]);
+                    }
+                }
+            }
+            return retn;
+        }
+
         private static Delegate FindMethod(Type type, string methodName, Type retnType = null, params Type[] arguements) {
             if (retnType == null) retnType = typeof(void);
             //todo not sure if its faster to user cached method types..probably is

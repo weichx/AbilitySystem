@@ -42,49 +42,49 @@ namespace AbilitySystem {
 
     }
 
-    public class SpawnThing : StatusAction {
+    //public class SpawnThing : StatusAction {
 
-        public GameObject thing;
+    //    public GameObject thing;
 
-        public override void OnEffectApplied(StatusEffect status) {
-            UnityEngine.Object.Instantiate(thing);
-            // status.GetActions<SpawnThing>(this);
-        }
-    }
+    //    public override void OnEffectApplied(StatusEffect status) {
+    //        UnityEngine.Object.Instantiate(thing);
+    //        // status.GetActions<SpawnThing>(this);
+    //    }
+    //}
 
-    public class DamageOverTime : StatusAction {
-        public string element;
-        public float amount;
-        public float interval;
+    //public class DamageOverTime : StatusAction {
+    //    public string element;
+    //    public float amount;
+    //    public float interval;
 
-        public override void OnEffectApplied(StatusEffect status) {
-            status.properties.Set("Timer", new Timer(status.duration.CachedValue));
-        }
+    //    public override void OnEffectApplied(StatusEffect status) {
+    //        status.properties.Set("Timer", new Timer(status.duration.CachedValue));
+    //    }
 
-        public override void OnEffectUpdated(StatusEffect status) {
-            Timer timer = status.properties.Get<Timer>("Timer");
-            if (timer.ReadyWithReset()) {
-                //drain mana
-            }
-        }
-    }
+    //    public override void OnEffectUpdated(StatusEffect status) {
+    //        Timer timer = status.properties.Get<Timer>("Timer");
+    //        if (timer.ReadyWithReset()) {
+    //            //drain mana
+    //        }
+    //    }
+    //}
 
-    public class DispelProtection : StatusAction {
-        float amount;
+    //public class DispelProtection : StatusAction {
+    //    float amount;
 
-        public override bool OnDispelAttempted(StatusEffect status) {
-            return UnityEngine.Random.Range(0, 1) > amount;
-        }
-    }
+    //    public override bool OnDispelAttempted(StatusEffect status) {
+    //        return UnityEngine.Random.Range(0, 1) > amount;
+    //    }
+    //}
 
-    public class ExplodeOnDispel : StatusAction {
-        GameObject prefab;
+    //public class ExplodeOnDispel : StatusAction {
+    //    GameObject prefab;
 
-        public override void OnEffectDispelled(StatusEffect status) {
-            UnityEngine.Object.Instantiate(prefab);
-        }
+    //    public override void OnEffectDispelled(StatusEffect status) {
+    //        UnityEngine.Object.Instantiate(prefab);
+    //    }
 
-    }
+    //}
 
     public class StatusEffectPrototype : ScriptableObject {
 

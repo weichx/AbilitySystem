@@ -3,24 +3,25 @@ using UnityEngine;
 
 namespace AbilitySystem {
 
-    [Serializable]
-    public class AbilityAction {
+    public class AbilityAction : MonoBehaviour {
+        public string name2 = "yay";
 
-        public virtual void OnTargetSelectionStarted(Ability ability, PropertySet properties) { }
-        public virtual bool OnTargetSelectionUpdated(Ability ability, PropertySet properties) { return true; }
-        public virtual void OnTargetSelectionCompleted(Ability ability, PropertySet properties) { }
-        public virtual void OnTargetSelectionCancelled(Ability ability, PropertySet properties) { }
+        public virtual void OnTargetSelectionStarted() { }
+        public virtual bool OnTargetSelectionUpdated() { return true; }
+        public virtual void OnTargetSelectionCompleted() { }
+        public virtual void OnTargetSelectionCancelled() { }
 
-        public virtual void OnUse(Ability ability, PropertySet properties) { }
+        public virtual void OnUse() { }
 
-        public virtual void OnCastStarted(Ability ability, PropertySet properties) { }
-        public virtual void OnCastCompleted(Ability ability, PropertySet properties) { }
-        public virtual void OnCastFailed(Ability ability, PropertySet properties) { }
-        public virtual void OnCastCancelled(Ability ability, PropertySet properties) { }
-        public virtual void OnCastInterrupted(Ability ability, PropertySet properties) { }
-        public virtual void OnChannelTick(Ability ability, PropertySet properties) { }
-        public virtual void OnChargeConsumed(Ability ability, PropertySet properties) { }
+        public virtual void OnCastStarted() { }
+        public virtual void OnCastCompleted() { }
+        public virtual void OnCastFailed() { }
+        public virtual void OnCastCancelled() { }
+        public virtual void OnCastInterrupted() { }
+        public virtual void OnChannelTick() { }
+        public virtual void OnChargeConsumed() { }
         
     }
 
+    //public class DamageOverTime : AbilityAction { }
 }
