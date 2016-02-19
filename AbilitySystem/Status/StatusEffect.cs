@@ -4,44 +4,7 @@ using System.Collections.Generic;
 
 namespace AbilitySystem {
 
-    public class StatusAction {
-
-        public virtual void Initialize() { }
-
-        public virtual void OnEffectApplied(StatusEffect status) {
-
-        }
-
-        public virtual void OnEffectUpdated(StatusEffect status) {
-
-        }
-
-        public virtual void OnEffectStackAdded(StatusEffect status) {
-
-        }
-
-        public virtual void OnEffectRefreshed(StatusEffect status) {
-
-        }
-
-        public virtual void OnEffectRemoved(StatusEffect status) {
-
-        }
-
-        public virtual void OnEffectExpired(StatusEffect status) {
-
-        }
-
-        public virtual bool OnDispelAttempted(StatusEffect status) {
-            return true;
-        }
-
-        public virtual void OnEffectDispelled(StatusEffect status) {
-
-        }
-
-    }
-
+   
     //public class SpawnThing : StatusAction {
 
     //    public GameObject thing;
@@ -135,13 +98,13 @@ namespace AbilitySystem {
 
         public void Apply() {
             for (int i = 0; i < actions.Count; i++) {
-                actions[i].OnEffectApplied(this);
+                actions[i].OnEffectApplied();
             }
         }
 
         public void Update() {
             for (int i = 0; i < actions.Count; i++) {
-                actions[i].OnEffectUpdated(this);
+                actions[i].OnEffectUpdated();
             }
             if (state == StatusState.Active && IsExpirable && timer.Ready) {
                 Expire();
@@ -153,7 +116,7 @@ namespace AbilitySystem {
             if (state != StatusState.Active) return;
             bool isDispelled = true;
             for (int i = 0; i < actions.Count; i++) {
-                bool actionResult = actions[i].OnDispelAttempted(this);
+                bool actionResult = actions[i].OnDispelAttempted();
                 if (!actionResult && isDispelled) {
                     isDispelled = actionResult;
                 }
@@ -161,26 +124,26 @@ namespace AbilitySystem {
             if (IsDispellable && isDispelled) {
                 state = StatusState.Dispelled;
                 for (int i = 0; i < actions.Count; i++) {
-                    actions[i].OnEffectDispelled(this);
+                    actions[i].OnEffectDispelled();
                 }
             }
         }
 
         public void Expire() {
             for (int i = 0; i < actions.Count; i++) {
-                actions[i].OnEffectExpired(this);
+                actions[i].OnEffectExpired();
             }
         }
 
         public void Refresh() {
             for (int i = 0; i < actions.Count; i++) {
-                actions[i].OnEffectRefreshed(this);
+                actions[i].OnEffectRefreshed();
             }
         }
 
         public void Remove() {
             for (int i = 0; i < actions.Count; i++) {
-                actions[i].OnEffectRemoved(this);
+                actions[i].OnEffectRemoved();
             }
         }
 
