@@ -4,22 +4,12 @@ using System.Collections.Generic;
 
 namespace AbilitySystem {
 
-    [Serializable]
-    public struct SpellSlotAssignment {
-        public string spellId;
-        public string slotId;
-        public string actionBarId;
-    }
-
     [RequireComponent(typeof(Entity))] //there might be a way to not require entity
     public class AbilityManager : MonoBehaviour {
         public float baseGlobalCooldown = 1.5f;
 
-        public List<string> abilityNames;
-        public List<SpellSlotAssignment> slotAssignments;
-
-        [HideInInspector]
         public List<Ability> abilities;
+
         [HideInInspector]
         public Entity entity;
 
@@ -51,6 +41,7 @@ namespace AbilitySystem {
         public void Update() {
             //todo maybe only do this ever ~10 frames
             for (int i = 0; i < abilities.Count; i++) {
+                if (abilities[i] == null) continue;
                 abilities[i].UpdateAttributes();
             }
             castQueue.UpdateCast();
@@ -123,34 +114,37 @@ namespace AbilitySystem {
             return false;
         }
         public Ability GetAbility(string abilityId) {
-            if (!abilitiesLoaded) {
-                LoadAbilities();
-            }
+            //if (!abilitiesLoaded) {
+            //    LoadAbilities();
+            //}
             for (int i = 0; i < abilities.Count; i++) {
+                if (abilities[i] == null) continue;
                 if (abilities[i].name == abilityId) return abilities[i];
             }
             return null;
         }
 
-        private bool abilitiesLoaded = false;
+        //private bool abilitiesLoaded = false;
         private void LoadAbilities() {
-            LoadResources();
-            abilitiesLoaded = true;
-            abilityNames = abilityNames ?? new List<string>();
+            //LoadResources();
+            //abilitiesLoaded = true;
             abilities = abilities ?? new List<Ability>();
             entity = entity ?? GetComponent<Entity>();
-            for (int i = 0; i < abilityNames.Count; i++) {
-                if (string.IsNullOrEmpty(abilityNames[i])) continue;
-                if (GetAbility(abilityNames[i]) != null) continue;
-                Ability proto = null;
-                if (masterAbilityDatabase.TryGetValue(abilityNames[i], out proto)) {
-                    var check = proto.CreateAbility(entity);
-                    abilities.Add(check);
-                }
-                else {
-                    throw new AbilityNotFoundException(abilityNames[i]);
-                }
+            for(int i = 0; i < abilities.Count; i++) {
+                if (abilities[i] != null) abilities[i].Initialize(entity);
             }
+            //for (int i = 0; i < abilityNames.Count; i++) {
+            //    if (string.IsNullOrEmpty(abilityNames[i])) continue;
+            //    if (GetAbility(abilityNames[i]) != null) continue;
+            //    Ability proto = null;
+            //    if (masterAbilityDatabase.TryGetValue(abilityNames[i], out proto)) {
+            //        var check = proto.CreateAbility(entity);
+            //        abilities.Add(check);
+            //    }
+            //    else {
+            //        throw new AbilityNotFoundException(abilityNames[i]);
+            //    }
+            //}
         }
 
         private static Dictionary<string, Ability> masterAbilityDatabase;

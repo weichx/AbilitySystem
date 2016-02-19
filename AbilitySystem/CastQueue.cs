@@ -21,7 +21,7 @@
 
             if (current == null || !gcdTimer.Ready) return null;
 
-            CastState castState = current.Update();
+            CastState castState = current.UpdateCast();
 
             if (castState == CastState.Invalid) {
                 current = null;

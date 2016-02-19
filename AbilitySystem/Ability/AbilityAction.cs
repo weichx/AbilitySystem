@@ -1,10 +1,16 @@
-﻿using System;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace AbilitySystem {
 
-    public class AbilityAction : MonoBehaviour {
-        public string name2 = "yay";
+    public abstract class AbilityAction : AbilitySystemComponent {
+
+        protected Entity caster;
+        protected Ability ability;
+
+        public void Initialize(Ability ability) {
+            this.ability = ability;
+            caster = ability.caster;
+        }
 
         public virtual void OnTargetSelectionStarted() { }
         public virtual bool OnTargetSelectionUpdated() { return true; }
@@ -20,8 +26,7 @@ namespace AbilitySystem {
         public virtual void OnCastInterrupted() { }
         public virtual void OnChannelTick() { }
         public virtual void OnChargeConsumed() { }
-        
+
     }
 
-    //public class DamageOverTime : AbilityAction { }
 }

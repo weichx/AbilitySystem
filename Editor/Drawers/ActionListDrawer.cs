@@ -7,7 +7,7 @@ using System;
 
 namespace AbilitySystem {
 
-    [CustomPropertyDrawer(typeof(ActionList), true)]
+    //[CustomPropertyDrawer(typeof(ActionList), true)]
     public class ActionListDrawer : ReorderableDrawer {
         private string[] abilityActionTypeNames;
         private List<Type> abilityAcitonTypes;

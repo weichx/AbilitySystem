@@ -1,8 +1,6 @@
 ﻿using UnityEngine;
 using AbilitySystem;
 
-[RequireAbilityAttr("Projectile Speed")]
-[RequireAbilityAttr("Collision Range")]
 public class HomingProjectile : MonoBehaviour, IAbilityInitializer {
 
     public float speed;
@@ -10,7 +8,7 @@ public class HomingProjectile : MonoBehaviour, IAbilityInitializer {
     public Entity targetEntity;
 
     public virtual void Initialize(Ability ability) {
-        targetEntity = (ability as SingleTargetAbilityPrototype).target;
+        targetEntity = ability.caster.Target;//todo make this better
         speed = ability.GetAttributeValue("Projectile Speed");
         AbilityAttribute collisionRangeAttr = ability.GetAttribute("Collision Range");
         if(collisionRangeAttr != null) {

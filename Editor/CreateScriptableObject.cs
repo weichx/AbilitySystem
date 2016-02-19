@@ -12,15 +12,15 @@ public static class ScriptableObjectUtility {
         CreateAsset<ScriptableObject>("Scriptable Object");
     }
 
-    [MenuItem("Assets/Requirement Prototype")]
-    public static void CreateAbilityRequirement() {
-        CreateAsset<RequirementPrototype>("Ability Requirement");
-    }
+    //[MenuItem("Assets/Requirement Prototype")]
+    //public static void CreateAbilityRequirement() {
+    //    CreateAsset<RequirementPrototype>("Ability Requirement");
+    //}
 
-    [MenuItem("Assets/Ability")]
-    public static void CreateAbility() {
-        CreateAsset<Ability>("Ability");
-    }
+    //[MenuItem("Assets/Ability")]
+    //public static void CreateAbility() {
+    //    //CreateAsset<Ability>("Ability");
+    //}
 
     public static void CreateAsset<T>(string assetName = null) where T : ScriptableObject {
         T asset = ScriptableObject.CreateInstance<T>();

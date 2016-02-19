@@ -4,20 +4,10 @@ using UnityEngine;
 
 namespace AbilitySystem {
 
-    [Serializable]
-    public class ActionList {
-        [SerializeField]
-        public AbilityAction[] actions;
-    }
-
-    //[Serializable] serializing this causes problems with constructors not being called right
-    //fail :( will need to figure this out soon
-    public class Ability : ScriptableObject {
+    public class Ability : AbilitySystemComponent, IAbilityRelated {
         public Sprite icon;
         public CastMode castMode;
-
-        public ScriptableObject[] baseArray = {  };
-
+        
         [Visible("ShowIgnoreGCD")]
         public bool IgnoreGCD;
 
@@ -37,8 +27,7 @@ namespace AbilitySystem {
         public AbilityRequirementSet requirementSet;
         public AbilityAttributeSet attributes;
 
-        [Space()]
-        public ActionList actionList;
+        protected List<AbilityAction> actionList;
 
         [HideInInspector]
         public Entity caster;
@@ -49,19 +38,35 @@ namespace AbilitySystem {
 
         protected List<Timer> chargeTimers;
 
-        void OnEnable() {
+        public void Initialize(Entity caster) {
+            this.caster = caster;
             castTimer = new Timer();
             channelTimer = new Timer();
             chargeTimers = new List<Timer>();
             UpdateAttributes();
+            if(transform.childCount != 0) {
+                Debug.LogError("Abilities should never have children or non-ability components.");
+            }
+            Component[] components = GetComponents<Component>();
+            for (int i = 0; i < components.Length; i++) {
+                if (components[i] != transform && (components[i] as AbilitySystemComponent) == null) {
+                    DestroyImmediate(components[i], true);
+                    Debug.LogError("Abilities should never have other components attached, removing " + components[i].GetType().Name + " from " + name);
+                }
+            }
+            actionList = new List<AbilityAction>(GetComponents<AbilityAction>());
+            Debug.Log(actionList.Count);
+            for(int i = 0; i < actionList.Count; i++) {
+                actionList[i].Initialize(this);
+            }
         }
 
-        public virtual Ability CreateAbility(Entity caster) {
-            var retn = Instantiate(this);
-            retn.caster = caster;
-            retn.name = name;
-            return retn;
-        }
+        //public virtual Ability CreateAbility(Entity caster) {
+        //    var retn = Instantiate(this);
+        //    retn.caster = caster;
+        //    //retn.name = name;
+        //    return retn;
+        //}
 
         public bool Use() {
             if (!CheckRequirements(RequirementType.CastStart)) {
@@ -205,7 +210,7 @@ namespace AbilitySystem {
         }
 
         //todo this should be throttled to 60 fps
-        public CastState Update() {
+        public CastState UpdateCast() {
             CastMode actualCastMode = castMode;
             if (castState == CastState.Targeting) {
                 if (OnTargetSelectionUpdated()) {
@@ -313,15 +318,34 @@ namespace AbilitySystem {
             return attr.CachedValue;
         }
 
-        public virtual void OnTargetSelectionStarted() { }
+        public virtual void OnTargetSelectionStarted() {
+            for (int i = 0; i < actionList.Count; i++) {
+                actionList[i].OnTargetSelectionStarted();
+            }
+        }
+
         public virtual bool OnTargetSelectionUpdated() { return true; }
         public virtual void OnTargetSelectionCompleted() { }
         public virtual void OnTargetSelectionCancelled() { }
 
-        public virtual void OnUse() { }
+        public virtual void OnUse() {
+            for (int i = 0; i < actionList.Count; i++) {
+                actionList[i].OnUse();
+            }
+        }
 
-        public virtual void OnCastStarted() { }
-        public virtual void OnCastCompleted() { }
+        public virtual void OnCastStarted() {
+            for (int i = 0; i < actionList.Count; i++) {
+                actionList[i].OnCastStarted();
+            }
+        }
+
+        public virtual void OnCastCompleted() {
+            for (int i = 0; i < actionList.Count; i++) {
+                actionList[i].OnCastCompleted();
+            }
+        }
+
         public virtual void OnCastFailed() { }
         public virtual void OnCastCancelled() { }
         public virtual void OnCastInterrupted() { }
