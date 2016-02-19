@@ -7,6 +7,7 @@ namespace AbilitySystem {
 
         //[Range(0, 180)]
         public float dotRequirement = 0.75f;
+        protected RequirementLog requirementLog;
 
         public override bool MeetsRequirement(Ability ability) {
             Entity caster = ability.caster;
@@ -17,8 +18,16 @@ namespace AbilitySystem {
         }
 
         public override void OnRequirementFailed(Ability ability, AbilityRequirement req, RequirementType type) {
-            Debug.Log("Target must be in front of you");
+            SetLogMessage();
+        }
+
+        private void SetLogMessage() {
+            if (requirementLog == null) {
+                requirementLog = GameObject.Find("RequirementLog").GetComponent<RequirementLog>();
+            }
+            if (requirementLog != null) {
+                requirementLog.SetMessage("Target must be in front of you");
+            }
         }
     }
-
 }

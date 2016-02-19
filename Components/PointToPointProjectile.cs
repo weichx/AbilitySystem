@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using AbilitySystem;
 
-public class PointToPointProjectile : MonoBehaviour, IAbilityInitializer {
+public class PointToPointProjectile : MonoBehaviour {
 
     public Vector3 targetPoint;
     public Vector3 originPoint;
@@ -12,22 +12,23 @@ public class PointToPointProjectile : MonoBehaviour, IAbilityInitializer {
     public float spawnHeight;
     public float originXZOffsetRadius;
 
-    public void Initialize(Ability ability) {
-        targetPoint = (ability as PointAOEAbilityPrototype).targetPoint;
+    public void Initialize() {
+        targetPoint = transform.position;
         Vector2 offset = Random.insideUnitCircle * originXZOffsetRadius;
         originPoint = targetPoint + (Vector3.up * spawnHeight);
         originPoint.x += offset.x;
         originPoint.z += offset.y;
         transform.position = originPoint;
     }
-	
-	void Update () {
+
+    void Update() {
         speed += (accelerationRate * Time.deltaTime);
         speed = Mathf.Clamp(speed, 0, maxSpeed);
-        if(transform.position.DistanceToSquared(targetPoint) < collisionRange * collisionRange) {
+        if (transform.position.DistanceToSquared(targetPoint) < collisionRange * collisionRange) {
             var evtManager = GetComponent<EventManager>();
-            if(evtManager != null) {
+            if (evtManager != null) {
                 evtManager.QueueEvent(new AbilityHitEvent());
+                enabled = false;
             }
         }
         transform.position = Vector3.MoveTowards(transform.position, targetPoint, speed * Time.deltaTime);

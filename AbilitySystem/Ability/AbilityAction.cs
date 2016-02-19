@@ -1,5 +1,4 @@
-﻿using UnityEngine;
-
+﻿
 namespace AbilitySystem {
 
     public abstract class AbilityAction : AbilitySystemComponent {
@@ -13,7 +12,7 @@ namespace AbilitySystem {
         }
 
         public virtual void OnTargetSelectionStarted() { }
-        public virtual bool OnTargetSelectionUpdated() { return true; }
+        public virtual void OnTargetSelectionUpdated() { }
         public virtual void OnTargetSelectionCompleted() { }
         public virtual void OnTargetSelectionCancelled() { }
 

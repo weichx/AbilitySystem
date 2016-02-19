@@ -4,10 +4,10 @@ using UnityEngine;
 
 namespace AbilitySystem {
 
-    public class Ability : AbilitySystemComponent, IAbilityRelated {
+    public class Ability : AbilitySystemComponent {
         public Sprite icon;
         public CastMode castMode;
-        
+
         [Visible("ShowIgnoreGCD")]
         public bool IgnoreGCD;
 
@@ -20,6 +20,7 @@ namespace AbilitySystem {
         public AbilityAttribute channelTicks;
         public AbilityAttribute cooldown;
         public AbilityAttribute charges;
+
         //public AbilityAttribute chargeUseCooldown;
 
         [Space()]
@@ -27,7 +28,7 @@ namespace AbilitySystem {
         public AbilityRequirementSet requirementSet;
         public AbilityAttributeSet attributes;
 
-        protected List<AbilityAction> actionList;
+        protected AbilityAction[] actionList;
 
         [HideInInspector]
         public Entity caster;
@@ -37,14 +38,25 @@ namespace AbilitySystem {
         protected CastState castState;
 
         protected List<Timer> chargeTimers;
+        protected TargetingStrategy targetingStrategy;
+
+        public TargetingStrategy TargetingStrategy {
+            get { return targetingStrategy; }
+        }
+
+        public void Reset() {
+            transform.hideFlags = HideFlags.HideInInspector;
+        }
 
         public void Initialize(Entity caster) {
             this.caster = caster;
+            gameObject.isStatic = true;
+            transform.hideFlags = HideFlags.HideInInspector;
             castTimer = new Timer();
             channelTimer = new Timer();
             chargeTimers = new List<Timer>();
             UpdateAttributes();
-            if(transform.childCount != 0) {
+            if (transform.childCount != 0) {
                 Debug.LogError("Abilities should never have children or non-ability components.");
             }
             Component[] components = GetComponents<Component>();
@@ -54,19 +66,15 @@ namespace AbilitySystem {
                     Debug.LogError("Abilities should never have other components attached, removing " + components[i].GetType().Name + " from " + name);
                 }
             }
-            actionList = new List<AbilityAction>(GetComponents<AbilityAction>());
-            Debug.Log(actionList.Count);
-            for(int i = 0; i < actionList.Count; i++) {
+
+            targetingStrategy = GetComponent<TargetingStrategy>();
+            targetingStrategy.__Initialize(this);
+
+            actionList = GetComponents<AbilityAction>();
+            for (int i = 0; i < actionList.Length; i++) {
                 actionList[i].Initialize(this);
             }
         }
-
-        //public virtual Ability CreateAbility(Entity caster) {
-        //    var retn = Instantiate(this);
-        //    retn.caster = caster;
-        //    //retn.name = name;
-        //    return retn;
-        //}
 
         public bool Use() {
             if (!CheckRequirements(RequirementType.CastStart)) {
@@ -89,12 +97,8 @@ namespace AbilitySystem {
             int oldChargeCount = chargeTimers.Count;
             if (chargeCount == oldChargeCount) return;
             if (chargeCount > oldChargeCount) {
-                float value = cooldown.CachedValue;
-                if (value <= 0) {
-                    value = 0.0001f;
-                }
                 for (int i = oldChargeCount; i < chargeCount; i++) {
-                    chargeTimers.Add(new Timer(value));
+                    chargeTimers.Add(new Timer(0));
                 }
             }
             else {
@@ -151,6 +155,7 @@ namespace AbilitySystem {
         }
 
         public void CancelCast() {
+            if (castState == CastState.Invalid) return;
             if (castState == CastState.Targeting) {
                 OnTargetSelectionCancelled();
             }
@@ -159,6 +164,7 @@ namespace AbilitySystem {
         }
 
         public void InterruptCast() {
+            if (castState == CastState.Invalid) return;
             if (castState == CastState.Targeting) {
                 OnTargetSelectionCancelled();
             }
@@ -233,6 +239,7 @@ namespace AbilitySystem {
             if (castState == CastState.Casting) {
                 if (!CheckRequirements(RequirementType.CastUpdate)) {
                     castState = CastState.Invalid;
+                    OnCastCancelled();
                     return castState;
                 }
                 switch (actualCastMode) {
@@ -262,6 +269,7 @@ namespace AbilitySystem {
                     return CastState.Completed;
                 }
                 else {
+                    OnCastCancelled();
                     castState = CastState.Invalid;
                 }
             }
@@ -318,39 +326,82 @@ namespace AbilitySystem {
             return attr.CachedValue;
         }
 
-        public virtual void OnTargetSelectionStarted() {
-            for (int i = 0; i < actionList.Count; i++) {
+        protected void OnTargetSelectionStarted() {
+            targetingStrategy.OnTargetSelectionStarted();
+            for (int i = 0; i < actionList.Length; i++) {
                 actionList[i].OnTargetSelectionStarted();
             }
         }
 
-        public virtual bool OnTargetSelectionUpdated() { return true; }
-        public virtual void OnTargetSelectionCompleted() { }
-        public virtual void OnTargetSelectionCancelled() { }
+        protected bool OnTargetSelectionUpdated() {
+            bool retn = targetingStrategy.OnTargetSelectionUpdated();
+            for (int i = 0; i < actionList.Length; i++) {
+                actionList[i].OnTargetSelectionUpdated();
+            }
+            return retn;
+        }
 
-        public virtual void OnUse() {
-            for (int i = 0; i < actionList.Count; i++) {
+        protected void OnTargetSelectionCompleted() {
+            targetingStrategy.OnTargetSelectionCompleted();
+            for (int i = 0; i < actionList.Length; i++) {
+                actionList[i].OnTargetSelectionCompleted();
+            }
+        }
+
+        protected void OnTargetSelectionCancelled() {
+            targetingStrategy.OnTargetSelectionCancelled();
+            for (int i = 0; i < actionList.Length; i++) {
+                actionList[i].OnTargetSelectionCancelled();
+            }
+        }
+
+        protected void OnUse() {
+            for (int i = 0; i < actionList.Length; i++) {
                 actionList[i].OnUse();
             }
         }
 
-        public virtual void OnCastStarted() {
-            for (int i = 0; i < actionList.Count; i++) {
+        protected void OnCastStarted() {
+            for (int i = 0; i < actionList.Length; i++) {
                 actionList[i].OnCastStarted();
             }
         }
 
-        public virtual void OnCastCompleted() {
-            for (int i = 0; i < actionList.Count; i++) {
+        protected void OnCastCompleted() {
+            for (int i = 0; i < actionList.Length; i++) {
                 actionList[i].OnCastCompleted();
             }
         }
 
-        public virtual void OnCastFailed() { }
-        public virtual void OnCastCancelled() { }
-        public virtual void OnCastInterrupted() { }
-        public virtual void OnChannelTick() { }
-        public virtual void OnChargeConsumed() { }
+        protected void OnCastFailed() {
+            for (int i = 0; i < actionList.Length; i++) {
+                actionList[i].OnCastFailed();
+            }
+        }
+
+        protected void OnCastCancelled() {
+            for (int i = 0; i < actionList.Length; i++) {
+                actionList[i].OnCastCancelled();
+            }
+        }
+
+        protected void OnCastInterrupted() {
+            for (int i = 0; i < actionList.Length; i++) {
+                actionList[i].OnCastInterrupted();
+            }
+        }
+
+        protected void OnChannelTick() {
+            for (int i = 0; i < actionList.Length; i++) {
+                actionList[i].OnChannelTick();
+            }
+        }
+
+        protected void OnChargeConsumed() {
+            for (int i = 0; i < actionList.Length; i++) {
+                actionList[i].OnChargeConsumed();
+            }
+        }
 
         protected static GameObject SpawnAndInitialize(GameObject toSpawn, Ability ability, Vector3? position = null, Quaternion? rotation = null) {
             if (position == null) {

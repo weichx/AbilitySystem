@@ -9,17 +9,22 @@ namespace AbilitySystem {
     [RequireComponent(typeof(TargetManager))]
     public class Entity : MonoBehaviour {
 
-        [HideInInspector] public StatusManager statusManager;
-        [HideInInspector] public EventManager eventManager;
-        [HideInInspector] public AbilityManager abilityManager;
-        [HideInInspector] public ResourceManager resourceManager;
-        [HideInInspector] public TargetManager targetManager;
+        [HideInInspector]
+        public StatusManager statusManager;
+        [HideInInspector]
+        public EventManager eventManager;
+        [HideInInspector]
+        public AbilityManager abilityManager;
+        [HideInInspector]
+        public ResourceManager resourceManager;
+        [HideInInspector]
+        public TargetManager targetManager;
 
         public float selectronHeight = 1f;
 
         public Faction faction;
+        private bool movedThisFrame = false;
 
-        public bool movedThisFrame;
         private Vector3 lastPosition;
 
         public void Awake() {
@@ -47,12 +52,16 @@ namespace AbilitySystem {
             }
         }
 
-        public void LateUpdate() {
+        public void Update() {
             lastPosition = transform.position;
         }
 
+        public void LateUpdate() {
+            movedThisFrame = lastPosition != transform.position;
+        }
+
         public bool IsMoving {
-            get { return transform.position != lastPosition; }
+            get { return movedThisFrame; }
         }
 
         public bool IsPlayer {
@@ -64,7 +73,7 @@ namespace AbilitySystem {
         }
 
         public Ability ActiveAbility {
-            get {  return abilityManager.ActiveAbility; }
+            get { return abilityManager.ActiveAbility; }
         }
 
         public bool IsChanneling {
@@ -75,7 +84,7 @@ namespace AbilitySystem {
 //figure out how to use formulas nicely, ie assign in editor (prefab reference? scriptable object? reflection? nothing?)
 //figure out how things like damage / healing get applied in concert with abilities
 
-    //ability.GetAttribute("String");
+//ability.GetAttribute("String");
 //abilityManager.Get("BackStab").RemoveRequirement<Behind>();
 /*
     var backstab = abilityManager.Get("BackStab");

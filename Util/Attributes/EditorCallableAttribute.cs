@@ -24,6 +24,7 @@ namespace AbilitySystem {
                 displayFn = GetDelegate(target, fnName);
             }
             if (displayFn == null) {
+                Debug.Log("FUCK");
                 return false;
             }
             else {
@@ -41,21 +42,22 @@ namespace AbilitySystem {
             string extensionTypeName = target.GetType().AssemblyQualifiedName;// + "EditorExtensions";
             int saftey = 0;
             Type declType = target.GetType();
-            MethodInfo info = null;
-            while (saftey < 10) {
-                declType = declType.BaseType;
-                if (declType == null) return null;
-                info = declType.GetMethod(fnName);
-                if (info != null) break;
-                saftey++;
+            MethodInfo info = declType.GetMethod(fnName);
+            if (info == null) {
+                while (saftey < 10) {
+                    declType = declType.BaseType;
+                    if (declType == null) return null;
+                    info = declType.GetMethod(fnName);
+                    if (info != null) break;
+                    saftey++;
+                }
             }
+
             Type type = TypeCache.GetType(extensionTypeName);
             if (declType == null) {
                 Debug.LogError("Cannot find type: " + extensionTypeName);
                 return null;
             }
-
-        //    MethodInfo info = type.GetMethod(fnName);
 
             if (info == null) {
                 Debug.LogWarning("Unable to find a static method on " + type +

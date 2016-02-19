@@ -9,10 +9,6 @@ namespace AbilitySystem {
 
     public abstract class AbilitySystemComponent : MonoBehaviour {
 
-        //public new string name {
-        //    get { return GetType().Name; }
-        //}
-
 #if UNITY_EDITOR
 
         private class AbilityComponentException : Exception {
@@ -133,6 +129,7 @@ namespace AbilitySystem {
         }
 
         public new T GetComponent<T>() {
+            if (GetType() == typeof(Ability)) return base.GetComponent<T>();
             throw new AbilityComponentException("GetComponent");
         }
 

@@ -14,7 +14,6 @@ namespace AbilitySystem {
         }
 
         public virtual bool MeetsRequirement(Ability ability) {
-            Debug.Log("BASE BAD");
             return true;
         }
 

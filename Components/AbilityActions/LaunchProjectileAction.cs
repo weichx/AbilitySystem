@@ -4,10 +4,8 @@ namespace AbilitySystem {
 
     public class LaunchProjectileAction : AbilityAction {
 
-        public HomingProjectile projectile;
-
-        [Writable(false)]
-        public Entity target;
+        public HomingProjectile projectilePrefab;
+        protected Entity target;
 
         public override void OnTargetSelectionStarted() {
             target = caster.Target;
@@ -19,11 +17,9 @@ namespace AbilitySystem {
 
         public override void OnCastCompleted() {
             Transform transform = caster.transform;
-            GameObject gameObject = Instantiate(projectile.gameObject, transform.position, transform.rotation) as GameObject;
-            IAbilityInitializer initializer = gameObject.GetComponent<IAbilityInitializer>();
-            if (initializer != null) {
-                initializer.Initialize(ability);
-            }
+            GameObject gameObject = Instantiate(projectilePrefab.gameObject, transform.position, transform.rotation) as GameObject;
+            HomingProjectile projectile = gameObject.GetComponent<HomingProjectile>();
+            projectile.Initialize(target, ability.GetAttributeValue("Projectile Speed"), ability.GetAttributeValue("Collision Range"));
         }
     }
 
