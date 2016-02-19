@@ -28,7 +28,7 @@ namespace AbilitySystem {
             prototype.objectReferenceValue = EditorGUI.ObjectField(rect.WidthMinus(100f), prototype.objectReferenceValue, typeof(RequirementPrototype), false);
 
             int idx =prop.Get<int>("type");
-            prop.Set("type", EditorGUI.Popup(rect, idx, AbilityRequirementShell.Options));
+            prop.Set("type", EditorGUI.Popup(rect, idx, AbilityRequirement.Options));
         }
 
         protected override void DrawHeader(Rect rect) {

@@ -22,7 +22,7 @@ namespace AbilitySystem {
         ///<summary>
         ///This method should return ONLY the adjustment for this modifier, not adjustment + current value
         ///</summary>
-        public float ModifyValue(float currentAttributeValue, float baseAttributeValue) {
+        public virtual float ModifyValue(float currentAttributeValue, float baseAttributeValue) {
             return baseValue;
         }
 
@@ -30,7 +30,7 @@ namespace AbilitySystem {
         ///This method should clamp and return the total value of the attribute.
         ///This will run after all modifiers have had `ModifyValue` called.
         ///</summary>
-        public float ClampValue(float currentAttributeValue, float baseAttributeValue) {
+        public virtual float ClampValue(float currentAttributeValue, float baseAttributeValue) {
             return Mathf.Clamp(currentAttributeValue, min, max);
         }
     }
@@ -40,6 +40,10 @@ namespace AbilitySystem {
 
         public AttributeModifier(string id, float baseValue, float min = 0, float max = float.MaxValue) : base(id, baseValue, min, max) { }
         public AttributeModifier(string id, AttributeModifier<T> toClone) : base(id, toClone.baseValue, toClone.min, toClone.max) { }
+
+        public AttributeModifier(AttributeModifier toClone) : base(toClone.id, toClone.baseValue, toClone.min, toClone.max) {
+
+        }
 
         ///<summary>
         ///This method should return ONLY the adjustment for this modifier, not adjustment + current value
@@ -62,7 +66,7 @@ namespace AbilitySystem {
 
         public AttributeModifier(string id, float baseValue, float min = 0, float max = float.MaxValue) : base(id, baseValue, min, max) { }
         public AttributeModifier(string id, AttributeModifier<T, U> toClone) : base(id, toClone.baseValue, toClone.min, toClone.max) { }
-
+        public AttributeModifier(AttributeModifier toClone) : base(toClone.id, toClone.baseValue, toClone.min, toClone.max) { }
         ///<summary>
         ///This method should return ONLY the adjustment for this modifier, not adjustment + current value
         ///</summary>
@@ -84,6 +88,7 @@ namespace AbilitySystem {
 
         public AttributeModifier(string id, float baseValue, float min = 0, float max = float.MaxValue) : base(id, baseValue, min, max) { }
         public AttributeModifier(string id, AttributeModifier<T, U, V> toClone) : base(id, toClone.baseValue, toClone.min, toClone.max) { }
+        public AttributeModifier(AttributeModifier toClone) : base(toClone.id, toClone.baseValue, toClone.min, toClone.max) { }
 
         ///<summary>
         ///This method should return ONLY the adjustment for this modifier, not adjustment + current value

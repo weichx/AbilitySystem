@@ -1,5 +1,5 @@
 ﻿namespace AbilitySystem {
     public interface IAbilityInitializer {
-        void Initialize(Ability ability, PropertySet properties);
+        void Initialize(Ability ability);
     }
 }

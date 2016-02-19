@@ -24,7 +24,6 @@ public class PlayerCastbar : MonoBehaviour {
                 castbarFill.fillAmount = player.abilityManager.CastProgress;
                 float elapsed = player.abilityManager.ElapsedCastTime;
                 float total = player.abilityManager.TotalCastTime;
-                Debug.Log(total);
                 castBarText.text = "Channeling " + (total - elapsed).ToString("0.0");
             }
             else {

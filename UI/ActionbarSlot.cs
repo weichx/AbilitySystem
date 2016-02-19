@@ -48,7 +48,7 @@ public class ActionbarSlot : UISlotBase {
         }
         else {
             abilityId = ability.name;
-            SetIcon(ability.prototype.icon);
+            SetIcon(ability.icon);
         }
     }
 

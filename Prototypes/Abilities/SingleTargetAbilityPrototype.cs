@@ -1,31 +1,30 @@
-﻿using UnityEngine;
+﻿//using UnityEngine;
 
-namespace AbilitySystem {
+//namespace AbilitySystem {
 
-    //todo enforce these attributes
-    [RequireAbilityAttr("Projectile Speed")]
-    public class SingleTargetAbilityPrototype : AbilityPrototype {
+//    //todo enforce these attributes
+//    [RequireAbilityAttr("Projectile Speed")]
+//    public class SingleTargetAbilityPrototype : Ability {
 
-        public GameObject projectile;
+//        public GameObject projectile;
+//        public Entity target;
 
-        public override void OnTargetSelectionStarted(Ability ability, PropertySet properties) {
-            Entity caster = ability.caster;
-            Entity target = caster.Target;
-            if(target == null) {
-                ability.CancelCast();
-                return;
-            }
-            properties.Set("Target", target);
-        }
+//        public override void OnTargetSelectionStarted() {
+//            target = caster.Target;
+//            if(target == null) {
+//                CancelCast();
+//                return;
+//            }
+//        }
 
-        public override void OnCastCompleted(Ability ability, PropertySet properties) {
-            Transform transform = ability.caster.transform;
-            GameObject gameObject = Instantiate(projectile, transform.position, transform.rotation) as GameObject;
-            IAbilityInitializer initializer = gameObject.GetComponent<IAbilityInitializer>();
-            if (initializer != null) {
-                initializer.Initialize(ability, properties);
-            }
-        }
-    }
+//        public override void OnCastCompleted() {
+//            Transform transform = caster.transform;
+//            GameObject gameObject = Instantiate(projectile, transform.position, transform.rotation) as GameObject;
+//            IAbilityInitializer initializer = gameObject.GetComponent<IAbilityInitializer>();
+//            if (initializer != null) {
+//                initializer.Initialize(this);
+//            }
+//        }
+//    }
 
-}
+//}

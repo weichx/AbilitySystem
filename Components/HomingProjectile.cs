@@ -1,22 +1,14 @@
 ﻿using UnityEngine;
 using AbilitySystem;
 
-[RequireAbilityAttr("Projectile Speed")]
-[RequireAbilityAttr("Collision Range")]
 public class HomingProjectile : MonoBehaviour, IAbilityInitializer {
 
     public float speed;
     public float collisionRange;
-    public Transform target;
-    
-    public virtual void Initialize(Ability ability, PropertySet properties) {
-        target = properties.Get<Transform>("Target");
-        if(target == null) {
-            var targetEntity = properties.Get<Entity>("Target");
-            if(targetEntity != null) {
-                target = targetEntity.transform;
-            }
-        }
+    public Entity targetEntity;
+
+    public virtual void Initialize(Ability ability) {
+        targetEntity = ability.caster.Target;//todo make this better
         speed = ability.GetAttributeValue("Projectile Speed");
         AbilityAttribute collisionRangeAttr = ability.GetAttribute("Collision Range");
         if(collisionRangeAttr != null) {
@@ -25,13 +17,13 @@ public class HomingProjectile : MonoBehaviour, IAbilityInitializer {
     }
 
     public void Update() {
-        if (target == null) return;
+        if (targetEntity == null) return;
         Vector3 movement = transform.forward * speed * Time.deltaTime;
-        transform.LookAt(target);
+        transform.LookAt(targetEntity.transform);
         transform.position += movement;
-        float distSqr = transform.DistanceToSquared(target);
+        float distSqr = transform.DistanceToSquared(targetEntity.transform);
         if(distSqr <= collisionRange * collisionRange) {
-            target = null;
+            targetEntity = null;
             var evtManager = GetComponent<EventManager>();
             if (evtManager != null) {
                 evtManager.QueueEvent(new AbilityHitEvent());
