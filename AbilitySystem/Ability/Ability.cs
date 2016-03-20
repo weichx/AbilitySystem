@@ -182,6 +182,7 @@ namespace AbilitySystem {
                 return NextChargeReadyTime();
             }
         }
+
         public bool IsCasting {
             get { return castState == CastState.Casting; }
         }
@@ -401,35 +402,6 @@ namespace AbilitySystem {
             for (int i = 0; i < actionList.Length; i++) {
                 actionList[i].OnChargeConsumed();
             }
-        }
-
-        protected static GameObject SpawnAndInitialize(GameObject toSpawn, Ability ability, Vector3? position = null, Quaternion? rotation = null) {
-            if (position == null) {
-                position = ability.caster.transform.position;
-            }
-            if (rotation == null) {
-                rotation = ability.caster.transform.rotation;
-            }
-
-            GameObject spawned = Instantiate(toSpawn, (Vector3)position, (Quaternion)rotation) as GameObject;
-            IAbilityInitializer[] components = spawned.GetComponents<IAbilityInitializer>();
-            if (components != null) {
-                for (int i = 0; i < components.Length; i++) {
-                    components[i].Initialize(ability);
-                }
-            }
-            return spawned;
-        }
-
-        protected static void DestructAndDespawn(GameObject toDespawn, Ability ability) {
-            if (toDespawn == null) return;
-            IAbilityDestructor[] components = toDespawn.GetComponents<IAbilityDestructor>();
-            if (components != null) {
-                for (int i = 0; i < components.Length; i++) {
-                    components[i].Destruct(ability);
-                }
-            }
-            Destroy(toDespawn);
         }
 
         #region Editor Helpers

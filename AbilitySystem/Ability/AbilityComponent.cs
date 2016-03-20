@@ -36,7 +36,7 @@ namespace AbilitySystem {
 
         public new GameObject gameObject {
             get {
-                if (GetType() == typeof(Ability)) {
+                if (GetType() == typeof(Ability) || GetType() == typeof(StatusEffect)) {
                     return base.gameObject;
                 }
                 else {
@@ -47,7 +47,7 @@ namespace AbilitySystem {
 
         public new Transform transform {
             get {
-                if (GetType() == typeof(Ability)) {
+                if (GetType() == typeof(Ability) || GetType() == typeof(StatusEffect)) {
                     return base.transform;
                 }
                 else {
@@ -198,7 +198,7 @@ namespace AbilitySystem {
         }
 
         public new T[] GetComponents<T>()  {
-            if (GetType() == typeof(Ability)) return base.GetComponents<T>();
+            if (GetType() == typeof(Ability) || GetType() == typeof(StatusEffect)) return base.GetComponents<T>();
             throw new AbilityComponentException("GetComponents");
         }
 

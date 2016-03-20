@@ -37,18 +37,21 @@ namespace AbilitySystem {
         public void Update() {
             for (int i = 0; i < statusList.Count; i++) {
                 StatusEffect status = statusList[i];
-                status.Update();
+                status.UpdateActions();
                 if (status.ReadyForRemoval) {
                     status.Remove();
                     statusList.RemoveAt(--i);
+                    Debug.Log("NUKED");
                 }
             }
         }
 
-        public void AddStatus(Ability ability, StatusEffectPrototype prototype) {
-            StatusEffect status = prototype.CreateStatus(ability, entity);
+        public void AddStatus(StatusEffect statusPrefab, Entity caster) {
+            StatusEffect status = Instantiate(statusPrefab) as StatusEffect;
+            status.name = statusPrefab.name;
+            //status.transform.parent = transform;
             StatusEffect existing = statusList.Find((StatusEffect s) => {
-                return s.name == prototype.name && s.caster == ability.caster || s.IsUnique;
+                return s.name == statusPrefab.name && s.caster == caster || s.IsUnique;
             });
             if(existing != null && existing.IsRefreshable) {
                 existing.Refresh();
@@ -56,10 +59,12 @@ namespace AbilitySystem {
             else if(existing != null) {
                 existing.Remove();
                 statusList.Remove(existing);
+                status.Initialize(caster, entity);
                 status.Apply();
                 statusList.Add(status);
             }
             else {
+                status.Initialize(caster, entity);
                 status.Apply();
                 statusList.Add(status);
             }
@@ -79,7 +84,7 @@ namespace AbilitySystem {
             return false;
         }
 
-        public bool RemoveStatus(Entity caster, string statusName) {
+        public bool RemoveStatus(string statusName, Entity caster) {
             StatusEffect effect = statusList.Find((status) => {
                 return status.caster == caster && status.name == statusName;
             });

@@ -72,7 +72,7 @@ namespace AbilitySystem {
         }
 
         public float ElapsedCastTime {
-            get { return (IsCasting) ? castQueue.current.ElapsedCastTime : 0; }
+               get { return (IsCasting) ? castQueue.current.ElapsedCastTime : 0; }
         }
 
         public float TotalCastTime {

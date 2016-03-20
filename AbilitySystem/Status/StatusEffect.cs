@@ -49,47 +49,33 @@ namespace AbilitySystem {
 
     //}
 
-    public class StatusEffectPrototype : ScriptableObject {
+    public class StatusEffect : AbilitySystemComponent {
 
-        public List<StatusAction> actions;
-        public bool IsExpirable;
+        [Writable(false)] public StatusState state;
+
         public ModifiableAttribute<StatusEffect> duration;
-
-        public StatusEffect CreateStatus(Ability ability, Entity target) {
-            return new StatusEffect(name, ability, target, this);
-        }
-
-    }
-
-    public class StatusEffect {
-
-        public string name;
-        protected List<StatusAction> actions;
-        public readonly ModifiableAttribute<StatusEffect> duration;
         public bool IsExpirable;
         public bool IsDispellable;
         public bool IsRefreshable;
         public bool IsUnique;
 
-        public Ability ability;
-        public Entity caster;
-        public Entity target;
-        public StatusEffectPrototype prototype;
-        public PropertySet properties;
-        public StatusState state;
-        public Timer timer;
+        [HideInInspector] public Entity caster;
+        [HideInInspector] public Entity target;
+        protected PropertySet properties;
+        protected StatusAction[] actions;
+        protected Timer timer;
 
-        public StatusEffect(string name, Ability ability, Entity target, StatusEffectPrototype prototype) {
-            this.name = name;
-            this.ability = ability;
+        public void Initialize(Entity caster, Entity target) {
+            hideFlags = HideFlags.HideInHierarchy;
+            transform.hideFlags = HideFlags.HideInInspector;
+            this.caster = caster;
             this.target = target;
-            this.prototype = prototype;
-            duration = new ModifiableAttribute<StatusEffect>("Duration", prototype.duration);
-            actions = new List<StatusAction>(prototype.actions);
+            actions = GetComponents<StatusAction>();
+            for (int i = 0; i < actions.Length; i++) {
+                actions[i].Initialize(caster, target);
+            }           
             properties = new PropertySet();
-            IsExpirable = prototype.IsExpirable;
-            caster = ability.caster;
-            timer = new Timer(duration.CachedValue);
+            timer = new Timer(-1);
         }
 
         public bool ReadyForRemoval {
@@ -97,13 +83,14 @@ namespace AbilitySystem {
         }
 
         public void Apply() {
-            for (int i = 0; i < actions.Count; i++) {
+            state = StatusState.Active;
+            for (int i = 0; i < actions.Length; i++) {
                 actions[i].OnEffectApplied();
             }
         }
 
-        public void Update() {
-            for (int i = 0; i < actions.Count; i++) {
+        public void UpdateActions() {
+            for (int i = 0; i < actions.Length; i++) {
                 actions[i].OnEffectUpdated();
             }
             if (state == StatusState.Active && IsExpirable && timer.Ready) {
@@ -115,7 +102,7 @@ namespace AbilitySystem {
         public void Dispel(/*source?*/) {
             if (state != StatusState.Active) return;
             bool isDispelled = true;
-            for (int i = 0; i < actions.Count; i++) {
+            for (int i = 0; i < actions.Length; i++) {
                 bool actionResult = actions[i].OnDispelAttempted();
                 if (!actionResult && isDispelled) {
                     isDispelled = actionResult;
@@ -123,31 +110,30 @@ namespace AbilitySystem {
             }
             if (IsDispellable && isDispelled) {
                 state = StatusState.Dispelled;
-                for (int i = 0; i < actions.Count; i++) {
+                for (int i = 0; i < actions.Length; i++) {
                     actions[i].OnEffectDispelled();
                 }
             }
         }
 
         public void Expire() {
-            for (int i = 0; i < actions.Count; i++) {
+            for (int i = 0; i < actions.Length; i++) {
                 actions[i].OnEffectExpired();
             }
         }
 
         public void Refresh() {
-            for (int i = 0; i < actions.Count; i++) {
+            for (int i = 0; i < actions.Length; i++) {
                 actions[i].OnEffectRefreshed();
             }
         }
 
         public void Remove() {
-            for (int i = 0; i < actions.Count; i++) {
+            for (int i = 0; i < actions.Length; i++) {
                 actions[i].OnEffectRemoved();
             }
+            Destroy(gameObject);
         }
-
-
     }
 
 }
