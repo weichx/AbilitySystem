@@ -20,13 +20,13 @@ namespace AbilitySystem {
         public AbilityAttribute channelTicks;
         public AbilityAttribute cooldown;
         public AbilityAttribute charges;
+        public AbilityAttribute range;
 
         //public AbilityAttribute chargeUseCooldown;
 
         [Space()]
         public TagCollection tags;
         public AbilityRequirementSet requirementSet;
-        public AbilityAttributeSet attributes;
 
         protected AbilityAction[] actionList;
 
@@ -87,7 +87,11 @@ namespace AbilitySystem {
         }
 
         public void UpdateAttributes() {
-            attributes.UpdateAll(this);
+            range.UpdateValue(this);
+            cooldown.UpdateValue(this);
+            castTime.UpdateValue(this);
+            channelTime.UpdateValue(this);
+            channelTicks.UpdateValue(this);
             if (charges != null) {
                 SetChargeCount((int)charges.UpdateValue(this));
             }
@@ -297,35 +301,35 @@ namespace AbilitySystem {
             return true;
         }
 
-        public AbilityAttribute GetAttribute(string attrName) {
-            return attributes.Get(attrName);
-        }
+        //public AbilityAttribute GetAttribute(string attrName) {
+        //    return attributes.Get(attrName);
+        //}
 
-        public bool AddAttribute(AbilityAttribute attr, bool replace = true) {
-            if (attr == null) return false;
-            var existing = attributes.Get(attr.id);
-            if (existing != null) {
-                if (replace) {
-                    attributes.Set(attr);
-                    return true;
-                }
-                else {
-                    return false;
-                }
-            }
-            attributes.Set(attr);
-            return true;
-        }
+        //public bool AddAttribute(AbilityAttribute attr, bool replace = true) {
+        //    if (attr == null) return false;
+        //    var existing = attributes.Get(attr.id);
+        //    if (existing != null) {
+        //        if (replace) {
+        //            attributes.Set(attr);
+        //            return true;
+        //        }
+        //        else {
+        //            return false;
+        //        }
+        //    }
+        //    attributes.Set(attr);
+        //    return true;
+        //}
 
-        public bool HasAttribute(string attrName) {
-            return attributes.Get(attrName) != null;
-        }
+        //public bool HasAttribute(string attrName) {
+        //    return attributes.Get(attrName) != null;
+        //}
 
-        public float GetAttributeValue(string attrName) {
-            var attr = attributes.Get(attrName);
-            if (attr == null) return 0f;
-            return attr.CachedValue;
-        }
+        //public float GetAttributeValue(string attrName) {
+        //    var attr = attributes.Get(attrName);
+        //    if (attr == null) return 0f;
+        //    return attr.CachedValue;
+        //}
 
         protected void OnTargetSelectionStarted() {
             targetingStrategy.OnTargetSelectionStarted();

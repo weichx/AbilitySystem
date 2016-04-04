@@ -4,7 +4,6 @@ using System.Collections.Generic;
 
 namespace AbilitySystem {
 
-    [RequireComponent(typeof(Entity))] //there might be a way to not require entity
     public class AbilityManager : MonoBehaviour {
         public float baseGlobalCooldown = 1.5f;
 

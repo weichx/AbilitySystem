@@ -10,9 +10,7 @@ namespace AbilitySystem {
         private SerializedProperty property;
         
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label) {
-           // var rect = new EditorRect(position);
-            var halfHeight = position.height * 0.5f;
-            var p = new Rect(position);// { height = halfHeight };
+            var p = new Rect(position);
             var rect = new EditorRect(p);
 
             var prop = new ImprovedSerializedProperty(property);
@@ -39,12 +37,7 @@ namespace AbilitySystem {
             }
 
             prop.Set("baseValue", EditorGUI.FloatField(rect, prop.Get<float>("baseValue")));
-//            GUI.Button(rect, "+");
 
-  //          p = new Rect(position) { height = halfHeight, y = (position.y + halfHeight) };
-    //        rect = new EditorRect(p);
-      //      rect.Width(15f);
-        //    EditorGUI.LabelField(rect.Width(EditorGUIUtility.labelWidth), "Modifier (Boots)");
         }
 
         public override float GetPropertyHeight(SerializedProperty property, GUIContent label) {

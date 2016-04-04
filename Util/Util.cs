@@ -1,6 +1,18 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
+//todo method from vector -- use dotpeek to copy
+public struct Vector2I {
+    public int x;
+    public int y;
+}
+
+public struct Vector3I {
+    public int x;
+    public int y;
+    public int z;
+}
+
 public static class Util {
 
     public static float AngleSigned(Vector3 v1, Vector3 v2, Vector3 normal) {

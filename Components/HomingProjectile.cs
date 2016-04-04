@@ -7,7 +7,7 @@ public class HomingProjectile : MonoBehaviour {
     public float collisionRange;
     public Entity target;
 
-    public void Initialize(Entity target, float speed, float collisionRange) {
+    public void Initialize(Entity target) {
         this.target = target;
         this.speed = speed;
         this.collisionRange = collisionRange;

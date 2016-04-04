@@ -32,6 +32,7 @@
         /// <returns>A new nearest neighbour iterator with the given parameters.</returns>
         public NearestNeighbour<T> NearestNeighbors(double[] tSearchPoint, int iMaxReturned, double fDistance = -1) {
             DistanceFunctions distanceFunction = new SquareEuclideanDistanceFunction();
+            fDistance = distanceFunction.DistanceTransformation(fDistance);
             return NearestNeighbors(tSearchPoint, distanceFunction, iMaxReturned, fDistance);
         }
 
@@ -44,7 +45,8 @@
         /// <param name="fDistance">A threshold distance to apply.  Optional.  Negative values mean that it is not applied.</param>
         /// <returns>A new nearest neighbour iterator with the given parameters.</returns>
         public NearestNeighbour<T> NearestNeighbors(double[] tSearchPoint, DistanceFunctions kDistanceFunction, int iMaxReturned, double fDistance) {
-            return new NearestNeighbour<T>(this, tSearchPoint, kDistanceFunction, iMaxReturned, fDistance);
+            fDistance = kDistanceFunction.DistanceTransformation(fDistance);
+            return new NearestNeighbour<T>(this, tSearchPoint, kDistanceFunction, iMaxReturned, fDistance * fDistance);
         }
     }
 }

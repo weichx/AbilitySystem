@@ -1,7 +1,6 @@
 ﻿using UnityEngine;
 
 namespace AbilitySystem {
-    [RequireComponent(typeof(Entity))]
     public class TargetManager : MonoBehaviour {
 
         public Entity currentTarget;

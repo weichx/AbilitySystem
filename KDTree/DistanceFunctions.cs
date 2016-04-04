@@ -19,6 +19,8 @@
         /// <param name="max">The maximum coorindate of the rectangle.</param>
         /// <returns>The shortest n-dimensional distance between the point and rectangle.</returns>
         double DistanceToRectangle(double[] point, double[] min, double[] max);
+
+        double DistanceTransformation(double distance);
     }
 
     /// <summary>
@@ -59,6 +61,11 @@
                 fSum += fDifference * fDifference;
             }
             return fSum;
+        }
+
+        public double DistanceTransformation(double inputDistance) {
+            if (inputDistance <= 0) return inputDistance;
+            return inputDistance * inputDistance;
         }
     }
 }

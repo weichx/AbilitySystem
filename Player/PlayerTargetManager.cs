@@ -46,7 +46,7 @@ namespace AbilitySystem {
                 projector.gameObject.SetActive(true);
                 projector.transform.parent = currentTarget.transform;
                 projector.transform.localPosition = new Vector3 {
-                    x = 0, y = currentTarget.selectronHeight, z = 0
+                    x = 0, y = 1, z = 0
                 };
                 Color highlightColor = Color.green;
                 projector.material.SetColor("_Color", highlightColor);

@@ -4,6 +4,18 @@ using UnityEngine;
 
 namespace AbilitySystem {
 
+    [Serializable]
+    public class SerializedAttribute {
+        public string name;
+        public float baseValue;
+        public string formulaName;
+        
+        //public ModifiableAttribute<float> ToAttribute(string name, ModifiableAttribute<float> attr) {
+        //    attr.BaseValue = baseValue;
+        //   // attr.SetMethodPointer(Reflector.FindDelegateWithSignature(formulaName));
+        //}            
+    }
+
     [Serializable] // just to let us draw an inspector
     public class AbilityRequirementSet {
         public List<AbilityRequirement> requirements = new List<AbilityRequirement>();

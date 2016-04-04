@@ -39,6 +39,8 @@
 			
 			fixed4 frag (v2f i) : SV_Target
 			{
+				clip(i.uvShadow.xyw);
+				clip(1.0 - i.uvShadow.xy);
 				// Apply alpha mask
 				fixed4 texCookie = tex2Dproj (_ShadowTex, UNITY_PROJ_COORD(i.uvShadow));
 				fixed4 outColor = _Color * texCookie.a;

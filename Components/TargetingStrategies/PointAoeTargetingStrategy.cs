@@ -20,7 +20,7 @@ public class PointAoeTargetingStrategy : TargetingStrategy {
         if (Physics.Raycast(mouseRay, out hit, 1000, (1 << 9))) {
             float distSqrd = hit.point.DistanceToSquared(caster.transform.position);
             float range = 999999;
-            AbilityAttribute rangeAttr = ability.GetAttribute("Range");
+            AbilityAttribute rangeAttr = ability.range;
             if (rangeAttr != null) {
                 range = rangeAttr.CachedValue;
             }

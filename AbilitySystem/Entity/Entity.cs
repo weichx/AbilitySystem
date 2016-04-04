@@ -1,15 +1,19 @@
 ﻿using UnityEngine;
 
-namespace AbilitySystem {
+//todo -- this is a log of every action an entity has taken
+//entries are in a circular buffer. this class provies
+//methods to query and log any action taken by this entity
+public class EntityActionLog {
 
+}
+
+namespace AbilitySystem {
+    [SelectionBase]
     [DisallowMultipleComponent]
-    [RequireComponent(typeof(StatusManager))]
-    [RequireComponent(typeof(AbilityManager))]
-    [RequireComponent(typeof(ResourceManager))]
-    [RequireComponent(typeof(TargetManager))]
     public class Entity : MonoBehaviour {
 
-        public TextAsset asset;
+        [HideInInspector]
+        public string id;
 
         [HideInInspector]
         public StatusManager statusManager;
@@ -18,26 +22,26 @@ namespace AbilitySystem {
         [HideInInspector]
         public AbilityManager abilityManager;
         [HideInInspector]
-        public ResourceManager resourceManager;
-        [HideInInspector]
         public TargetManager targetManager;
 
-        public float selectronHeight = 1f;
+        public ModifiableVariable movementSpeed;
+        public ModifiableVariable health;
+        public ModifiableVariable energy;
 
         public Faction faction;
         private bool movedThisFrame = false;
 
         private Vector3 lastPosition;
 
-        public void Awake() {
+        public virtual void Awake() {
+            EntityManager.Instance.Register(this);
             gameObject.layer = LayerMask.NameToLayer("Entity");
             eventManager = new EventManager();
         }
 
-        public void Start() {
+        public virtual void Start() {
             statusManager = GetComponent<StatusManager>();
             abilityManager = GetComponent<AbilityManager>();
-            resourceManager = GetComponent<ResourceManager>();
             targetManager = GetComponent<TargetManager>();
         }
 
@@ -45,17 +49,14 @@ namespace AbilitySystem {
             get { return targetManager.currentTarget; }
             set { targetManager.SetTarget(value); }
         }
-
-        public Vector3 CollisionPoint {
-            get {
-                //todo selection height isnt the right metric here, use a vector 
-                var p = transform.position;
-                return new Vector3(p.x, selectronHeight, p.z);
-            }
-        }
-
-        public void Update() {
+        
+        public virtual void Update() {
             lastPosition = transform.position;
+            //todo find a better system for this, dont need all these updates
+            //to run every frame
+            health.Update();
+            movementSpeed.Update();
+            energy.Update();
         }
 
         public void LateUpdate() {

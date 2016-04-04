@@ -19,7 +19,7 @@ namespace AbilitySystem {
             Transform transform = caster.transform;
             GameObject gameObject = Instantiate(projectilePrefab.gameObject, transform.position, transform.rotation) as GameObject;
             HomingProjectile projectile = gameObject.GetComponent<HomingProjectile>();
-            projectile.Initialize(target, ability.GetAttributeValue("Projectile Speed"), ability.GetAttributeValue("Collision Range"));
+            projectile.Initialize(target);
         }
     }
 

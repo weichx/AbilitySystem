@@ -48,7 +48,7 @@
 
         private float GetGlobalCooldownTime(Ability ability) {
             float baseGCD = ability.caster.abilityManager.baseGlobalCooldown;
-            return baseGCD + ability.GetAttributeValue("GCDAdjustment");
+            return baseGCD + 0;// ability.GetAttributeValue("GCDAdjustment");
         }
 
         public void Enqueue(Ability ability) {
@@ -67,3 +67,21 @@
         }
     }
 }
+
+//public class AttrMod {
+//    public string id;
+//    public string name;
+//    public string[] tags;
+//    public string category;
+//    public string type;
+//    public string source;
+//    public float duration;
+//    public float baseModifierValue;
+//    public float baseClampValue;
+//    public string modFnPointer;
+//    public string clampFnPointer;
+//}
+
+//public class AbilAction {
+
+//}
