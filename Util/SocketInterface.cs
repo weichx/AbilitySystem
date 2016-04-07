@@ -27,22 +27,19 @@
 
 #endregion
 
-//#define SOCKET_IO_DEBUG			// Uncomment this for debug
+#define SOCKET_IO_DEBUG			// Uncomment this for debug
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Threading;
 using UnityEngine;
 using WebSocketSharp;
-using WebSocketSharp.Net;
-using UnityEditor;
 
 namespace SocketIO {
 
     public class SocketInterface {
         #region Public Properties
 
-        public string url = "ws://127.0.0.1:4567/socket.io/?EIO=4&transport=websocket";
+        public string url = "ws://127.0.0.1:1234/socket.io/?EIO=4&transport=websocket";
         public bool autoConnect = true;
         public int reconnectDelay = 5;
         public float ackExpirationTime = 1800f;
@@ -97,11 +94,7 @@ namespace SocketIO {
             sid = null;
             packetId = 0;
 
-            ws = new WebSocket(url);
-            ws.OnOpen += OnOpen;
-            ws.OnMessage += OnMessage;
-            ws.OnError += OnError;
-            ws.OnClose += OnClose;
+           
             wsConnected = false;
 
             eventQueueLock = new object();
@@ -117,6 +110,7 @@ namespace SocketIO {
         }
 
         public void Update() {
+            if (ws == null) return;
             lock (eventQueueLock) {
                 while (eventQueue.Count > 0) {
                     EmitEvent(eventQueue.Dequeue());
@@ -148,6 +142,12 @@ namespace SocketIO {
         #region Public Interface
 
         public void Connect() {
+            if (connected) return;
+            ws = new WebSocket(url);
+            ws.OnOpen += OnOpen;
+            ws.OnMessage += OnMessage;
+            ws.OnError += OnError;
+            ws.OnClose += OnClose;
             connected = true;
 
             socketThread = new Thread(RunSocketThread);
@@ -162,8 +162,17 @@ namespace SocketIO {
             if (!connected) return;
             EmitClose();
             connected = false;
+            wsConnected = false;
             if (socketThread != null) { socketThread.Abort(); }
             if (pingThread != null) { pingThread.Abort(); }
+            if (ws != null) {
+                ws.OnOpen -= OnOpen;
+                ws.OnMessage -= OnMessage;
+                ws.OnError -= OnError;
+                ws.OnClose -= OnClose;
+                ws = null;
+            }
+           
         }
 
         public void On(string ev, Action<SocketIOEvent> callback) {
@@ -230,6 +239,7 @@ namespace SocketIO {
             webSocket.Close();
         }
 
+        //todo try this without threads
         private void RunPingThread(object obj) {
             WebSocket webSocket = (WebSocket)obj;
 
@@ -311,6 +321,7 @@ namespace SocketIO {
 #endif
             sid = packet.json["sid"].str;
             EmitEvent("open");
+            Debug.Log("[SocketIO] Socket connected");
         }
 
         private void HandlePing() {
@@ -345,10 +356,13 @@ namespace SocketIO {
 
         private void OnError(object sender, ErrorEventArgs e) {
             EmitEvent("error");
+            Debug.Log(e.Message);
         }
 
         private void OnClose(object sender, CloseEventArgs e) {
             EmitEvent("close");
+            Debug.Log("[SocketIO] Socket closed");
+            Disconnect();
         }
 
         private void EmitEvent(string type) {
