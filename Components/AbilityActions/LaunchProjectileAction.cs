@@ -20,6 +20,7 @@ namespace AbilitySystem {
             GameObject gameObject = Instantiate(projectilePrefab.gameObject, transform.position, transform.rotation) as GameObject;
             HomingProjectile projectile = gameObject.GetComponent<HomingProjectile>();
             projectile.Initialize(target);
+            gameObject.transform.position += Vector3.up;
         }
     }
 

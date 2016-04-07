@@ -46,8 +46,7 @@ namespace AbilitySystem {
         }
 
         public Entity Target {
-            get { return targetManager.currentTarget; }
-            set { targetManager.SetTarget(value); }
+            get; set;
         }
         
         public virtual void Update() {

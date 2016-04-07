@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using AbilitySystem;
 
-
+//[RequireTargetStrategy(typeof(SingleTargetStrategy))]
 public class LaunchBlast : AbilityAction {
 
     public GameObject spellPrefab;

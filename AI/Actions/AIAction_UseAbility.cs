@@ -4,25 +4,24 @@ public class AIAction_UseAbility : AIAction {
 
     public string abilityId;
     public float range;
-    private Timer timer;
 
     public override void OnStart() {
-        timer = new Timer(1f);
+        entity.GetComponent<NavMeshAgent>().ResetPath();
+        entity.Target = context.target;
+        entity.abilityManager.Cast(abilityId);
+        var animator = entity.GetComponent<Animator>();
+        animator.SetInteger("PhaseId", 100);
     }
 
     public override ActionStatus OnUpdate() {
-        Debug.Log("Using ability [" + abilityId + "]");
-        if (timer.Ready) {
-            return ActionStatus.Success;
+        if (entity.abilityManager.IsCasting) {
+            return ActionStatus.Running;
         }
-        return ActionStatus.Running;
-    }
-
-    public override void OnSuccess() {
-        Debug.Log("finished using ability [" + abilityId + "]");
+        return ActionStatus.Success;
     }
 
     public override AIDecisionContext[] GetContexts() {
-        return AIDecisionContext.CreateFromEntityHostileList(entity, range);
+        return AIDecisionContext.CreateFromEntityHostileList(entity, 200);
     }
+
 }

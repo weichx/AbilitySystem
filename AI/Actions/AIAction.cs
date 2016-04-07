@@ -69,12 +69,14 @@ public abstract class AIAction {
 
         bool passedRequirements = true;
 
-        for(int i = 0; i < requirements.Length; i++) {
-            var requirement = requirements[i];
-            passedRequirements = requirement.Check(context);
-            actionLog.RecordRequirement(requirement.name, passedRequirements);
-            if (!passedRequirements) {
-                break;
+        if (requirements != null) {
+            for (int i = 0; i < requirements.Length; i++) {
+                var requirement = requirements[i];
+                passedRequirements = requirement.Check(context);
+                actionLog.RecordRequirement(requirement.name, passedRequirements);
+                if (!passedRequirements) {
+                    break;
+                }
             }
         }
 
@@ -90,7 +92,6 @@ public abstract class AIAction {
                     actionLog.RecordConsideration(consideration, Mathf.Clamp01(input), score);
                     break;
                 }
-                //if !consideration.isBoolean :: modFactor ++
                 float makeUpValue = (1 - score) * modFactor;
                 float final = score + (makeUpValue * score);
                 total *= final;

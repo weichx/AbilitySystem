@@ -15,6 +15,7 @@ public class AIAction_CloseToMeleeRange : AIAction {
     public override void OnStart() {
         agent.SetDestination(context.target.transform.position);
         agent.stoppingDistance = arrivalDistance;
+        Debug.Log("Going");
     }
 
     public override ActionStatus OnUpdate() {

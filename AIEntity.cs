@@ -1,13 +1,115 @@
-﻿using System.Collections.Generic;
-using UnityEngine;
-using System;
+﻿using UnityEngine;
 using AbilitySystem;
-using System.Text;
-using System.IO;
+
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
 
+/*
+
+    entity.AddAbilityModifier(new TagMatcher(tags), new AddStatusModifier(new WhirlwindStatus));
+    entity.AddAbilityModifier(new AbilityNameMatcher(tags), new AddStatusModifier(new WhirlwindStatus));
+
+    AddAbilityModifer(matcher, modifier) {
+        abilities = abilityManager.get(matcher)
+        abilities.Foreach(ability)
+            modifier.apply(ability)
+        modifiers.Add(modifier)
+
+    }
+
+    Update() {
+        foreach modifier
+            modifer.Update()
+            if(modifier.shouldRemove) 
+                abilities = modifer.matcher.get(abilityManager)
+                abilities.foreach
+                    modifier.Restore(ability)
+    }
+
+    AddAbility() {
+        foreach modifier
+            if(modifier.matcher.matches(ability) {
+                modifier.apply(ability)
+            }
+    }
+
+    class WhirlWind : AbilityModifier {
+        
+        void Init() {
+            entity.OnStatusAdded()
+            entity.OnDamageTaken()
+            entity.OnManaSpent()    
+            
+            entity.OnAbilityUsed(tags, OnAbilityUsed)
+                }
+
+        entity.OnDamageTaken(Source ability, float damage) {
+        }
+
+        entity.OnDamageDealt(Source ability) {
+            if(ability.target.hasTag(tags) && ability.hasTag(tag)) {
+                ability.damage.Value += modifier
+            }
+         }
+
+        void OnAbilityUsed() {
+            if(ability.HasTags(tags)) {
+                charges--;
+            }
+            if(charges == 0) { Remove(); }
+        }
+
+        void Update() {
+            
+        }
+    }
+
+    ability.Get("Damage")
+
+    Damage
+    Healing
+    Resource
+
+    [Flat, FlatPoolPercentage, BonusPercentage]
+    DamageDescriptor
+        base: 100
+        flatBonus: 200,
+        percentage: 5,
+        bonus: [2, 3, 5] (sort small to large)
+        elements: ["Ice"]
+
+    Properties: {
+        "Elements": ["Ice"]
+    }
+
+    foreach modifier(ability)
+        modifier.OnAbilityHit()
+
+    foreach action
+        action.OnDamageDealt()
+        
+    target.ApplyDamage(entity, ability, damageDescriptor)
+    
+    ability can implicitly do more damage to some things
+
+    DamageDescriptor desc;
+    ability.attributeModifiers.damage.each.Invoke(entity, ability, ref damageDescriptor)
+    entity.ApplyDamage(damageDescriptor)
+
+Status.Add("WhirlWind")
+    Status.Apply() {
+       var mod = Entity.AddAbilityModifier("id", [Tags], new Whirlwind(4));    
+    }   
+
+    Combat
+    NonCombat
+
+    DisableDoubleDamage(abilty) {
+        ability.properties.doubleDamageVsFrozen = false
+    }
+
+*/
 [SelectionBase]
 public class AIEntity : Entity {
     public TextAsset jsonFile;
@@ -18,6 +120,13 @@ public class AIEntity : Entity {
     private InfluenceMapSection iMapSection;
     public AIActionEvaluator evaluator;
     private Animator animator;
+
+    //public void Awake() {
+    //    //var asset = Resources.Load("AI/" + aiProfile) as TextAsset;
+    //    //if(asset != null) {
+    //    //    evaluator = new AIActionEvaluator(this, AIActionFactory.Create(this, asset.text));
+    //    //}
+    //}
 
     public override void Start() {
         base.Start();
@@ -46,22 +155,6 @@ public class AIEntity : Entity {
         AIAction[] actionPackage = AIActionFactory.Create(this, jsonFile.text);
         evaluator.AddActionPackage(actionPackage);
     }
-
-#if UNITY_EDITOR
-    public void OnGUI() {
-        if(Selection.activeGameObject == gameObject && Application.isPlaying) {
-            GUI.Box(new Rect(0, 0, 400, 600), "Action: " + evaluator.GetCurrentActionName());
-
-            //evaluator.decisionLog.entries;
-            //var results = evaluator.GetLastDecisionResults();
-            //var rect = new Rect(0, 25, 400, 25);
-            //for (int i = 0; i < results.Count; i++) {
-            //    GUI.Label(rect, results[i].action.name + " : " + results[i].score);
-            //    rect.y += 20f;
-            //}
-        }
-    }
-#endif
 
 }
 

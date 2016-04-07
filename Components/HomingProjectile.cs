@@ -5,12 +5,11 @@ public class HomingProjectile : MonoBehaviour {
 
     public float speed;
     public float collisionRange;
-    public Entity target;
+
+    [Writable(false)] public Entity target;
 
     public void Initialize(Entity target) {
         this.target = target;
-        this.speed = speed;
-        this.collisionRange = collisionRange;
     }
 
     public void Update() {
@@ -20,6 +19,9 @@ public class HomingProjectile : MonoBehaviour {
         transform.position += movement;
         float distSqr = transform.DistanceToSquared(target.transform);
         if(distSqr <= collisionRange * collisionRange) {
+            //snapshot.GetAttribute("Damage");
+            //damage.GetDescriptor();
+            //target.ApplyDamage(descriptor);
             target = null;
             var evtManager = GetComponent<EventManager>();
             if (evtManager != null) {

@@ -92,7 +92,6 @@ public class AIActionEvaluator {
         actionResults.Clear();
 
         AIDecisionLogEntry diagLog = decisionLog.AddEntry();
-
         for (int i = 0; i < actions.Length; i++) {
             var action = actions[i];
             var contexts = action.GetContexts();
@@ -117,7 +116,7 @@ public class AIActionEvaluator {
             currentAction.OnInterrupt();
             currentAction.OnEnd();
         }
-
+        //todo dont re-invoke start if action/context pair doesnt change
         currentAction = best.action;
         currentAction.Execute(best.context);
     }

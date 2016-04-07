@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Reflection;
 
 public static class TypeCache {
     private static readonly Dictionary<string, Type> _typeCache
         = new Dictionary<string, Type>();
+
+    //private static readonly Dictionary<Type, FieldInfo[]> fieldInfo = new Dictionary<Type, FieldInfo[]>();
 
     public static Type GetType(string typeName) {
         Type type = null;
