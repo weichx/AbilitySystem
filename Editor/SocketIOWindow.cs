@@ -14,12 +14,15 @@ public class SocketIOWindow : EditorWindow {
     private static SocketInterface instance;
 
     public void OnEnable() {
+        bool wasNull = instance == null;
         if (instance == null) {
             instance = new SocketInterface();
         }
         instance.Connect();
         EditorApplication.update += OnUpdate;
-        instance.On("AIConsiderationTypes_Request", EmitConsiderationTypes);
+        if (wasNull) {
+            instance.On("AIConsiderationTypes_Request", EmitConsiderationTypes);
+        }
         Debug.Log("Connected!");
     }
 
@@ -28,11 +31,12 @@ public class SocketIOWindow : EditorWindow {
         List<Type> types = Reflector.FindSubClasses<AIConsideration>();
         string output = "";
         for (int i = 0; i < types.Count - 1; i++) {
-            output += types.GetType().Name;
+            output += types[i].Name;
             output += ",";
         }
-        output += types[types.Count - 1].GetType().Name;
-        instance.Emit("AIConsiderationTypes_Response", JSONObject.Create(output));
+        output += types[types.Count - 1].Name;
+        Debug.Log(output);
+        instance.Emit("AIConsiderationTypes_Response", JSONObject.StringObject(output));
     }
 
     public void OnUpdate() {
@@ -42,6 +46,7 @@ public class SocketIOWindow : EditorWindow {
     public void OnDisable() {
         if (instance != null) {
             instance.Disconnect();
+            instance.Off("AIConsiderationTypes_Request", EmitConsiderationTypes);
         }
         EditorApplication.update -= OnUpdate;
     }
@@ -70,6 +75,7 @@ public class SocketIOWindow : EditorWindow {
             
         }
         if (GUILayout.Button("Reconnect")) {
+            instance.Disconnect();
             OnEnable();
         }
     }
