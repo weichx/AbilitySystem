@@ -3,7 +3,7 @@
 //todo -- this is a log of every action an entity has taken
 //entries are in a circular buffer. this class provies
 //methods to query and log any action taken by this entity
-public class EntityActionLog {
+public class EntityActionLog<T> where T : class {
 
 }
 
@@ -40,6 +40,7 @@ namespace AbilitySystem {
         }
 
         public virtual void Start() {
+            Debug.Log(typeof(EntityActionLog<object>).Name);
             statusManager = GetComponent<StatusManager>();
             abilityManager = GetComponent<AbilityManager>();
             targetManager = GetComponent<TargetManager>();

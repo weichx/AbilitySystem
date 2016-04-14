@@ -119,6 +119,17 @@ public static class DictionaryExtensions {
     }
 }
 
+public static class ListExtensions {
+
+    public static T First<T>(this List<T> list) {
+        return list.Count > 0 ? list[0] : default(T);
+    }
+
+    public static T Last<T>(this List<T> list) {
+        return list.Count > 0 ? list[list.Count - 1] : default(T);
+    }
+}
+
 public static class Vector3Extensions {
 
     public static float AnglePreNormalized(this Vector3 self, Vector3 to) {
