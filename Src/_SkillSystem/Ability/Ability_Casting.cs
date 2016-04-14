@@ -64,7 +64,44 @@ public class AbilityContext {
 		
 }
 
+public abstract class AbilityContextCreator {
+
+	public AbilityContext context;
+
+	public virtual void Initialize() {
+	
+	}
+
+	public void Start() {
+	
+	}
+
+	public void Update() {
+	
+	}
+
+	public void Cancel() {
+	
+	}
+
+	public void Interrupt() {
+	
+	}
+
+	public void End() {
+		
+	}
+}
+
+public class PlayerAbility {
+	public AbilityContextCreator creator;
+	public Ability ability;
+}
+
 public partial class Ability2 {
+
+	public CastState castState;
+	public AbilityContextCreator contextCreator;
 
 	public bool Usable() {
 		
@@ -77,8 +114,15 @@ public partial class Ability2 {
 	}
 
 	public bool Use() {
-	
+		AbilityContext context = new AbilityContext();
+
+		return Use(context);
 	}
 
+	public void Update() {
+		if(castState == CastState.Targeting) {
+
+		}
+	}
 }
 
