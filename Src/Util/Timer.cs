@@ -1,4 +1,4 @@
-﻿public class Timer {
+﻿public struct Timer {
 
     private float startTime;
     private float timeout;
@@ -8,6 +8,12 @@
     public static void Tick(float deltaTime) {
         TotalElapsedTime += deltaTime;
     }
+
+	public static float GetTimestamp {
+		get {
+			return TotalElapsedTime;
+		}
+	}
 
     public Timer(float timeout = 1) {
         this.timeout = timeout;

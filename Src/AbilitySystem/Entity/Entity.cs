@@ -9,8 +9,6 @@ namespace AbilitySystem {
     [RequireComponent(typeof(TargetManager))]
     public class Entity : MonoBehaviour {
 
-        public TextAsset asset;
-
         [HideInInspector]
         public StatusManager statusManager;
         [HideInInspector]
