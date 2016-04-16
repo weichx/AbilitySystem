@@ -93,7 +93,7 @@ namespace MiniJSON {
             if (json == null) return default(T);
             var parsed = Parser.Parse(json);
             if(typeof(T).IsArray) {
-                Array typedArray = Array.CreateInstance(typeof(AIAction), (parsed as object[]).Length);
+                Array typedArray = Array.CreateInstance(typeof(T).GetElementType(), (parsed as object[]).Length);
                 Array.Copy(parsed as object[], typedArray, typedArray.Length);
                 return typedArray as T;
             }
@@ -213,37 +213,80 @@ namespace MiniJSON {
                 return ParseByToken(nextToken);
             }
 
+            //todo figure out how to do deserialization onto an existing object
             object CreateInstance(Dictionary<string, object> table) {
                 object value;
+                object instance = null;
                 if(table.TryGetValue("typeName", out value)) {
                     string typeName = value as string;
                     Type type = TypeCache.GetType(value as string);
-                    var instance = Activator.CreateInstance(type);
+                    if(type == null) {
+                        UnityEngine.Debug.Log("Unable to find type `" + (value as string) + "` so an instance cannot be deserialized");
+                    }
+                    try {
+                        instance = Activator.CreateInstance(type);
+                    } catch (Exception e) {
+                        UnityEngine.Debug.LogError("Unable to create instance of " + typeName);
+                        return null;
+                    }
                     FieldInfo[] fields = type.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
                     for(int i = 0; i < fields.Length; i++) {
                         FieldInfo fieldInfo = fields[i];
                         if (fieldInfo.IsNotSerialized) continue;
                         if(table.TryGetValue(fieldInfo.Name, out value)) {
-                            if (fieldInfo.FieldType.IsArray) {
-                                var elementType = fieldInfo.FieldType.GetElementType();
+                            Type fieldType = fieldInfo.FieldType;
+                            if (fieldType.IsArray) {
+                                var elementType = fieldType.GetElementType();
                                 Array filled = Array.CreateInstance(elementType, (value as object[]).Length);
                                 Array.Copy(value as object[], filled, filled.Length);
                                 fieldInfo.SetValue(instance, filled);
                             }
+                            else if(fieldType.IsGenericType) {
+
+                                //todo im just assuming its a list right now
+                                //var elementType = fieldType.GetGenericArguments()[0];
+                                //object[] valueArray = value as object[];
+                                //Type listType = typeof(List<>).MakeGenericType(new[] { elementType });
+                                //IList list = (IList)Activator.CreateInstance(listType);
+                                //for(int valueIndex = 0; valueIndex < valueArray.Length; valueIndex++) {
+                                //    list.Add(valueArray[valueIndex]);
+                                //}
+                                fieldInfo.SetValue(instance, DeserializeList(fieldType, value as object[]));
+                            }
+                            else if (fieldType.IsEnum) {
+                                fieldInfo.SetValue(instance, Enum.Parse(fieldType, value as string));
+                            }
+                            else if (fieldType.IsGenericType) {
+                                UnityEngine.Debug.Log(fieldType.Name + " is generic");
+                            }
                             else {
+                               
                                 fieldInfo.SetValue(instance, value);
                             }
                         }
                     }
-                    //todo might do this via interface also
-                    //todo this is where we can 'require' fields to be set 
-                    MethodInfo methodInfo = type.GetMethod("OnDeserialized", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
-                    if(methodInfo != null) {
-                        methodInfo.Invoke(instance, new object[] { table });
+
+                    IDeserializable deserializable = instance as IDeserializable;
+                    
+                    if (deserializable != null) {
+                        deserializable.OnDeserialized(table);
                     }
+
+                    //todo this is where we can 'require' fields to be set 
+     
                     return instance;
                 }
                 return null;
+            }
+
+            IList DeserializeList(Type type, object[] values) {
+                var elementType = type.GetGenericArguments()[0];
+                Type listType = typeof(List<>).MakeGenericType(new[] { elementType });
+                IList list = (IList)Activator.CreateInstance(listType);
+                for (int i = 0; i < values.Length; i++) {
+                    list.Add(values[i]);
+                }
+                return list;
             }
 
             object ParseByToken(TOKEN token) {
@@ -339,8 +382,8 @@ namespace MiniJSON {
                 string number = NextWord;
 
                 if (number.IndexOf('.') == -1) {
-                    long parsedInt;
-                    Int64.TryParse(number, out parsedInt);
+                    int parsedInt;
+                    Int32.TryParse(number, out parsedInt);
                     return parsedInt;
                 }
 

@@ -9,11 +9,11 @@ public class EnableDisableOnAbilityHit : MonoBehaviour {
 	void Start () {
         var evtManager = GetComponentInParent<EventManager>();
         if (evtManager != null) {
-            evtManager.AddListenerOnce<AbilityHitEvent>(EnableDisableObjects);
+            evtManager.AddListenerOnce<AbilityHitEntityEvent>(EnableDisableObjects);
         }
     }
 	
-    public void EnableDisableObjects(AbilityHitEvent evt) {
+    public void EnableDisableObjects(AbilityHitEntityEvent evt) {
         if(toEnable != null) {
             for(int i = 0; i < toEnable.Length; i++) {
                 if(toEnable[i] != null) toEnable[i].SetActive(true);

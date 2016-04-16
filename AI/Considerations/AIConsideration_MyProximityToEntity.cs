@@ -7,7 +7,7 @@ public class AIConsideration_MyProximityToEntity : AIConsideration {
     public float rangeMax = 100;
     public string entityId;
 
-    public override float Score(AIDecisionContext context) {
+    public override float Score(Context context) {
         Entity target = EntityManager.Instance.FindEntity(entityId);
         if (target == null) return 0f;
         Vector3 targetPosition = target.transform.position;

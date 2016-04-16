@@ -59,4 +59,10 @@
     public float Timestamp {
         get { return ElapsedTime; }
     }
+
+    public static float GetTimestamp {
+        get {
+            return TotalElapsedTime;
+        }
+    }
 }

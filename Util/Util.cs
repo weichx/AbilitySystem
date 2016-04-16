@@ -107,9 +107,17 @@ public static class TransformExtensions {
 
 public static class DictionaryExtensions {
 
-    public static U Get<T, U>(this Dictionary<T, U> dict, T key) where U : class {
+    public static U Get<T, U>(this Dictionary<T, U> dict, T key) {
         U val;
         dict.TryGetValue(key, out val);
+        return val;
+    }
+
+    public static U Get<T, U>(this Dictionary<T, U> dict, T key, U defaultValue) {
+        U val;
+        if (!dict.TryGetValue(key, out val)) {
+            val = defaultValue;
+        }
         return val;
     }
 
@@ -117,6 +125,7 @@ public static class DictionaryExtensions {
         dict.Add(key, value);
         return value;
     }
+
 }
 
 public static class ListExtensions {

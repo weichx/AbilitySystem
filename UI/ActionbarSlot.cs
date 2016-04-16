@@ -18,7 +18,7 @@ public class ActionbarSlot : UISlotBase {
     public AbilityManager abilityManager;
 
     protected override void Start() {
-        abilityManager = PlayerManager.playerEntity.GetComponent<AbilityManager>();    
+        abilityManager = PlayerManager.playerEntity.abilityManager;    
         if (iconGraphic == null) {
             Transform iconTransform = transform.Find("Icon");
             iconGraphic = iconTransform.GetComponent<Image>();
@@ -47,8 +47,8 @@ public class ActionbarSlot : UISlotBase {
             Unassign();
         }
         else {
-            abilityId = ability.name;
-            SetIcon(ability.icon);
+            abilityId = ability.abilityId;
+          //  SetIcon(ability.icon);
         }
     }
 
@@ -58,27 +58,27 @@ public class ActionbarSlot : UISlotBase {
             if (cooldownText != null) cooldownText.text = "";
         }
         else {
-            if (ability.OnCooldown) {
-                cooldownImage.enabled = true;
-                float remaining = ability.RemainingCooldown;
-                cooldownImage.fillAmount = ability.RemainingCooldown / ability.cooldown.CachedValue;
-                cooldownText.text = ability.RemainingCooldown.ToString("0.0");
-            }
-            else if (abilityManager.OnGlobalCooldown) {
-                cooldownImage.enabled = true;
-                cooldownImage.fillAmount = abilityManager.RemainingGCDTime;
-            }
-            else {
-                cooldownImage.enabled = false;
-                cooldownText.text = "";
-            }
+            //if (ability.OnCooldown) {
+            //    cooldownImage.enabled = true;
+            //    float remaining = ability.RemainingCooldown;
+            //    cooldownImage.fillAmount = ability.RemainingCooldown / ability.cooldown.CachedValue;
+            //    cooldownText.text = ability.RemainingCooldown.ToString("0.0");
+            //}
+            //else if (abilityManager.OnGlobalCooldown) {
+            //    cooldownImage.enabled = true;
+            //    cooldownImage.fillAmount = abilityManager.RemainingGCDTime;
+            //}
+            //else {
+            //    cooldownImage.enabled = false;
+            //    cooldownText.text = "";
+            //}
         }
 
        
     }
 
     public void SetAbility(string abilityId) {
-        var abilityManager = PlayerManager.playerEntity.GetComponent<AbilityManager>();
+        var abilityManager = PlayerManager.playerEntity.abilityManager;
         SetAbility(abilityManager.GetAbility(abilityId));        
     }
 
@@ -120,7 +120,7 @@ public class ActionbarSlot : UISlotBase {
 
         if (!IsAssigned()) return;
 
-        PlayerManager.playerEntity.GetComponent<AbilityManager>().Cast(abilityId);
+       // PlayerManager.playerEntity.abilityManager.Cast(abilityId);
 
         eventData.Use();
 

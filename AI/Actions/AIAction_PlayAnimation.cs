@@ -4,7 +4,6 @@ using UnityEngine;
 public class AIAction_PlayAnimation : AIAction {
 
     public string animationName;
-    private AIDecisionContext[] contexts = new AIDecisionContext[1];
 
     public override void OnStart() {
         //int animationId = AnimationManager.GetId(animationName);
@@ -26,13 +25,6 @@ public class AIAction_PlayAnimation : AIAction {
         Animator animator = entity.GetComponent<Animator>();
         Debug.Assert(animator != null, "AIAction_PlayAnimation requires an animator, " + entity.name + " doesnt have one");
         animator.SetInteger("PhaseId", 0);
-    }
-
-    public override AIDecisionContext[] GetContexts() {
-        contexts[0] = new AIDecisionContext() {
-            entity = entity
-        };
-        return contexts;
     }
 
 }

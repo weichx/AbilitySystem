@@ -16,37 +16,35 @@ using System;
 //score but still get re-evaluated. things like scripted actions can be either checked for
 //or given very high weights
 
-
-public class AIActionEvaluator {
+public class AIActionManager {
 
     // todo divide into 'packages' that can be dynamically added / removed
 
     private Entity entity;
-    private AIAction[] actions;
+    private Decision[] decisions;
     private AIAction currentAction;
     public Timer nextDecisionTimer;
-    private List<AIDecisionResult> actionResults;
+    private List<AIDecisionResult> decisionResults;
 
     public AIDecisionLog decisionLog;
 
-    public AIActionEvaluator(Entity entity, AIAction[] actions) {
+    //for now assume a single implicit behavior, explore having more behaviors later
+
+    public AIActionManager(Entity entity, Decision[] actions = null) {
         this.entity = entity;
-        AddActionPackage(actions);
+        SetDecisionPackage(actions);
         nextDecisionTimer = new Timer(0.5f);
-        actionResults = new List<AIDecisionResult>();
+        decisionResults = new List<AIDecisionResult>();
         decisionLog = new AIDecisionLog(entity.name);
     }
 
     //todo this should really be json so we dont re-use action instances across AI Entities
-    public void AddActionPackage(AIAction[] actionPackage) {
-        actions = actionPackage ?? new AIAction[0];
-        for (int i = 0; i < actions.Length; i++) {
-            actions[i].entity = entity;
-        }
+    public void SetDecisionPackage(Decision[] decisionPackage) {
+        decisions = decisionPackage ?? new Decision[0];
     }
 
     public void Update() {
-        if (actions.Length == 0) return;
+        if (decisions.Length == 0) return;
         if (currentAction == null || nextDecisionTimer.ReadyWithReset()) {
             SelectAction();
             return;
@@ -72,44 +70,33 @@ public class AIActionEvaluator {
             currentAction.OnEnd();
         }
         currentAction = null;
-        actions = null;
+        decisions = null;
     }
-
-    //public AIDiagnostic_Action[] GetDiagnostics() {
-    //    return null;
-    //}
-
-    public List<AIDecisionResult> GetLastDecisionResults() {
-        return null;
-    }
-
-    //public AIDiagnostic_Action[] GetLastDecisionDiagnostic() {
-
-    //}
 
     private void SelectAction() {
-        if (actions == null) return;
-        actionResults.Clear();
+        if (decisions == null) return;
+        decisionResults.Clear();
 
         AIDecisionLogEntry diagLog = decisionLog.AddEntry();
-        for (int i = 0; i < actions.Length; i++) {
-            var action = actions[i];
-            var contexts = action.GetContexts();
+        for (int i = 0; i < decisions.Length; i++) {
+            Decision decision = decisions[i];
+            Context[] contexts = decision.contextCreator.GetContexts(entity);
             for (int j = 0; j < contexts.Length; j++) {
-                AIDecisionContext context = contexts[j];
-                AIActionLogEntry logEntry = diagLog.AddActionEntry(action, context);
-                AIDecisionResult result = action.Score(context, logEntry);
-                actionResults.Add(result);
+                Context context = contexts[j];
+                context.entity = entity;
+                AIDecisionEvaluatorLogEntry logEntry = diagLog.AddDecision(decision, context);
+                AIDecisionResult result = decision.Score(context, logEntry);
+                decisionResults.Add(result);
             }
             //todo weight each result
         }
 
-        if (actionResults.Count == 0) {
+        if (decisionResults.Count == 0) {
             return;
         }
 
-        actionResults.Sort();
-        AIDecisionResult best = actionResults[0];
+        decisionResults.Sort();
+        AIDecisionResult best = decisionResults[0];
         diagLog.SetSelectedAction(best);
 
         if (currentAction != null && best.action != currentAction) {
@@ -125,6 +112,55 @@ public class AIActionEvaluator {
         if (currentAction == null) return "No Current Action";
         return currentAction.GetType().Name;
     }
+
+    //protected AIDecisionResult Score(AIAction action, Context context, AIDecisionEvaluatorLogEntry deciscionLog) {
+    //    var considerations = action.considerations;
+    //    var requirements = action.requirements;
+
+    //    float modFactor = 1f - (1f / considerations.Length);
+    //    float total = 1f;
+
+    //    bool passedRequirements = true;
+
+    //    if (requirements != null) {
+    //        for (int i = 0; i < requirements.Length; i++) {
+    //            var requirement = requirements[i];
+    //            passedRequirements = requirement.Check(context);
+    //            deciscionLog.RecordRequirement(requirement.name, passedRequirements);
+    //            if (!passedRequirements) {
+    //                break;
+    //            }
+    //        }
+    //    }
+
+    //    if (passedRequirements) {
+    //        //score and scale score according to total # of considerations
+    //        for (int i = 0; i < considerations.Length; i++) {
+    //            var consideration = considerations[i];
+    //            var curve = consideration.curve;
+    //            var input = considerations[i].Score(context);
+    //            var score = curve.Evaluate(input);
+    //            if (score == 0) {
+    //                total = 0;
+    //                deciscionLog.RecordConsideration(consideration, Mathf.Clamp01(input), score);
+    //                break;
+    //            }
+    //            float makeUpValue = (1 - score) * modFactor;
+    //            float final = score + (makeUpValue * score);
+    //            total *= final;
+    //            deciscionLog.RecordConsideration(consideration, Mathf.Clamp01(input), score);
+    //        }
+    //    }
+
+    //    AIDecisionResult result = new AIDecisionResult() {
+    //        score = total,
+    //        action = action,
+    //        context = context
+    //    };
+
+    //    deciscionLog.RecordResult(total);
+    //    return result;
+    //}
 }
 
 /*

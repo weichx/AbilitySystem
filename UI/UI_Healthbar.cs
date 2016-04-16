@@ -13,6 +13,6 @@ public class UI_Healthbar : MonoBehaviour {
     }
 
     void Update() {
-        image.fillAmount = entity.health.Normalized;
+       // image.fillAmount = entity.health.Normalized;
     }
 }

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 
 [Serializable]
-public class AIActionLogEntry {
+public class AIDecisionEvaluatorLogEntry {
     public string name;
     public string context;
     public float score;
@@ -13,9 +13,9 @@ public class AIActionLogEntry {
 
     private Timer timer;
 
-    public AIActionLogEntry(AIAction action, AIDecisionContext context) {
+    public AIDecisionEvaluatorLogEntry(Decision decision, Context context) {
         timer = new Timer();
-        name = action.name;
+        name = decision.name;
         this.context = context.ToString();
         considerations = new List<AIConsiderationLogEntry>();
         requirements = new List<AIRequirementLogEntry>();

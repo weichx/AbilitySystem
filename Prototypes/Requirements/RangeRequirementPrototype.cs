@@ -16,7 +16,7 @@ namespace AbilitySystem {
         public override bool MeetsRequirement(Ability ability) {
             Entity caster = ability.caster;
             if (caster.Target == null) return false;
-            float attr = ability.range.CachedValue;
+            float attr = ability.GetAttribute<FloatAttribute>("range").Value;
             attr *= attr;
             return caster.Target.transform.DistanceToSquared(caster.transform) <= attr;
         }

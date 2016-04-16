@@ -1,21 +1,21 @@
-﻿using UnityEngine;
+﻿//using UnityEngine;
 
-namespace AbilitySystem {
+//namespace AbilitySystem {
 
-    [AddComponentMenu("Ability System/Targeting/Single Target")]
-    public class SingleTargetStrategy : TargetingStrategy {
+//    [AddComponentMenu("Ability System/Targeting/Single Target")]
+//    public class SingleTargetStrategy : TargetingStrategy {
 
-        [HideInInspector]
-        public Entity target;
+//        [HideInInspector]
+//        public Entity target;
 
-        public override void OnTargetSelectionStarted() {
-            target = caster.Target;
-            if (target == null) {
-                ability.CancelCast();
-                return;
-            }
-        }
+//        public override void OnTargetSelectionStarted() {
+//            target = caster.Target;
+//            if (target == null) {
+//                ability.CancelCast();
+//                return;
+//            }
+//        }
 
-    }
+//    }
 
-}
+//}

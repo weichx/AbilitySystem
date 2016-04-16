@@ -8,7 +8,7 @@ public class AIConsideration_TimeSinceAbilityLastUsed : AIConsideration {
     public float maxTime_ms;
     public float minTime_ms;
 
-    public override float Score(AIDecisionContext context) {
+    public override float Score(Context context) {
         return 1f;
     }
 

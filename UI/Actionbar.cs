@@ -1,7 +1,5 @@
 ﻿using UnityEngine;
-using System.Collections.Generic;
 using AbilitySystem;
-
 
 public class Actionbar : MonoBehaviour {
 
@@ -10,7 +8,7 @@ public class Actionbar : MonoBehaviour {
 
     void Start() {
         slots = GetComponentsInChildren<ActionbarSlot>();
-        abilityManager = PlayerManager.playerEntity.GetComponent<AbilityManager>();
+        abilityManager = PlayerManager.playerEntity.abilityManager;
         for (int i = 0; i < slots.Length; i++) {
             slots[i].SetAbility(abilityManager.GetAbility(slots[i].abilityId));
         }

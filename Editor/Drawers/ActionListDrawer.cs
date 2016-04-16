@@ -73,10 +73,10 @@ namespace AbilitySystem {
 
         private void GetOptions(SerializedProperty inputProperty) {
             if (abilityAcitonTypes == null) {
-                abilityAcitonTypes = Reflector.FindSubClasses<AbilityAction>();
-                var names = abilityAcitonTypes.Select((t) => t.Name).ToList();// as List<string>;
-                names.Insert(0, "None");
-                abilityActionTypeNames = names.ToArray();
+                //abilityAcitonTypes = Reflector.FindSubClasses<AbilityAction>();
+                //var names = abilityAcitonTypes.Select((t) => t.Name).ToList();// as List<string>;
+                //names.Insert(0, "None");
+                //abilityActionTypeNames = names.ToArray();
             }
         }
     }

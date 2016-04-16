@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 namespace AbilitySystem {
 
-    public class DamageOverTime : AbilityAction {
+    public class DamageOverTime  {
 
     }
 }

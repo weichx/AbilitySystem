@@ -24,6 +24,6 @@ public class BoostEntitySpeed : StatusAction {
 
     [Formula]
     public static float TestBoostSpeed(Entity entity, float baseValue) {
-        return entity.abilityManager.ElapsedCastTime * 10f;
+        return 10f;// entity.abilityManager.ElapsedCastTime * 10f;
     }
 }

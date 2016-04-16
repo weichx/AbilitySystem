@@ -1,7 +1,7 @@
 ﻿using System;
 
 public struct AIDecisionResult : IComparable<AIDecisionResult> {
-    public AIDecisionContext context;
+    public Context context;
     public AIAction action;
     public float score;
 

@@ -1,9 +1,9 @@
 ﻿
 namespace AbilitySystem {
 
-    public abstract class StatusAction : AbilitySystemComponent {
+    public abstract class StatusAction {
 
-        protected StatusEffect status;
+       // protected StatusEffect status;
         protected Entity caster;
         protected Entity target;
 

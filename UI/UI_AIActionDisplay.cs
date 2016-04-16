@@ -13,7 +13,7 @@ public class UI_AIActionDisplay : MonoBehaviour {
     }
 	
 	void Update () {
-        string name = entity.evaluator.GetCurrentActionName();
+        string name = entity.actionManager.GetCurrentActionName();
         int idx = name.IndexOf("AIAction_");
         
         if(idx != -1) {

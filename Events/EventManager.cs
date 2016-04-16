@@ -5,7 +5,7 @@ using System;
 
 public class GameEvent { }
 
-//todo flesh this out more
+//todo flesh this out more, probably dont need so many dictionaries
 //public class EvtMngr : MonoBehaviour {
 
 //    public delegate void EventDelegate<T>(T e = null) where T : GameEvent;
@@ -24,16 +24,15 @@ public class GameEvent { }
 //    }
 
 //    public void TriggerEvent(GameEvent evt) {
-//        AddEventListener<AbilityDatabaseLoaded>((e) => { });
-//        TriggerEvent(new AbilityDatabaseLoaded());
-//        TriggerEvent<AbilityDatabaseLoaded>();
+       
 //    }
 
-//    public void TriggerEvent<T>() where T : GameEvent {
+//    public void TriggerEvent<T>(T evt = null) where T : GameEvent {
 //        Type t = typeof(T);
 //        EventDelegate<T> del = dict[t] as EventDelegate<T>;
-//        del.Invoke();
+//        del.Invoke(evt);
 //    }
+
 //}
 
 public class EventManager : MonoBehaviour {
@@ -152,6 +151,10 @@ public class EventManager : MonoBehaviour {
 
     //Inserts the event into the current queue.
     public void QueueEvent(GameEvent evt) {
+        eventQueue.Enqueue(evt);
+    }
+
+    public void QueueEvent<T>(T evt) {
         eventQueue.Enqueue(evt);
     }
 

@@ -1,7 +1,4 @@
-﻿using System;
-using AbilitySystem;
-using UnityEngine;
-using System.Collections.Generic;
+﻿using UnityEngine;
 
 public class AIAction_CloseToMeleeRange : AIAction {
 
@@ -13,9 +10,8 @@ public class AIAction_CloseToMeleeRange : AIAction {
     }
 
     public override void OnStart() {
-        agent.SetDestination(context.target.transform.position);
-        agent.stoppingDistance = arrivalDistance;
-        Debug.Log("Going");
+        //agent.SetDestination(context.target.transform.position);
+        //agent.stoppingDistance = arrivalDistance;
     }
 
     public override ActionStatus OnUpdate() {
@@ -29,10 +25,6 @@ public class AIAction_CloseToMeleeRange : AIAction {
 
     public override void OnEnd() {
         agent.ResetPath();
-    }
-
-    public override AIDecisionContext[] GetContexts() {
-        return AIDecisionContext.CreateFromEntityHostileList(entity, 250);
     }
 
 }
