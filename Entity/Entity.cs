@@ -4,9 +4,9 @@ using AbilitySystem;
 //todo -- this is a log of every action an entity has taken
 //entries are in a circular buffer. this class provies
 //methods to query and log any action taken by this entity
-public class EntityActionLog<T> where T : class {
+//public class EntityActionLog<T> where T : class {
 
-}
+//}
 
 
 [SelectionBase]

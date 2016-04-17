@@ -5,10 +5,14 @@ using System.Collections.Generic;
 //todo use an IModifiable<T> as a base interface for this and intattr / floatattr
 //IAdjustable
 
+///<summary>
+///Responsible for things like armor, essentially a pipeline of adjustments just like modifiers
+///might have one to take double damage or half damage or negate armor or double xp rate etc.
+///</summary>
 public class Resource : FloatAttribute {
 
     protected List<ResourceAdjuster> adjusters;
-    public AbilitySystem.TagCollection tags;
+    public TagCollection tags;
 
     public Resource() : base() {
         adjusters = new List<ResourceAdjuster>();
@@ -68,13 +72,4 @@ public class Resource : FloatAttribute {
         Decrease(Mathf.Clamp01(amount / totalValue), context);
     }
 
-}
-
-
-public class ArmorAdjustor : ResourceAdjuster {
-
-    public override float Adjust(float delta, Resource resource, Context context) {
-        float armor = context.Get<float>("armor");
-        return delta - armor;
-    }
 }

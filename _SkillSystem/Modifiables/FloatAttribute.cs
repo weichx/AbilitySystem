@@ -1,7 +1,8 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
+using System;
 
-public class FloatAttribute {
+public class FloatAttribute : IDeserializable {
 
     protected Dictionary<string, FloatModifier> modifiers;
     protected float baseValue;
@@ -73,6 +74,20 @@ public class FloatAttribute {
         return modifiers.Remove(id);
     }
 
+    public virtual void OnDeserialized(Dictionary<string, object> table) {
+        if (modifiers.Count == 0) {
+            totalValue = baseValue;
+            currentValue = totalValue;
+        }
+        else {
+            //will have to run through all modifiers and call set on them
+            //since they are added under the hood by the deserializer
+            foreach (var mod in modifiers) {
+                SetModifier(mod.Key, mod.Value);
+            }
+        }
+    }
+
     public float BaseValue {
         get { return baseValue; }
         set {
@@ -107,6 +122,7 @@ public class FloatAttribute {
     public float PercentBonus {
         get { return percentBonus; }
     }
+
 
     //extend this for 'bounded float attribute'
     //public virtual float MaxValue {

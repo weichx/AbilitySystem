@@ -9,8 +9,8 @@ using UnityEditor;
 
 public class EntityDefinition {
     public string name;
-    public string action;
-    public AbilityModifier[] modifiers;
+    public string factionId;
+    public AbilityModifier[] abilityModifiers;
 }
 
 [SelectionBase]
@@ -65,11 +65,10 @@ public class AIEntity : Entity {
         if(entityDefFile != null) {
             EntityDefinition def = MiniJSON.Json.Deserialize<EntityDefinition>(entityDefFile.text);
             name = def.name;
-            abilityManagerAddAbilityModifier(def.modifiers[0]);
+            factionId = def.factionId;
+            abilityManager.AddAbilityModifiers(def.abilityModifiers);
         }
-        ////temp
-        //AbilityModifier modifier = new Haste();
-        //abilityManager.AddAbilityModifier(modifier);
+
     }
 
     public override void Update() {

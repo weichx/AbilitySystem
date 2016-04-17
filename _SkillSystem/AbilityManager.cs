@@ -31,7 +31,7 @@ public class AbilityManager {
             }
         }
         if (idx == -1) {
-            Ability ability = AbilityDatabase.Instance.Create(abilityId);
+            Ability ability = database.Create(abilityId);
             ApplyModifiers(ability);
             abilities.Add(ability);
             abilityReferences.Add(1);
@@ -187,6 +187,12 @@ public class AbilityManager {
         get { return (IsCasting) ? castQueue.CurrentAbility.TotalCastTime : 0f; }
     }
 
+    public void AddAbilityModifiers(IList<AbilityModifier> mods) {
+        for (int i = 0; i < mods.Count; i++) {
+            AddAbilityModifier(mods[i]);
+        }
+    }
+
     public void AddAbilityModifier(AbilityModifier mod) {
         mod.Initialize();
         for (int i = 0; i < abilities.Count; i++) {
@@ -200,6 +206,12 @@ public class AbilityManager {
             mod.Remove(abilities[i]);
         }
         abilityModifiers.Remove(mod);
+    }
+
+    private static JSONDatabase<Ability> database;
+
+    static AbilityManager() {
+        database = new JSONDatabase<Ability>("Ability Definitions");
     }
 
 }
