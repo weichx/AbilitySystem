@@ -4,8 +4,10 @@ using AbilitySystem;
 
 public class Nameplate : MonoBehaviour {
 
-    protected Text textComponent;
+    protected Text nameText;
+    protected Text castTimeText;
     protected Image castBar;
+    protected Image healthBar;
     [Writable(false)] public Entity entity;
 
     public void Initialize(Entity entity) {
@@ -13,12 +15,17 @@ public class Nameplate : MonoBehaviour {
         WorldSpaceUIOverlay overlay = GetComponent<WorldSpaceUIOverlay>();
         overlay.SetTrackedObject(entity.transform);
         transform.SetParent(GameObject.FindGameObjectWithTag("UICanvas").transform);
+        nameText = GetComponentInChildren<Text>();
+        nameText.text = entity.name;
     }
 
     void Start () {
-        textComponent = GetComponentInChildren<Text>();
-        castBar = GetComponentInChildren<Image>();
-        if(entity != null) {
+        castBar = transform.Find("Castbar").GetComponent<Image>();
+        healthBar = transform.Find("Healthbar").GetComponent<Image>();
+        castTimeText = castBar.GetComponentInChildren<Text>();
+        castTimeText.text = "";
+
+        if (entity != null) {
             WorldSpaceUIOverlay overlay = GetComponent<WorldSpaceUIOverlay>();
             overlay.SetTrackedObject(entity.transform);
         }
@@ -28,11 +35,13 @@ public class Nameplate : MonoBehaviour {
         if(entity == null) return;
         if(entity.abilityManager.IsCasting) {
             Ability currentAbility = entity.abilityManager.ActiveAbility;
-            textComponent.text = entity.name + " (" + currentAbility.ElapsedCastTime.ToString("0.00") + ")";
+            castTimeText.text = currentAbility.abilityId + " (" + currentAbility.ElapsedCastTime.ToString("0.00") + ")";
         }
         else {
-            textComponent.text = entity.name;
+            nameText.text = entity.name;
+            castTimeText.text = "";
         }
+        healthBar.fillAmount = entity.GetAttribute("Health").NormalizedValue;
         castBar.fillAmount = entity.abilityManager.NormalizedElapsedCastTime;   
 	}
 }

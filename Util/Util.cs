@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 //todo method from vector -- use dotpeek to copy
@@ -14,6 +15,25 @@ public struct Vector3I {
 }
 
 public static class Util {
+
+    public static GameObject FindOrCreateByName(string name, Type[] components = null) {
+        GameObject retn = GameObject.Find(name);
+        if(retn == null) {
+            retn = new GameObject(name);
+        }
+        if(components != null) {
+            for(int i = 0; i < components.Length; i++) {
+                Type componentType = components[i];
+                if (componentType == null) continue;
+                if(componentType.IsSubclassOf(typeof(MonoBehaviour))) {
+                    if(retn.GetComponent(componentType) == null) {
+                        retn.AddComponent(componentType);
+                    }
+                }
+            }
+        }
+        return retn;
+    }
 
     public static float AngleSigned(Vector3 v1, Vector3 v2, Vector3 normal) {
         return Mathf.Atan2(Vector3.Dot(normal, Vector3.Cross(v1, v2)), Vector3.Dot(v1, v2)) * Mathf.Rad2Deg;

@@ -10,10 +10,12 @@ public class AbilityManager {
 
     protected Timer gcdTimer;
     protected CastQueue castQueue;
+    protected Entity entity;
 
     public static float BaseGlobalCooldown = 1.5f;
 
-    public AbilityManager() {
+    public AbilityManager(Entity entity) {
+        this.entity = entity;
         abilities = new List<Ability>();
         abilityReferences = new List<int>();
         abilityModifiers = new List<AbilityModifier>();
@@ -31,7 +33,8 @@ public class AbilityManager {
             }
         }
         if (idx == -1) {
-            Ability ability = database.Create(abilityId);
+            Ability ability = EntitySystemLoader.Instance.Create<Ability>(abilityId);
+            ability.caster = entity;
             ApplyModifiers(ability);
             abilities.Add(ability);
             abilityReferences.Add(1);
@@ -206,12 +209,6 @@ public class AbilityManager {
             mod.Remove(abilities[i]);
         }
         abilityModifiers.Remove(mod);
-    }
-
-    private static JSONDatabase<Ability> database;
-
-    static AbilityManager() {
-        database = new JSONDatabase<Ability>("Ability Definitions");
     }
 
 }

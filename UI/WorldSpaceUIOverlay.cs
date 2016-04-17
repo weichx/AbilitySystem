@@ -93,22 +93,17 @@ public class WorldSpaceUIOverlay : MonoBehaviour {
         }
     }
 
-    public void OnValidate() {
-        rectTransform = GetComponent<RectTransform>();
-        graphics = GetComponentsInChildren<Graphic>();
-        LateUpdate();
-    }
 }
 
-#if UNITY_EDITOR
-[CustomEditor(typeof(WorldSpaceUIOverlay))]
-public class OverlayInspector :  Editor {
+//#if UNITY_EDITOR
+//[CustomEditor(typeof(WorldSpaceUIOverlay))]
+//public class OverlayInspector :  Editor {
 
-    public override void OnInspectorGUI() {
-        base.OnInspectorGUI();
-        if (GUILayout.Button("Update To Transform")) {
-            (target as WorldSpaceUIOverlay).OnValidate();
-        }
-    }
-}
-#endif
+//    public override void OnInspectorGUI() {
+//        base.OnInspectorGUI();
+//        if (GUILayout.Button("Update To Transform")) {
+//            (target as WorldSpaceUIOverlay).OnValidate();
+//        }
+//    }
+//}
+//#endif

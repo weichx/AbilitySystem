@@ -1,6 +1,6 @@
 ﻿using System;
 
-public abstract class StatusComponent {
+public abstract class StatusEffectComponent {
 
     [NonSerialized] public StatusEffect statusEffect;
     [NonSerialized] public Context context;
@@ -18,6 +18,10 @@ public abstract class StatusComponent {
     //public virtual void OnEffectStackAdded() {
 
     //}
+
+    public virtual void OnEffectTick() {
+
+    }
 
     public virtual void OnEffectRefreshed(Context context) {
 

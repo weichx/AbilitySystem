@@ -10,12 +10,16 @@ using System.Collections.Generic;
 ///might have one to take double damage or half damage or negate armor or double xp rate etc.
 ///</summary>
 public class Resource : FloatAttribute {
+    
+    public string resourceId; //todo depricate this
+    [NonSerialized] protected Action<float, float> watchers;
 
     protected List<ResourceAdjuster> adjusters;
     public TagCollection tags;
 
     public Resource() : base() {
         adjusters = new List<ResourceAdjuster>();
+        watchers = delegate (float a, float b) { };
     }
 
     public void AddAdjuster(ResourceAdjuster adjuster) {
@@ -70,6 +74,14 @@ public class Resource : FloatAttribute {
 
     public void DecreaseNormalized(float amount, Context context) {
         Decrease(Mathf.Clamp01(amount / totalValue), context);
+    }
+
+    public void AddWatcher(Action<float, float> watcher) {
+        watchers += watcher;
+    }
+
+    public void RemoveWatcher(Action<float, float> watcher) {
+        watchers -= watcher;
     }
 
 }

@@ -14,19 +14,22 @@ public class StatusEffect : IDeserializable {
 
     public Entity caster;
     public Entity target;
-    public List<StatusComponent> components;
+    public List<StatusEffectComponent> components;
     protected Timer timer;
     public Context context;
 
+    public FloatAttribute tickRate;
+    public FloatAttribute ticks;
+
     public StatusEffect() {
         state = StatusState.Invalid;
-        components = new List<StatusComponent>();
+        components = new List<StatusEffectComponent>();
         tags = new TagCollection();
         duration = new FloatAttribute();
         timer = new Timer();//can probably get rid of timer and just duration as a variable
     }
 
-    public StatusComponent AddStatusComponent<T>() where T : StatusComponent, new() {
+    public StatusEffectComponent AddStatusComponent<T>() where T : StatusEffectComponent, new() {
         T component = new T();
         component.statusEffect = this;
         component.caster = caster;
@@ -38,7 +41,7 @@ public class StatusEffect : IDeserializable {
     public void Apply(Entity target, Context context) {
         this.target = target;
         this.context = context;
-        caster = context.Caster;
+        caster = context.entity;
         state = StatusState.Active;
         UpdateComponentContext();
     }
@@ -106,4 +109,17 @@ public class StatusEffect : IDeserializable {
             components[i].OnEffectApplied();
         }
     }
+
+    public virtual void AddStatusComponentsFromTemplate(StatusEffectTemplate template) {
+        if (template.additionalComponents == null) return;
+        for (int i = 0; i < template.additionalComponents.Length; i++) {
+            StatusEffectComponent component = template.additionalComponents[i];
+            components[i].caster = caster;
+            components[i].target = target;
+            components[i].context = context;
+            components.Add(component);
+        }
+    }
+
+    
 }

@@ -14,6 +14,7 @@ public class FloatAttribute : IDeserializable {
     public FloatAttribute() {
         baseValue = 0;
         currentValue = 0;
+        percentBonus = 0;
         totalValue = baseValue;
         modifiers = new Dictionary<string, FloatModifier>();
     }
@@ -34,13 +35,13 @@ public class FloatAttribute : IDeserializable {
     }
 
     public void SetFlatBonus(string id, float bonus) {
-        FloatModifier mod = modifiers[id];
+        FloatModifier mod = modifiers.Get(id);
         mod.flatBonus = bonus;
         SetModifier(id, mod);
     }
 
     public void SetPercentBonus(string id, float bonus) {
-        FloatModifier mod = modifiers[id];
+        FloatModifier mod = modifiers.Get(id);
         mod.percentBonus = bonus;
         SetModifier(id, mod);
     }
@@ -57,9 +58,11 @@ public class FloatAttribute : IDeserializable {
         modifiers[id] = modifier;
 
         float currentNormalized = NormalizedValue;
-        float totalFlat = baseValue + flatBonus;
-        totalValue = totalFlat + (totalFlat * percentBonus);
-        currentValue = currentNormalized * totalValue;
+        float totalValue = baseValue + flatBonus;
+        if(percentBonus != 0) {
+            totalValue = totalValue + ((totalValue * percentBonus));
+        }
+        currentValue =  (currentNormalized * totalValue);
     }
 
     public virtual bool RemoveModifier(string id) {
@@ -70,7 +73,7 @@ public class FloatAttribute : IDeserializable {
         float currentNormalized = NormalizedValue;
         float totalFlat = baseValue + flatBonus;
         totalValue = totalFlat + (totalFlat * percentBonus);
-        currentValue = currentNormalized * totalValue;
+        currentValue = (currentNormalized * totalValue);
         return modifiers.Remove(id);
     }
 
@@ -95,7 +98,7 @@ public class FloatAttribute : IDeserializable {
             float currentNormalized = NormalizedValue;
             float totalFlat = baseValue + flatBonus;
             totalValue = totalFlat + (totalFlat * percentBonus);
-            currentValue = currentNormalized * totalValue;
+            currentValue = (currentNormalized * totalValue);
         }
     }
 
@@ -113,6 +116,10 @@ public class FloatAttribute : IDeserializable {
             float percent = Mathf.Clamp01(value);
             currentValue = totalValue * percent;
         }
+    }
+
+    public float Max {
+        get { return totalValue; }
     }
 
     public float FlatBonus {

@@ -3,6 +3,7 @@ using UnityEngine;
 
 public class Context {
 
+    //todo maybe nuke these
     public readonly List<Entity> targets;
     public readonly List<Vector3> positions;
 
@@ -22,10 +23,6 @@ public class Context {
         targets.Clear();
         positions.Clear();
         targets.Clear();
-    }
-
-    public Entity Caster {
-        get { return entity; }
     }
 
     public T Get<T>(string propertyName) {

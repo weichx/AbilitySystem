@@ -1,5 +1,5 @@
 ﻿using UnityEngine;
-using AbilitySystem;
+using System.Collections.Generic;
 
 //todo -- this is a log of every action an entity has taken
 //entries are in a circular buffer. this class provies
@@ -15,19 +15,35 @@ public class Entity : MonoBehaviour {
 
     public string factionId;
 
-    [HideInInspector] public string id;
-    [HideInInspector] public AbilityManager abilityManager;
-    [HideInInspector] public ResourceManager resourceManager;
+    [HideInInspector]
+    public string id;
+    [HideInInspector]
+    public AbilityManager abilityManager;
+    [HideInInspector]
+    public ResourceManager resourceManager;
+    [HideInInspector]
+    public StatusEffectManager statusManager;
 
-    [SerializeField]  protected Vector3 castPoint;
-    [SerializeField]  protected Vector3 castTarget;
+    [SerializeField]
+    protected Vector3 castPoint;
+    [SerializeField]
+    protected Vector3 castTarget;
 
     private Vector3 lastPosition;
     private bool movedThisFrame = false;
+    private Dictionary<string, FloatAttribute> attributes;
 
-    public virtual void Awake() {
+    [SerializeField]
+    private string templatePath;
+
+    public void Awake() {
+        attributes = new Dictionary<string, FloatAttribute>();
+        resourceManager = new ResourceManager(this);
+        statusManager = new StatusEffectManager(this);
+        abilityManager = new AbilityManager(this);
+        attributes["Health"] = new FloatAttribute(100);
         EntityManager.Instance.Register(this);
-        resourceManager = new ResourceManager();
+
         gameObject.layer = LayerMask.NameToLayer("Entity");
     }
 
@@ -40,13 +56,34 @@ public class Entity : MonoBehaviour {
         if (abilityManager != null) {
             abilityManager.Update();
         }
+        if (statusManager != null) {
+            statusManager.Update();
+        }
+        if (resourceManager != null) {
+            //resourceManager.Update();
+        }
     }
 
     public void LateUpdate() {
         movedThisFrame = lastPosition != transform.position;
     }
 
-    #region properties
+    #region Attributes
+
+    public FloatAttribute GetAttribute(string attrName) {
+        return attributes.Get(attrName);
+    }
+
+    public void SetAttribute(string attrName, FloatAttribute attr) {
+        attributes[attrName] = attr;
+    }
+
+    public bool HasAttribute(string propertyName) {
+        return attributes.ContainsKey(propertyName);
+    }
+    #endregion
+
+    #region Properties
     public Vector3 CastPoint {
         get {
             return transform.TransformPoint(castPoint);
@@ -78,6 +115,11 @@ public class Entity : MonoBehaviour {
     public bool IsChanneling {
         get { return abilityManager.ActiveAbility != null && abilityManager.ActiveAbility.IsChanneled; }
     }
+
+    public string TemplatePath {
+        get { return templatePath; }
+    }
+
     #endregion
 }
 

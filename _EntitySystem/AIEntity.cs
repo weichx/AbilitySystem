@@ -7,18 +7,10 @@ using System.Collections.Generic;
 using UnityEditor;
 #endif
 
-public class EntityDefinition {
-    public string name;
-    public string factionId;
-    public AbilityModifier[] abilityModifiers;
-}
-
 [SelectionBase]
 public class AIEntity : Entity {
 
-    public Entity target;
-    public TextAsset jsonFile;
-    public TextAsset entityDefFile;
+    public string behaviorPath;
 
     public NavMeshAgent agent;
     public AIActionManager actionManager;
@@ -32,24 +24,22 @@ public class AIEntity : Entity {
 
     public void Start() {
 
-        abilityManager = new AbilityManager();
-
         animator = GetComponent<Animator>();
         influenceUpdateTimer = new Timer(0.25f);
         agent = GetComponent<NavMeshAgent>();
         iMapSection = new InfluenceMapSection(9 * 9);
 
-        if (jsonFile != null) {
-            behaviors = MiniJSON.Json.Deserialize<AIBehavior[]>(jsonFile.text);
+
+        if (!string.IsNullOrEmpty(behaviorPath)) {
+            AIBehavior behavior = EntitySystemLoader.Instance.Create<AIBehavior>(behaviorPath);
             List<Decision> decisions = new List<Decision>();
-            for (int i = 0; i < behaviors.Length; i++) {
-                for (int j = 0; j < behaviors[i].decisions.Length; j++) {
-                    Decision decision = behaviors[i].decisions[j];
-                    decisions.Add(decision);
-                    AIAction_UseAbility useAbility = decision.action as AIAction_UseAbility;
-                    if (useAbility != null) {
-                        abilityManager.AddAbility(useAbility.abilityId);
-                    }
+            for (int i = 0; i < behavior.decisions.Length; i++) {
+                Decision decision = behavior.decisions[i];
+                decisions.Add(decision);
+                //todo figure out the behavior is really a source of abilities
+                AIAction_UseAbility useAbility = decision.action as AIAction_UseAbility;
+                if (useAbility != null) {
+                    abilityManager.AddAbility(useAbility.abilityId);
                 }
             }
 
@@ -61,14 +51,6 @@ public class AIEntity : Entity {
             np.GetComponent<Nameplate>().Initialize(this);
             //todo handle entity being destroyed
         }
-
-        if(entityDefFile != null) {
-            EntityDefinition def = MiniJSON.Json.Deserialize<EntityDefinition>(entityDefFile.text);
-            name = def.name;
-            factionId = def.factionId;
-            abilityManager.AddAbilityModifiers(def.abilityModifiers);
-        }
-
     }
 
     public override void Update() {

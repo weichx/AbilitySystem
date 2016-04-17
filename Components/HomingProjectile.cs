@@ -28,6 +28,6 @@ public class HomingProjectile : MonoBehaviour, IAbilityContextAware {
     public void SetAbilityContext(Context context) {
         this.context = context;
         target = context.Get<Entity>("target");
-        transform.position = context.Caster.CastPoint;
+        transform.position = context.entity.CastPoint;
     }
 }

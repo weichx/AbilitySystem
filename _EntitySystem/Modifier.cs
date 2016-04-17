@@ -5,9 +5,16 @@ public abstract class Modifier<T> where T : class {
 
     protected List<T> targets;
     public IMatcher<T> matcher;
+    public string id;
 
     [NonSerialized]
     private bool initialized;
+
+    public Modifier(string id) {
+        this.id = id;
+    }
+
+    public Modifier() { }
 
     public void Initialize() {
         if (initialized) return;
@@ -16,10 +23,10 @@ public abstract class Modifier<T> where T : class {
         OnInitialize();
     }
 
-    public void Apply(T thing) {
-        if ((matcher == null || matcher.Match(thing)) && !targets.Contains(thing)) {
-            targets.Add(thing);
-            OnApply(thing);
+    public void Apply(T modified) {
+        if ((matcher == null || matcher.Match(modified)) && !targets.Contains(modified)) {
+            targets.Add(modified);
+            OnApply(modified);
         }
     }
 
@@ -27,18 +34,18 @@ public abstract class Modifier<T> where T : class {
         OnUpdate();
     }
 
-    public void Remove(T thing) {
-        if (targets.Remove(thing)) {
-            OnRemove(thing);
+    public void Remove(T modified) {
+        if (targets.Remove(modified)) {
+            OnRemove(modified);
         }
     }
 
-    protected virtual void OnInitialize() {  }
+    public virtual void OnInitialize() {  }
 
-    protected virtual void OnApply(T thing) {  }
+    public virtual void OnApply(T modified) {  }
 
-    protected virtual void OnUpdate() { }
+    public virtual void OnUpdate() { }
 
-    protected virtual void OnRemove(T thing) { }
+    public virtual void OnRemove(T modified) { }
 
 }

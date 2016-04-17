@@ -4,9 +4,11 @@ public class ResourceManager {
 
     //todo consider making these matchable / taggable / etc
 
-    private Dictionary<string, Resource> resources;
+    protected Dictionary<string, Resource> resources;
+    protected Entity entity;
 
-    public ResourceManager() {
+    public ResourceManager(Entity entity) {
+        this.entity = entity;
         resources = new Dictionary<string, Resource>();
     }
 

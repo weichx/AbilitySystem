@@ -2,10 +2,11 @@
 
 public class StatusEffectManager {
 
-    public List<StatusEffect> statusList;
-    public Entity entity;
+    protected List<StatusEffect> statusList;
+    protected Entity entity;
 
-    public StatusEffectManager() {
+    public StatusEffectManager(Entity entity) {
+        this.entity = entity;
         statusList = new List<StatusEffect>();
     }
 
@@ -21,7 +22,7 @@ public class StatusEffectManager {
     }
 
     public StatusEffect AddStatusEffect(string effectId, Context context) {
-        Entity caster = context.Caster;
+        Entity caster = context.entity;
         StatusEffect existing = statusList.Find((StatusEffect s) => {
             return s.statusEffectId == effectId && s.caster == caster || s.IsUnique;
         });
@@ -31,7 +32,7 @@ public class StatusEffectManager {
             return existing;
         }
 
-        StatusEffect statusEffect = database.Create(effectId);
+        StatusEffect statusEffect = EntitySystemLoader.Instance.Create<StatusEffect>(effectId);
 
         if (existing != null) {
             existing.Remove();
@@ -42,6 +43,14 @@ public class StatusEffectManager {
         statusList.Add(statusEffect);
 
         return statusEffect;
+    }
+
+    //this is pseudo private
+    public void AddStatusEffectFromTemplate(StatusEffectTemplate template) {
+        StatusEffect effect = template.Create(entity);
+        Context context = template.GetContext(entity);
+        effect.Apply(entity, context);
+        statusList.Add(effect);
     }
 
     public bool DispelStatus(Entity caster, string statusId) {
@@ -90,11 +99,6 @@ public class StatusEffectManager {
         return null;
     }
 
-    private static JSONDatabase<StatusEffect> database;
-
-    static StatusEffectManager() {
-        database = new JSONDatabase<StatusEffect>("Status Effects");
-    }
 }
 
 public class StatusNotFoundException : System.Exception {

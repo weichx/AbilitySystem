@@ -92,7 +92,7 @@ namespace MiniJSON {
         public static T Deserialize<T>(string json) where T : class {
             if (json == null) return default(T);
             var parsed = Parser.Parse(json);
-            if(typeof(T).IsArray) {
+            if (typeof(T).IsArray) {
                 Array typedArray = Array.CreateInstance(typeof(T).GetElementType(), (parsed as object[]).Length);
                 Array.Copy(parsed as object[], typedArray, typedArray.Length);
                 return typedArray as T;
@@ -217,31 +217,38 @@ namespace MiniJSON {
             object CreateInstance(Dictionary<string, object> table) {
                 object value;
                 object instance = null;
-                if(table.TryGetValue("typeName", out value)) {
+                if (table.TryGetValue("typeName", out value)) {
                     string typeName = value as string;
                     Type type = TypeCache.GetType(value as string);
-                    if(type == null) {
+                    if (type == null) {
                         UnityEngine.Debug.Log("Unable to find type `" + (value as string) + "` so an instance cannot be deserialized");
                     }
                     try {
                         instance = Activator.CreateInstance(type);
-                    } catch (Exception e) {
+                    }
+                    catch (Exception e) {
                         UnityEngine.Debug.LogError("Unable to create instance of " + typeName);
                         return null;
                     }
                     FieldInfo[] fields = type.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
-                    for(int i = 0; i < fields.Length; i++) {
+                    for (int i = 0; i < fields.Length; i++) {
                         FieldInfo fieldInfo = fields[i];
                         if (fieldInfo.IsNotSerialized) continue;
-                        if(table.TryGetValue(fieldInfo.Name, out value)) {
+                        if (table.TryGetValue(fieldInfo.Name, out value)) {
                             Type fieldType = fieldInfo.FieldType;
                             if (fieldType.IsArray) {
-                                var elementType = fieldType.GetElementType();
-                                Array filled = Array.CreateInstance(elementType, (value as object[]).Length);
-                                Array.Copy(value as object[], filled, filled.Length);
-                                fieldInfo.SetValue(instance, filled);
+                                try {
+                                    var elementType = fieldType.GetElementType();
+                                    Array filled = Array.CreateInstance(elementType, (value as object[]).Length);
+                                    Array.Copy(value as object[], filled, filled.Length);
+                                    fieldInfo.SetValue(instance, filled);
+                                }
+                                catch (Exception e) {
+                                    UnityEngine.Debug.LogError(e);
+                                    UnityEngine.Debug.Log("Cannot assign to " + type.Name + "." + fieldInfo.Name);
+                                }
                             }
-                            else if(fieldType.IsGenericType) {
+                            else if (fieldType.IsGenericType) {
 
                                 //todo im just assuming its a list right now
                                 //var elementType = fieldType.GetGenericArguments()[0];
@@ -260,20 +267,20 @@ namespace MiniJSON {
                                 UnityEngine.Debug.Log(fieldType.Name + " is generic");
                             }
                             else {
-                               
+
                                 fieldInfo.SetValue(instance, value);
                             }
                         }
                     }
 
                     IDeserializable deserializable = instance as IDeserializable;
-                    
+
                     if (deserializable != null) {
                         deserializable.OnDeserialized(table);
                     }
 
                     //todo this is where we can 'require' fields to be set 
-     
+
                     return instance;
                 }
                 return null;
