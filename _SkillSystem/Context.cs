@@ -57,12 +57,8 @@ public class Context {
     }
 
     public object this[string propertyName] {
-        get {
-            return properties[propertyName];
-        }
-        set {
-            properties[propertyName] = value;
-        }
+        get { return properties[propertyName]; }
+        set { properties[propertyName] = value; }
     }
 
 }

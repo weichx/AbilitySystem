@@ -13,12 +13,14 @@ public class FloatAttribute {
     public FloatAttribute() {
         baseValue = 0;
         currentValue = 0;
+        totalValue = baseValue;
         modifiers = new Dictionary<string, FloatModifier>();
     }
 
     public FloatAttribute(float baseValue) {
         this.baseValue = Mathf.Max(0, baseValue);
         currentValue = baseValue;
+        totalValue = baseValue;
         modifiers = new Dictionary<string, FloatModifier>();
     }
 
@@ -56,8 +58,20 @@ public class FloatAttribute {
         float currentNormalized = NormalizedValue;
         float totalFlat = baseValue + flatBonus;
         totalValue = totalFlat + (totalFlat * percentBonus);
-        currentValue = totalValue * (currentNormalized / totalValue);
-    }   
+        currentValue = currentNormalized * totalValue;
+    }
+
+    public virtual bool RemoveModifier(string id) {
+        FloatModifier prev = modifiers.Get(id);
+        flatBonus -= prev.flatBonus;
+        percentBonus -= prev.percentBonus;
+
+        float currentNormalized = NormalizedValue;
+        float totalFlat = baseValue + flatBonus;
+        totalValue = totalFlat + (totalFlat * percentBonus);
+        currentValue = currentNormalized * totalValue;
+        return modifiers.Remove(id);
+    }
 
     public float BaseValue {
         get { return baseValue; }
@@ -66,7 +80,7 @@ public class FloatAttribute {
             float currentNormalized = NormalizedValue;
             float totalFlat = baseValue + flatBonus;
             totalValue = totalFlat + (totalFlat * percentBonus);
-            currentValue = totalValue * (currentNormalized / totalValue);
+            currentValue = currentNormalized * totalValue;
         }
     }
 
@@ -76,10 +90,13 @@ public class FloatAttribute {
     }
 
     public virtual float NormalizedValue {
-        get { return currentValue / totalValue; }
+        get {
+            if (totalValue == 0) return 0;
+            return currentValue / totalValue;
+        }
         set {
             float percent = Mathf.Clamp01(value);
-            currentValue = totalValue * (percent / totalValue);
+            currentValue = totalValue * percent;
         }
     }
 

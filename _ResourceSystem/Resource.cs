@@ -7,48 +7,69 @@ using System.Collections.Generic;
 
 public class Resource : FloatAttribute {
 
-    public string name;
-    public List<ResourceAdjuster> adjustors;
+    protected List<ResourceAdjuster> adjusters;
+    public AbilitySystem.TagCollection tags;
 
     public Resource() : base() {
-        adjustors = new List<ResourceAdjuster>();
+        adjusters = new List<ResourceAdjuster>();
     }
 
-    public void Increase(Context context, float amount) {
+    public void AddAdjuster(ResourceAdjuster adjuster) {
+        adjusters.Add(adjuster);
+    }
+
+    public bool HasAdjuster(ResourceAdjuster adjuster) {
+        return adjusters.Contains(adjuster);
+    }
+
+    public bool HasAdjuster(string adjusterId) {
+        for (int i = 0; i < adjusters.Count; i++) {
+            if (adjusters[i].resourceId == adjusterId) return true;
+        }
+        return false;
+    }
+
+    public bool RemoveAdjuster(ResourceAdjuster adjuster) {
+        return adjusters.Remove(adjuster);
+    }
+
+    public bool RemoveAdjuster(string adjusterId) {
+        for (int i = 0; i < adjusters.Count; i++) {
+            if (adjusters[i].resourceId == adjusterId) {
+                adjusters.RemoveAt(i);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public void Increase(float amount, Context context) {
         float adjustedValue = 0;
-        for (int i = 0; i < adjustors.Count; i++) {
-            adjustedValue += adjustors[i].Adjust(amount, this, context);
+        for (int i = 0; i < adjusters.Count; i++) {
+            adjustedValue += adjusters[i].Adjust(amount, this, context);
         }
         currentValue += adjustedValue;
         currentValue = Mathf.Clamp(currentValue, float.MinValue, totalValue);
     }
 
-    public void Decrease(Context context, float amount) {
+    public void Decrease(float amount, Context context) {
         float adjustedValue = 0;
-        for (int i = 0; i < adjustors.Count; i++) {
-            adjustedValue -= adjustors[i].Adjust(amount, this, context);
+        for (int i = 0; i < adjusters.Count; i++) {
+            adjustedValue -= adjusters[i].Adjust(amount, this, context);
         }
         currentValue -= adjustedValue;
     }
 
-    public void IncreaseNormalized(Context context, float amount) {
-        Increase(context, Mathf.Clamp01(amount / totalValue));
+    public void IncreaseNormalized(float amount, Context context) {
+        Increase(Mathf.Clamp01(amount / totalValue), context);
     }
 
-    public void DecreaseNormalized(Context context, float amount) {
-        Decrease(context, Mathf.Clamp01(amount / totalValue));
+    public void DecreaseNormalized(float amount, Context context) {
+        Decrease(Mathf.Clamp01(amount / totalValue), context);
     }
 
 }
 
-//todo maybe this is an interface
-public abstract class ResourceAdjuster {
-
-    public string id;
-
-    public abstract float Adjust(float delta, Resource resource, Context context);
-
-}
 
 public class ArmorAdjustor : ResourceAdjuster {
 

@@ -7,11 +7,19 @@ using System.Collections.Generic;
 using UnityEditor;
 #endif
 
+public class EntityDefinition {
+    public string name;
+    public string action;
+    public AbilityModifier[] modifiers;
+}
+
 [SelectionBase]
 public class AIEntity : Entity {
 
     public Entity target;
     public TextAsset jsonFile;
+    public TextAsset entityDefFile;
+
     public NavMeshAgent agent;
     public AIActionManager actionManager;
 
@@ -22,8 +30,7 @@ public class AIEntity : Entity {
     private AIBehavior[] behaviors;
     public GameObject nameplate;
 
-    public override void Start() {
-        base.Start();
+    public void Start() {
 
         abilityManager = new AbilityManager();
 
@@ -55,10 +62,14 @@ public class AIEntity : Entity {
             //todo handle entity being destroyed
         }
 
-
-        //temp
-        AbilityModifier modifier = new Haste();
-        abilityManager.AddAbilityModifier(modifier);
+        if(entityDefFile != null) {
+            EntityDefinition def = MiniJSON.Json.Deserialize<EntityDefinition>(entityDefFile.text);
+            name = def.name;
+            abilityManagerAddAbilityModifier(def.modifiers[0]);
+        }
+        ////temp
+        //AbilityModifier modifier = new Haste();
+        //abilityManager.AddAbilityModifier(modifier);
     }
 
     public override void Update() {

@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-public class ResourceManager {
+public class ResourcePool {
 
     //todo pool stuff
     public static GameObject Spawn(string prefabUrl, Vector3 position, Quaternion rotation) {

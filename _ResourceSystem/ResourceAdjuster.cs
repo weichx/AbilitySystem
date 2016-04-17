@@ -1,9 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿
+//todo maybe this is an interface
+public abstract class ResourceAdjuster {
 
-namespace Assets.Src._ResourceSystem {
-    class ResourceAdjuster {
-    }
+    public string resourceId;
+
+    public abstract float Adjust(float delta, Resource resource, Context context);
+
 }

@@ -17,6 +17,8 @@ public class Entity : MonoBehaviour {
 
     [HideInInspector] public string id;
     [HideInInspector] public AbilityManager abilityManager;
+    [HideInInspector] public ResourceManager resourceManager;
+
     [SerializeField]  protected Vector3 castPoint;
     [SerializeField]  protected Vector3 castTarget;
 
@@ -25,10 +27,9 @@ public class Entity : MonoBehaviour {
 
     public virtual void Awake() {
         EntityManager.Instance.Register(this);
+        resourceManager = new ResourceManager();
         gameObject.layer = LayerMask.NameToLayer("Entity");
     }
-
-    public virtual void Start() {}
 
     public Entity Target { //todo remove this after fixing requirements
         get; set;
