@@ -9,7 +9,6 @@ public class CastSpeedModifier : AbilityModifier {
     }
 
     public override void OnApply(Ability ability) {
-        UnityEngine.Debug.Log(power);
         ability.castTime.SetPercentBonus(id, -power);
     }
 

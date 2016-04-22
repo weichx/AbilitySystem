@@ -2,10 +2,11 @@
 using System.Collections.Generic;
 using System;
 
+[Serializable]
 public class FloatAttribute : IDeserializable {
 
     protected Dictionary<string, FloatModifier> modifiers;
-    protected float baseValue;
+    [SerializeField] protected float baseValue;
     protected float flatBonus;
     protected float percentBonus;
     protected float totalValue;

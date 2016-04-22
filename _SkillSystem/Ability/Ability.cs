@@ -2,13 +2,14 @@
 using System;
 using System.Collections.Generic;
 
+[Serializable]
 public partial class Ability : IDeserializable {
 
     public string abilityId;
     [NonSerialized]
     public Entity caster;
     private int nextCharge;
-    private Charge[] charges;
+    [SerializeField] private Charge[] charges;
     public CastState castState;
     public CastMode castMode;
     public CastMode actualCastMode; //a cast time of <= 0 makes things instant. inverse possible as well

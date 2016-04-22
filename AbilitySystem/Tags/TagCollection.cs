@@ -7,7 +7,8 @@ public class TagCollection {
 
     [SerializeField]
     private List<Tag> tags = new List<Tag>();
-
+    //todo -- list is the wrong structure for this, use a dictionary or a set dummy!
+    //if collection is small list is fine, larger collections of tags should use a dictionary
     public TagCollection() {
         tags = new List<Tag>();
     }
@@ -53,6 +54,15 @@ public class TagCollection {
 
     public bool Contains(Tag tag) {
         return tags.Contains(tag);
+    }
+
+    public bool ContainsAny(TagCollection collection) {
+        for (int i = 0; i < collection.tags.Count; i++) {
+            if (tags.Contains(collection.tags[i])) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public TagCollection Union(TagCollection other) {

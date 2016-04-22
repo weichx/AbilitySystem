@@ -50,7 +50,6 @@ public class EntityManager {
 
     public Entity FindEntity(string entityId) {
         for(int i = 0; i < entities.Count; i++) {
-           // Debug.Log(entities[i].gameObject.name + " -> " + entityId);
             if (entities[i].gameObject.name == entityId) return entities[i];
         }
         return null;
