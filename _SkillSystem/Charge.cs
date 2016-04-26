@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [Serializable]
-public class Charge : IDeserializable {
+public class Charge {
 
     private float lastUsed;
     public float cooldown;
@@ -37,7 +37,7 @@ public class Charge : IDeserializable {
         lastUsed = Timer.GetTimestamp;
     }
 
-    public void OnDeserialized(Dictionary<string, object> table) {
-        Debug.Log(cooldownAttr.Value + " -> attr value");
-    }
+    //public void OnDeserialized(Dictionary<string, object> table) {
+    //    Debug.Log(cooldownAttr.Value + " -> attr value");
+    //}
 }

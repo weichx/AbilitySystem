@@ -1,6 +1,12 @@
 ﻿using UnityEngine;
 using UnityEditor;
 using EntitySystemUtil;
+using System;
+using System.Reflection;
+using System.CodeDom.Compiler;
+using Microsoft.CSharp;
+using System.IO;
+using System.Collections.Generic;
 
 public enum ESWMode {
     Ability, StatusEffect, Behaviors, AIDebugger
@@ -12,9 +18,31 @@ public class EntitySystemWindow : EditorWindow {
     static void Init() {
         EntitySystemWindow window = GetWindow<EntitySystemWindow>();
     }
-
     private ESWMode mode;
     private AbilityPage abilityPage;
+
+    public static ScriptableObject ExecuteCode(string code) {
+        Dictionary<string, string> provOptions = new Dictionary<string, string>();
+
+        provOptions.Add("CompilerVersion", "v2.0");
+        CSharpCodeProvider provider = new CSharpCodeProvider(provOptions);
+        CompilerParameters compilerParams = new CompilerParameters();
+        compilerParams.GenerateExecutable = false;
+        compilerParams.GenerateInMemory = true;
+        compilerParams.IncludeDebugInformation = true;
+        compilerParams.ReferencedAssemblies.Add(typeof(Ability).Assembly.CodeBase);
+        compilerParams.ReferencedAssemblies.Add(typeof(Vector3).Assembly.CodeBase);
+
+        CompilerResults results = provider.CompileAssemblyFromSource(compilerParams, code);
+        Debug.Log("Number of Errors: " + results.Errors.Count);
+        foreach (CompilerError err in results.Errors) {
+            Debug.Log(err.ErrorText);
+
+        }
+        
+        Type t = results.CompiledAssembly.GetType("DummyScriptable");
+        return ScriptableObject.CreateInstance(t);
+    }
 
     void OnEnable() {
         abilityPage = new AbilityPage();
@@ -22,18 +50,15 @@ public class EntitySystemWindow : EditorWindow {
     }
 
     void OnDisable() {
-        if (abilityPage.dummy != null) {
+        if (abilityPage != null && abilityPage.dummy != null) {
             DestroyImmediate(abilityPage.dummy);
         }
-        Debug.Log("Disabling");
     }
 
     void OnDestroy() {
-        if(abilityPage.dummy != null) {
+        if (abilityPage != null && abilityPage.dummy != null) {
             DestroyImmediate(abilityPage.dummy);
         }
-        Debug.Log("Destroying");
-
     }
 
     public void OnGUI() {

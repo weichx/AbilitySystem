@@ -63,5 +63,19 @@ namespace EntitySystemUtil {
         public static EditorRect EditorRect(this Rect rect, float widthMargin, float heightMargin) {
             return new global::EditorRect(rect, widthMargin, heightMargin);
         }
+
+        public static Rect WidthCentered(this Rect rect, float itemWidth) {
+            return new Rect(rect) {
+                x = rect.x + (rect.width * 0.5f) - (itemWidth * 0.5f),
+                width = itemWidth
+            };
+        }
+
+        public static Rect HeightCentered(this Rect rect, float itemHeight) {
+            return new Rect(rect) {
+                y = rect.y + (rect.height * 0.5f) - (itemHeight * 0.5f),
+                width = itemHeight
+            };
+        }
     }
 }

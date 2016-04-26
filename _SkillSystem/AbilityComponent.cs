@@ -1,11 +1,14 @@
-﻿
+﻿using System;
+
+[Serializable]
 public class AbilityComponent {
 
-    public string name;
+    public string name = "AbilityComponent1";
+    public string componentName = "my component name";
 
-    public Entity caster;
-    public Ability ability;
-    public Context context;
+    [NonSerialized] public Entity caster;
+    [NonSerialized] public Ability ability;
+    [NonSerialized] public Context context;
 
     public virtual void OnUse() { }
     public virtual void OnChargeConsumed() { }

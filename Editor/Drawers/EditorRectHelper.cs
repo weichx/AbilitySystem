@@ -37,6 +37,10 @@ public class EditorRect {
         return VerticalSlice(currentRect.height - blockSize);
     }
 
+    public Rect VerticalSlice() {
+        return VerticalSlice(UnityEditor.EditorGUIUtility.singleLineHeight);
+    }
+
     public Rect HorizontalSlice(float slice) {
         Rect retn = new Rect(currentRect) {
             width = slice
