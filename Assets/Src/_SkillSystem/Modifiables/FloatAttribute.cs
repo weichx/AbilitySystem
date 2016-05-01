@@ -4,7 +4,7 @@ using System;
 
 [Serializable]
 public class FloatAttribute {
-
+	[HideInInspector]
     [SerializeField] protected Dictionary<string, FloatModifier> modifiers;
     [SerializeField] protected float baseValue;
     [NonSerialized] protected float flatBonus;

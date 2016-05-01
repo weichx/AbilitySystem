@@ -21,27 +21,26 @@ public class EntitySystemWindow : EditorWindow {
 
     void OnEnable() {
         abilityPage = null;
-        EditorUtility.UnloadUnusedAssetsImmediate(true);
-
-        GC.Collect();
-        GC.WaitForPendingFinalizers();
         abilityPage = new AbilityPage();
         abilityPage.Initialize();
         Repaint();
     }
 
     void OnDisable() {
-        EditorUtility.UnloadUnusedAssetsImmediate(true);
-        CacheTools.CleanCache();
-        GC.Collect();
-        GC.WaitForPendingFinalizers();
+
     }
 
     void OnDestroy() {
-        EditorUtility.UnloadUnusedAssetsImmediate(true);
-        GC.Collect();
-        GC.WaitForPendingFinalizers();
+       
     }
+
+	public void Update(){ 
+		ScriptableObjectCompiler.UpdateCompileJobs();
+		//todo make this current page
+		if(abilityPage != null) {
+			abilityPage.Update();
+		}
+	}
 
     public void OnGUI() {
         Rect window = new Rect(0, 0, position.width, position.height)
@@ -77,7 +76,7 @@ public class EntitySystemWindow : EditorWindow {
         }
         else if (GUI.Button(d, "AI Debugger")) {
 
-        }//hello?
+        }
     }
 
 }

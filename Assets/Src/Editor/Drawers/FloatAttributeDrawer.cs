@@ -4,8 +4,8 @@ using UnityEditor;
 [CustomPropertyDrawer(typeof(FloatAttribute))]
 public class FloatAttributeDrawer : PropertyDrawer {
 
-    public override void OnGUI(Rect position, SerializedProperty property, GUIContent label) {
-        //EditorGUI.LabelField(position, "Hello");
+	public override void OnGUI (Rect pos, SerializedProperty prop, GUIContent label) {
+		EditorGUI.LabelField(pos, "Hello");
     }
 
 }

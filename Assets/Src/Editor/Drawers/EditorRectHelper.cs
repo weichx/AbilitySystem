@@ -94,6 +94,18 @@ public class EditorRect {
         return rect;
     }
 
+	public Rect HeightMinus(float amount) {
+		amount = Mathf.Clamp(amount, 0, baseRect.height);
+		Rect rect = new Rect(currentRect) {
+			height = currentRect.height - amount
+		};
+		currentRect = new Rect(rect) {
+			y = rect.y + rect.height,
+			height = amount
+		};
+		return rect;
+	}
+
     public Rect ShrinkBottom(float amount) {
         currentRect = new Rect(currentRect) {
             height = currentRect.height - amount

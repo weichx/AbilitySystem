@@ -1,28 +1,27 @@
 FileType : Asset
 
 0 new -1 Ability v1.0 
-abilityId String " 
+abilityId NULL -1
 nextCharge Int32 : 0
 charges Charge[] [ 1
 castState CastState : 0
-castMode CastMode : 0
+castMode CastMode : 1
 actualCastMode CastMode : 0
 castTimer Timer { 2
 channelTimer Timer { 3
-icon Texture2D { 4
+icon NULL -1
 contextCreator NULL -1
-castTime FloatAttribute { 5
-channelTime FloatAttribute { 6
-channelTicks IntAttribute { 7
-requirements List<AbilityRequirement> { 8
-components List<AbilityComponent> { 9
+castTime FloatAttribute { 4
+channelTime FloatAttribute { 5
+channelTicks IntAttribute { 6
+requirements List<AbilityRequirement> { 7
+components List<AbilityComponent> { 8
 context NULL -1
 IgnoreGCD Boolean : False
-attributes Dictionary<String,Object> { 10
+attributes Dictionary<String,Object> { 9
 
 1 new -1 Charge[] v1.0 
-- Charge { 11
-- Charge { 12
+- Charge { 10
 
 2 new -1 Timer v1.0 
 startTime Single : 0
@@ -32,64 +31,60 @@ timeout Single : 1
 startTime Single : 0
 timeout Single : 1
 
-4 new -1 Texture2D v1.0 
-
-5 new -1 FloatAttribute v1.0 
-modifiers Dictionary<String,FloatModifier> { 13
+4 new -1 FloatAttribute v1.0 
+modifiers Dictionary<String,FloatModifier> { 11
 baseValue Single : 1
 
-6 new -1 FloatAttribute v1.0 
-modifiers Dictionary<String,FloatModifier> { 14
+5 new -1 FloatAttribute v1.0 
+modifiers Dictionary<String,FloatModifier> { 12
 baseValue Single : 3
 
-7 new -1 IntAttribute v1.0 
-modifiers Dictionary<String,IntModifier> { 15
+6 new -1 IntAttribute v1.0 
+modifiers Dictionary<String,IntModifier> { 13
 baseValue Int32 : 3
 
-8 new -1 List<AbilityRequirement> v1.0 
+7 new -1 List<AbilityRequirement> v1.0 
 
-9 new -1 List<AbilityComponent> v1.0 
-- AddStatusEffect { 16
+8 new -1 List<AbilityComponent> v1.0 
+- AddStatusEffect { 14
 
-10 new -1 Dictionary<String,Object> v1.0 
+9 new -1 Dictionary<String,Object> v1.0 
 keys Object[] ] 
 values Object[] ] 
 
-11 new -1 Charge v1.0 
+10 new -1 Charge v1.0 
 lastUsed Single : -1
 cooldown Single : 0
-cooldownAttr FloatAttribute { 17
+cooldownAttr FloatAttribute { 15
 
-12 new -1 Charge v1.0 
-lastUsed Single : -1
-cooldown Single : 0
-cooldownAttr FloatAttribute { 18
-
-13 new -1 Dictionary<String,FloatModifier> v1.0 
+11 new -1 Dictionary<String,FloatModifier> v1.0 
 keys Object[] ] 
 values Object[] ] 
 
-14 new -1 Dictionary<String,FloatModifier> v1.0 
+12 new -1 Dictionary<String,FloatModifier> v1.0 
 keys Object[] ] 
 values Object[] ] 
 
-15 new -1 Dictionary<String,IntModifier> v1.0 
+13 new -1 Dictionary<String,IntModifier> v1.0 
 keys Object[] ] 
 values Object[] ] 
 
-16 new -1 AddStatusEffect v1.0 
-statusObject GameObject { 19
-tmp Stack<String> { 20
+14 new -1 AddStatusEffect v1.0 
+statusObject NULL -1
+tmp Stack<String> { 16
 name String " AbilityComponent1
 componentName String " my component name
 
-17 new -1 FloatAttribute v1.0 
-modifiers Dictionary<String,FloatModifier> { 21
+15 new -1 FloatAttribute v1.0 
+modifiers Dictionary<String,FloatModifier> { 17
 baseValue Single : 0
 
-18 new -1 FloatAttribute v1.0 
-modifiers Dictionary<String,FloatModifier> { 22
-baseValue Single : 0
+16 new -1 Stack<String> v1.0 
+- String " three
+- String " two
+- String " one
 
-19 new -1 GameObject v1.0 
+17 new -1 Dictionary<String,FloatModifier> v1.0 
+keys Object[] ] 
+values Object[] ] 
 
