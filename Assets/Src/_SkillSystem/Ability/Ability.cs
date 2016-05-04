@@ -5,6 +5,7 @@ using System.Collections.Generic;
 [Serializable]
 public partial class Ability : IDeserializable {
 
+    public Vector3 tempVec3 = new Vector3(1, 2, 3);
     public string abilityId;
     [NonSerialized]
     public Entity caster;
@@ -25,15 +26,21 @@ public partial class Ability : IDeserializable {
     public List<AbilityRequirement> requirements;
     public List<AbilityComponent> components;
 
+    public TagCollection tags;
+
     private Context context;
 
     public bool IgnoreGCD = false;
 
-    public Ability() {
+    public Ability() : this("New Ability") { }
+
+    public Ability(string id) {
+        this.abilityId = id;
         nextCharge = 0;
         charges = new Charge[1] {
             new Charge()
         };
+        tags = new TagCollection();
         attributes = new Dictionary<string, object>();
         components = new List<AbilityComponent>();
         requirements = new List<AbilityRequirement>();

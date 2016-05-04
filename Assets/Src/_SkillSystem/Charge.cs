@@ -1,8 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using UnityEngine;
 
 [Serializable]
+[EntityDeserializerSkipConstructor]
 public class Charge {
 
     private float lastUsed;
@@ -18,7 +18,6 @@ public class Charge {
     public Charge(float cooldown, bool ready = true)  : this() {
         lastUsed = ready ? -1 : Timer.GetTimestamp;
         this.cooldown = cooldown;
-
     }
 
     public bool OnCooldown {

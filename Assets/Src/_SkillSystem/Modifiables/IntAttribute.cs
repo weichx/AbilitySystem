@@ -3,6 +3,7 @@ using UnityEngine;
 using System.Collections.Generic;
 
 [Serializable]
+[EntityDeserializerSkipConstructor]
 public class IntAttribute  {
     protected Dictionary<string, IntModifier> modifiers;
     [SerializeField] protected int baseValue;

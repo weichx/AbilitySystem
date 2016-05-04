@@ -1,4 +1,6 @@
-﻿
+﻿using System;
+
+[Serializable]
 public class SlowCastTime : StatusEffectComponent {
 
     public float power;

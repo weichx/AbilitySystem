@@ -9,7 +9,9 @@
         TotalElapsedTime += deltaTime;
     }
 
-    public Timer(float timeout = 1) {
+    public Timer() : this(-1) { }
+
+    public Timer(float timeout) {
         this.timeout = timeout;
         startTime = TotalElapsedTime;
     }

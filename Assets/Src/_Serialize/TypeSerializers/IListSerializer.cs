@@ -11,13 +11,26 @@ public class IListSerializer : TypeSerializer<IList> {
 
     public override void Serialize(IList list, IWriter writer) {
         if (list != null) {
-            Debug.Log("Yup");
-            for(int i = 0; i < list.Count; i++) {
+            if(!list.GetType().IsArray) {
+                writer.WriteField("Length", list.Count);
+            }
+            for (int i = 0; i < list.Count; i++) {
                 writer.WriteField("-", list[i]);
             }
         }
+    }
+
+    public override void Deserialize(IList obj, IReader reader) {
+        if (obj.GetType().IsArray) {
+            for (int i = 0; i < obj.Count; i++) {
+                obj[i] = reader.GetFieldValueAtIndex(i);
+            }
+        }
         else {
-            Debug.Log("Nope");
+            int length = reader.GetFieldValue<int>("Length");
+            for (int i = 0; i < length; i++) {
+                obj.Add(reader.GetFieldValueAtIndex(i + 1));
+            }
         }
     }
 }
@@ -27,14 +40,9 @@ public class StackSerializer : TypeSerializer<ICollection> {
 
     public override void Serialize(ICollection list, IWriter writer) {
         if (list != null) {
-            Debug.Log("Yup");
-            foreach(var item in list) {
+            foreach (var item in list) {
                 writer.WriteField("-", item);
             }
         }
-        else {
-            Debug.Log("Nope");
-        }
     }
-
 }

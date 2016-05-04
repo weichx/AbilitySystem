@@ -1,5 +1,7 @@
 ﻿using DiceRoll;
+using System;
 
+[Serializable]
 public class DispelResistance : StatusEffectComponent {
 
     public float baseResistance;

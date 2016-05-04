@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using UnityEngine;
+[Serializable]
 
-public class StatusEffect : IDeserializable {
+public class StatusEffect  {
 
     public string statusEffectId;
+    public Texture2D icon;
     public StatusState state;
     public FloatAttribute duration;
     public TagCollection tags;
@@ -45,6 +48,8 @@ public class StatusEffect : IDeserializable {
         state = StatusState.Active;
         UpdateComponentContext();
     }
+
+    //todo on stack added callback
 
     public void UpdateComponents() {
         for (int i = 0; i < components.Count; i++) {
@@ -91,10 +96,6 @@ public class StatusEffect : IDeserializable {
         for (int i = 0; i < components.Count; i++) {
             components[i].OnEffectRemoved();
         }
-    }
-
-    public void OnDeserialized(Dictionary<string, object> table) {
-
     }
 
     public bool ReadyForRemoval {

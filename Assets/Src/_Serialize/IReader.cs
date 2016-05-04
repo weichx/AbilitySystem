@@ -1,5 +1,8 @@
 ﻿public interface IReader {
     void ReadDefault();
     void ReadDefaultExcept(string[] exceptions);
-    void ReadField(string fieldId);
+    object GetFieldValue(string fieldId);
+    T GetFieldValue<T>(string fieldId);
+    object GetFieldValueAtIndex(int index);
+    T GetFieldValueAtIndex<T>(int index);
 }

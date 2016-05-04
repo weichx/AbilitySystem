@@ -1,6 +1,7 @@
 ﻿using System;
 using UnityEngine;
 
+[Serializable]
 public class ReduceTotalHealth : StatusEffectComponent {
 
     public float reduceByPercent;

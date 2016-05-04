@@ -2,9 +2,8 @@
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
-using EntitySystemUtil;
 
-public class SearchBox<T> : IRectDrawable {
+public class SearchBox<T> {
     private Texture2D blue;
     private bool hasResults;
     private List<Type> results;
@@ -13,12 +12,16 @@ public class SearchBox<T> : IRectDrawable {
     private List<Type> searchSet;
     private GUIContent resultContent;
     private Action<Type> selected;
+    private string buttonText;
+    private string labelText;
 
-    public SearchBox(Texture2D resultIcon, Action<Type> selectedAction) {
+    public SearchBox(Texture2D resultIcon, Action<Type> selectedAction, string buttonText, string labelText) {
         searchString = string.Empty;
         searchSet = Reflector.FindSubClasses<T>().FindAll((type) => {
             return type.IsSerializable;
         });
+        this.buttonText = buttonText;
+        this.labelText = labelText;
         results = new List<Type>();
         resultContent = new GUIContent();
         resultContent.image = resultIcon;
@@ -28,20 +31,21 @@ public class SearchBox<T> : IRectDrawable {
         blue.Apply();
     }
 
-    public float GetHeight() {
-        return 12f * 20f; //todo this is wrong
+    public void RenderLayout() {
+        Rect rect = GUILayoutUtility.GetRect(GUIContent.none, GUIStyle.none);
+        Render(rect);
     }
 
     public void Render(Rect rect) {
 
-        if (!searching && GUILayout.Button("Add Ability Component")) {
+        if (!searching && GUILayout.Button(buttonText, GUILayout.Width(225))) {
             searching = !searching;
         }
 
         if (searching) {
 
-            GUILayout.BeginVertical(EditorStyles.helpBox);
-            GUILayout.Box("Ability Components", new GUIStyle(EditorStyles.helpBox) {
+            GUILayout.BeginVertical(EditorStyles.helpBox, GUILayout.Width(225));
+            GUILayout.Box(labelText, new GUIStyle(EditorStyles.helpBox) {
                 font = EditorStyles.boldLabel.font,
                 alignment = TextAnchor.UpperCenter,
             });
@@ -80,27 +84,5 @@ public class SearchBox<T> : IRectDrawable {
             }
             EditorGUILayout.EndVertical();
         }
-    }
-}
-
-public static class SearchResult {
-
-
-    public static bool SearchResultItem(Rect controlRect, GUIContent result) {
-
-        int controlId = GUIUtility.GetControlID(FocusType.Native);
-
-        switch (Event.current.GetTypeForControl(controlId)) {
-            case EventType.Repaint:
-                GUI.Label(controlRect, result);
-                break;
-            case EventType.MouseDown:
-                if (controlRect.Contains(Event.current.mousePosition)) {
-                    return true;
-                }
-                break;
-        }
-
-        return false;
     }
 }

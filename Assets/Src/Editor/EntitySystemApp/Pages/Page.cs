@@ -6,12 +6,12 @@ public interface IRectDrawable {
     float GetHeight();
 }
 
-public abstract class Page : IRectDrawable {
+public abstract class Page {
 
-    public virtual void Initialize() { }
+    public virtual void OnEnter() { }
     public abstract void Render(Rect rect);
-    public abstract float GetHeight();
-
+    public virtual void Update() { }
+    public virtual void OnExit() { }
     public static float LabelWidth = EditorGUIUtility.labelWidth;
     public static float LineHeight = EditorGUIUtility.singleLineHeight;
 }

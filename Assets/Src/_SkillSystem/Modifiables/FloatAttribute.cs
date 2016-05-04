@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System;
 
 [Serializable]
+[EntityDeserializerSkipConstructor]
 public class FloatAttribute {
 	[HideInInspector]
     [SerializeField] protected Dictionary<string, FloatModifier> modifiers;

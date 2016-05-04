@@ -1,4 +1,6 @@
-﻿
+﻿using System;
+
+[Serializable]
 public class ReduceMovementSpeed : StatusEffectComponent {
 
     public float power;

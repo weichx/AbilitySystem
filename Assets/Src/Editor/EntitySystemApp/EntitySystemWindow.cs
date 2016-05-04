@@ -17,30 +17,43 @@ public class EntitySystemWindow : EditorWindow {
         GetWindow<EntitySystemWindow>();
     }
 
-    private AbilityPage abilityPage;
+    private Page currentPage;
+
 
     void OnEnable() {
-        abilityPage = null;
-        abilityPage = new AbilityPage();
-        abilityPage.Initialize();
+        string typeString = EditorPrefs.GetString("ESWindow.CurrentPage");
+        if(typeString != null) {
+            switch (typeString) {
+                case "AbilityPage":
+                    currentPage = new AbilityPage();
+                    break;
+                case "StatusPage":
+                    currentPage = new StatusPage();
+                    break;
+            }
+        }
+        if (currentPage == null) {
+            currentPage = new AbilityPage();
+        }
+        currentPage.OnEnter();
         Repaint();
     }
 
     void OnDisable() {
-
+        EditorPrefs.SetString("ESWindow.CurrentPage", currentPage.GetType().Name);
     }
 
     void OnDestroy() {
-       
+        EditorPrefs.DeleteKey("ESWindow.CurrentPage");
     }
 
-	public void Update(){ 
-		ScriptableObjectCompiler.UpdateCompileJobs();
-		//todo make this current page
-		if(abilityPage != null) {
-			abilityPage.Update();
-		}
-	}
+    public void Update() {
+        ScriptableObjectCompiler.UpdateCompileJobs();
+        //todo make this current page
+        if (currentPage != null) {
+            currentPage.Update();
+        }
+    }
 
     public void OnGUI() {
         Rect window = new Rect(0, 0, position.width, position.height)
@@ -53,23 +66,24 @@ public class EntitySystemWindow : EditorWindow {
         RenderHeaderBar(header);
 
         Rect body = new Rect(window) {
-            y = header.height + window.y,
+            y = header.height + window.y + 5,
             height = window.height - header.height
         };
 
-        abilityPage.Render(body);
+        currentPage.Render(body);
 
     }
 
     void RenderHeaderBar(Rect rect) {
-
         HorizontalRectLayout d = new HorizontalRectLayout(rect, 4);
 
-        if (GUI.Button(d, "Abilities")) {
-
+        if (GUI.Button(d, "Abilities", GetStyle(typeof(AbilityPage)))) {
+            currentPage = new AbilityPage();
+            currentPage.OnEnter();
         }
-        else if (GUI.Button(d, "Status Effects")) {
-
+        else if (GUI.Button(d, "Status Effects", GetStyle(typeof(StatusPage)))) {
+            currentPage = new StatusPage();
+            currentPage.OnEnter();
         }
         else if (GUI.Button(d, "Behaviors")) {
 
@@ -78,5 +92,16 @@ public class EntitySystemWindow : EditorWindow {
 
         }
     }
-
+    //
+    private GUIStyle GetStyle(Type type) {
+        GUIStyle normalStyle = new GUIStyle(GUI.skin.button);
+        GUIStyle selectedStyle = new GUIStyle(GUI.skin.button);
+        selectedStyle.fontStyle = FontStyle.Bold;
+        if (currentPage.GetType() == type) {
+            return selectedStyle;
+        }
+        else {
+            return normalStyle;
+        }
+    }
 }

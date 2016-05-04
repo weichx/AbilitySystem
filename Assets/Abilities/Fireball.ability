@@ -1,0 +1,111 @@
+--types
+Ability, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+UnityEngine.Vector3, UnityEngine, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089
+System.Int32, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089
+Charge[], Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+CastState, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+CastMode, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+Timer, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+UnityEngine.Texture2D, UnityEngine, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+FloatAttribute, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+IntAttribute, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+System.Collections.Generic.List`1[[AbilityRequirement, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null]], mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089
+System.Collections.Generic.List`1[[AbilityComponent, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null]], mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089
+System.Boolean, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089
+System.Collections.Generic.Dictionary`2[[System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089],[System.Object, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089]], mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089
+Charge, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+System.Single, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089
+System.Collections.Generic.Dictionary`2[[System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089],[FloatModifier, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null]], mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089
+System.Collections.Generic.Dictionary`2[[System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089],[IntModifier, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null]], mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089
+System.Object[], mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089
+--refs
+0 new -1 19 v1.0 0
+1 new -1 1 v1.0 4
+2 new -1 2 v1.0 7
+3 new -1 2 v1.0 7
+4 new -1 0 v1.0 8
+5 new -1 2 v1.0 9
+6 new -1 2 v1.0 9
+7 new -1 2 v1.0 10
+8 new -1 1 v1.0 11
+9 new -1 1 v1.0 12
+10 new -1 2 v1.0 14
+11 new -1 3 v1.0 15
+12 new -1 2 v1.0 17
+13 new -1 2 v1.0 17
+14 new -1 2 v1.0 18
+15 new -1 2 v1.0 9
+16 new -1 2 v1.0 17
+--structs
+0 new -1 3 v1.0 1
+x 16 : 1
+y 16 : 2
+z 16 : 3
+--fields
+0
+tempVec3 1 { 0
+abilityId 2 " Fireball
+nextCharge 3 : 0
+charges 4 [ 1
+castState 5 : 0
+castMode 6 : 1
+actualCastMode 6 : 0
+castTimer 7 * 2
+channelTimer 7 * 3
+icon 8 * 4
+contextCreator NULL -1
+castTime 9 * 5
+channelTime 9 * 6
+channelTicks 10 * 7
+requirements 11 * 8
+components 12 * 9
+context NULL -1
+IgnoreGCD 13 : False
+attributes 14 * 10
+1
+- 15 * 11
+2
+startTime 16 : 0
+timeout 16 : -1
+3
+startTime 16 : 0
+timeout 16 : -1
+4
+5
+modifiers 17 * 12
+baseValue 16 : 1
+6
+modifiers 17 * 13
+baseValue 16 : 3
+7
+modifiers 18 * 14
+baseValue 3 : 3
+8
+Length 3 : 0
+9
+Length 3 : 0
+10
+keys 19 ] 
+values 19 ] 
+11
+lastUsed 16 : -1
+cooldown 16 : 0
+cooldownAttr 9 * 15
+12
+keys 19 ] 
+values 19 ] 
+13
+keys 19 ] 
+values 19 ] 
+14
+keys 19 ] 
+values 19 ] 
+15
+modifiers 17 * 16
+baseValue 16 : 0
+16
+keys 19 ] 
+values 19 ] 
+--tags
+__default__ 0

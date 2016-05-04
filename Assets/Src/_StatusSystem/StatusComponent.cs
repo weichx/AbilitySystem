@@ -15,9 +15,9 @@ public abstract class StatusEffectComponent {
 
     }
 
-    //public virtual void OnEffectStackAdded() {
+    public virtual void OnEffectStackAdded() {
 
-    //}
+    }
 
     public virtual void OnEffectTick() {
 
