@@ -79,8 +79,33 @@ public class StatusEffectManager {
         return false;
     }
 
+    public bool HasStatus(string statusName) {
+        for (var i = 0; i < statusList.Count; i++) {
+            if (statusList[i].statusEffectId == statusName) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public bool HasStatus(StatusEffectCreator creator) {
+        for(var i = 0; i < statusList.Count; i++) {
+            if(statusList[i].Creator == creator) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public bool HasStatus(Entity caster, string statusName) {
-        return true;
+        for (var i = 0; i < statusList.Count; i++) {
+            if (statusList[i].statusEffectId == statusName) {
+                if (statusList[i].caster == caster) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     public bool HasStatusWithTag(Tag tag) {

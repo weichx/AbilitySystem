@@ -10,6 +10,9 @@ public class ResourceManager {
     public ResourceManager(Entity entity) {
         this.entity = entity;
         resources = new Dictionary<string, Resource>();
+        //these are temporary, should be configured elsewhere
+        AddResource("Health", new Resource());
+        AddResource("Mana", new Resource());
     }
 
     public bool AddResource(string id, Resource resource) {

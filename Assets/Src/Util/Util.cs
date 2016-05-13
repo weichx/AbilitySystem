@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
+using System.Text.RegularExpressions;
 using UnityEngine;
 
 //todo method from vector -- use dotpeek to copy
@@ -16,6 +18,10 @@ public struct Vector3I {
 
 public static class Util {
 
+    public static string SplitAndTitlize(string input) {
+        return CultureInfo.CurrentCulture.TextInfo.ToTitleCase(Regex.Replace(input, "(\\B[A-Z])", " $1"));
+    }
+
     public static string RandomString(int charCount = 8) {
         var chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";// 0123456789";
         var stringChars = new char[charCount];
@@ -29,15 +35,15 @@ public static class Util {
 
     public static GameObject FindOrCreateByName(string name, Type[] components = null) {
         GameObject retn = GameObject.Find(name);
-        if(retn == null) {
+        if (retn == null) {
             retn = new GameObject(name);
         }
-        if(components != null) {
-            for(int i = 0; i < components.Length; i++) {
+        if (components != null) {
+            for (int i = 0; i < components.Length; i++) {
                 Type componentType = components[i];
                 if (componentType == null) continue;
-                if(componentType.IsSubclassOf(typeof(MonoBehaviour))) {
-                    if(retn.GetComponent(componentType) == null) {
+                if (componentType.IsSubclassOf(typeof(MonoBehaviour))) {
+                    if (retn.GetComponent(componentType) == null) {
                         retn.AddComponent(componentType);
                     }
                 }

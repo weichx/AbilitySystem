@@ -6,15 +6,15 @@ public class StatusListEntry {
     public Type scriptableType;
     public StatusEffect statusEffect;
     private string assetpath;
-    private StatusEffectWrapper wrapper;
+    private StatusEffectCreator wrapper;
 
-    public StatusListEntry(string name, StatusEffectWrapper wrapper, string assetpath) {
+    public StatusListEntry(string name, StatusEffectCreator wrapper, string assetpath) {
         this.name = name;
         this.wrapper = wrapper;
         this.assetpath = assetpath;
     }
 
-    public StatusEffectWrapper Wrapper {
+    public StatusEffectCreator Wrapper {
         get { return wrapper; }
     }
 
@@ -34,7 +34,7 @@ public class StatusListEntry {
 
     public string Source {
         get {
-            return wrapper.statusSource;
+            return wrapper.source;
         }
     }
 }

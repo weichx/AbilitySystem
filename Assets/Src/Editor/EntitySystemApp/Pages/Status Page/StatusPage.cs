@@ -16,6 +16,7 @@ public class StatusPage : Page {
     public StatusPage() {
         masterView = new StatusPage_MasterView(this);
         detailView = new StatusPage_DetailView(this);
+        GUIUtility.keyboardControl = 0;
     }
 
     public override void Update() {
@@ -61,7 +62,7 @@ public class StatusPage : Page {
         serialRoot.ApplyModifiedProperties();
         AssetSerializer serializer = new AssetSerializer();
         serializer.AddItem(activeEntry.statusEffect);
-        activeEntry.Wrapper.statusSource = serializer.WriteToString();
+        activeEntry.Wrapper.source = serializer.WriteToString();
         EditorUtility.SetDirty(activeEntry.Wrapper);
         AssetDatabase.SaveAssets();
         activeEntry.FilePath = AssetDatabase.RenameAsset(activeEntry.FilePath, activeEntry.Name);

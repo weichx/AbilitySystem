@@ -91,7 +91,7 @@ public class AssetDeserializer : IReader {
         return CreateItem<T>("__default__");
     }
 
-    public void Deserialize() {
+    private void Deserialize() {
         currentIdx = 1;
         while (lines[currentIdx] != "--refs") {
             CreateType(lines[currentIdx]);
@@ -141,9 +141,6 @@ public class AssetDeserializer : IReader {
         FieldReadResult result = new FieldReadResult();
         string[] segments = line.Split(SpaceArray, 4);
         result.fieldId = segments[0];
-        if (segments[0] == "abilityId") {
-            int x = 1;
-        }
         if (segments[1] == "NULL") {
             result.value = null;
             result.symbol = 'x';
@@ -288,7 +285,9 @@ public class AssetDeserializer : IReader {
                 if (fInfo == null) {
                     continue;
                 }
-                fInfo.SetValue(instance, GetValue(context.fields[i]));
+                if (fInfo.FieldType.IsAssignableFrom(context.fields[i].type)) {
+                    fInfo.SetValue(instance, GetValue(context.fields[i]));
+                }
             }
         }
     }

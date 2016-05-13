@@ -1,19 +1,9 @@
-﻿using UnityEngine;
-using System;
-using System.Collections.Generic;
+﻿using System;
 
 [Serializable]
 public class AddStatusEffect : AbilityComponent {
 
-    public GameObject statusObject;
-    [SerializeField]
-    public Stack<string> tmp;
-
-    public AddStatusEffect() {
-        tmp = new Stack<string>();
-        tmp.Push("one");
-        tmp.Push("two");
-        tmp.Push("three");
-    }
+    public StatusEffectCreator statusCreator;
+    [EnumFlag] public CastEvent applyOnEvent;
 
 }

@@ -3,7 +3,6 @@ using UnityEditor;
 
 public class StatusPage_NameSection : StatusPage_SectionBase {
 
-
     public StatusPage_NameSection(StatusPage page) : base(page) { }
 
     public override void Render() {

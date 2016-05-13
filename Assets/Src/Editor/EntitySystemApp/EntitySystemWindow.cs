@@ -92,7 +92,7 @@ public class EntitySystemWindow : EditorWindow {
 
         }
     }
-    //
+
     private GUIStyle GetStyle(Type type) {
         GUIStyle normalStyle = new GUIStyle(GUI.skin.button);
         GUIStyle selectedStyle = new GUIStyle(GUI.skin.button);

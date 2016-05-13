@@ -1,10 +1,8 @@
 ﻿using System;
+using UnityEngine;
 
 [Serializable]
 public class AbilityComponent {
-
-    public string name = "AbilityComponent1";
-    public string componentName = "my component name";
 
     [NonSerialized] public Entity caster;
     [NonSerialized] public Ability ability;

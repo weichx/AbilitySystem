@@ -53,8 +53,37 @@ public class DrawerUtil {
     public static PropertyDrawer GetDrawer(SerializedProperty property) {
         object target = GetTarget(property);
         FieldInfo propertyFieldInfo = target.GetType().GetField(property.name);
-        return Reflector.GetCustomPropertyDrawerFor(propertyFieldInfo,
+        return Reflector.GetCustomPropertyDrawerFor(propertyFieldInfo.FieldType,
             typeof(VisibleAttributeDrawer).Assembly);
+    }
+
+    private static FieldInfo rectField;
+    public static void DrawProperty(SerializedProperty p, Type parentType) {
+        if(rectField == null) {
+            rectField = typeof(EditorGUILayout).GetField("s_LastRect", BindingFlags.Static | BindingFlags.NonPublic);
+        }
+        FieldInfo fInfo = parentType.GetField(p.name);
+        if (fInfo != null) {
+            var drawer = Reflector.GetCustomPropertyDrawerFor(fInfo.FieldType, typeof(AbilityPage).Assembly);
+            if (drawer == null) {
+                var attrs = fInfo.GetCustomAttributes(false);
+                if (attrs.Length > 0) {
+                    drawer = Reflector.GetCustomPropertyDrawerFor(attrs[0].GetType(), typeof(AbilityPage).Assembly);
+                    if (drawer != null) {
+                        drawer.GetType().GetField("m_Attribute", BindingFlags.NonPublic | BindingFlags.Instance).SetValue(drawer, attrs[0]);
+                    }
+                }
+            }
+            if (drawer != null) {
+                GUIContent label = new GUIContent(Util.SplitAndTitlize(p.name));
+                Rect position = EditorGUILayout.GetControlRect(true, drawer.GetPropertyHeight(p, label));
+                rectField.SetValue(null, position);
+                drawer.OnGUI(position, p, label);
+            }
+            else {
+                EditorGUILayout.PropertyField(p, true);
+            }
+        }
     }
 
     public static float GetPropertyHeight(SerializedProperty property, GUIContent label) {

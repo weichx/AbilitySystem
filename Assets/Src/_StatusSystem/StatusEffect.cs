@@ -4,6 +4,8 @@ using UnityEngine;
 [Serializable]
 
 public class StatusEffect  {
+    [HideInInspector] [SerializeField]
+    public StatusEffectCreator Creator;
 
     public string statusEffectId;
     public Texture2D icon;

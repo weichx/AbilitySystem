@@ -25,7 +25,7 @@ public abstract class AbstractMethodPointer : ISerializationCallbackReceiver {
         get { return original != null; }
     }
 
-    protected abstract void SetFromDelegate(Delegate del);
+    public abstract void SetFromDelegate(Delegate del);
 
     public void SetMethod(Delegate newMethod) {
         original = newMethod;
@@ -47,6 +47,13 @@ public abstract class AbstractMethodPointer : ISerializationCallbackReceiver {
         return signature;
     }
 
+    public string ShortSignature {
+        get {
+            if (signature == null) return "";
+            var parts = signature.Split(' ');
+            return parts[1].Split('(')[0];
+        }
+    }
 }
 
 [Serializable]
@@ -62,7 +69,7 @@ public class MethodPointer : AbstractMethodPointer {
         fn();
     }
 
-    protected override void SetFromDelegate(Delegate del) {
+    public override void SetFromDelegate(Delegate del) {
         fn = del as Action;
     }
 
@@ -80,7 +87,7 @@ public class MethodPointer<T> : AbstractMethodPointer {
         return fn();
     }
 
-    protected override void SetFromDelegate(Delegate del) {
+    public override void SetFromDelegate(Delegate del) {
         fn = del as Func<T>;
     }
 }
@@ -98,7 +105,7 @@ public class MethodPointer<T, U> : AbstractMethodPointer {
         return fn(arg0);
     }
 
-    protected override void SetFromDelegate(Delegate del) {
+    public override void SetFromDelegate(Delegate del) {
         fn = del as Func<T, U>;
     }
 }
@@ -116,7 +123,7 @@ public class MethodPointer<T, U, V> : AbstractMethodPointer, ISerializationCallb
         return fn(arg0, arg1);
     }
 
-    protected override void SetFromDelegate(Delegate del) {
+    public override void SetFromDelegate(Delegate del) {
         fn = del as Func<T, U, V>;
     }
 
@@ -135,7 +142,7 @@ public class MethodPointer<T, U, V, W> : AbstractMethodPointer, ISerializationCa
         return fn(arg0, arg1, arg2);
     }
 
-    protected override void SetFromDelegate(Delegate del) {
+    public override void SetFromDelegate(Delegate del) {
         fn = del as Func<T, U, V, W>;
     }
 }
@@ -153,7 +160,7 @@ public class MethodPointer<T, U, V, W, X> : AbstractMethodPointer, ISerializatio
         return fn(arg0, arg1, arg2, arg3);
     }
 
-    protected override void SetFromDelegate(Delegate del) {
+    public override void SetFromDelegate(Delegate del) {
         fn = del as Func<T, U, V, W, X>;
     }
 }

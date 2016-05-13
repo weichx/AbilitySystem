@@ -55,12 +55,23 @@ public static class Reflector {
             return fn;
         }
         else {
-            return null;// throw new Exception("Method not found with signature: " + signature);
+            return null;// throw new Exception("Method not found with signature: " + signature); d
         }
     }
 
     public static FieldInfo GetProperty(object obj, string property) {
         return obj.GetType().GetField(property);
+    }
+
+    public static List<MethodPointer> FindMethodPointersWithAttribute(Type attrType, Type retnType, params Type[] parameterTypes) {
+        var list = new List<MethodPointer>();
+        for (int i = 0; i < methodSet.Count; i++) {
+            MethodInfo methodInfo = methodSet[i];
+            if (HasAttribute(methodInfo, attrType) && MatchesSignature(methodInfo, retnType, parameterTypes)) {
+                list.Add(new MethodPointer(methodInfo));
+            }
+        }
+        return list;
     }
 
     public static List<MethodPointer> FindMethodPointersWithAttribute<T>(Type retnType, params Type[] parameterTypes) where T : Attribute {
@@ -94,7 +105,7 @@ public static class Reflector {
             var assembly = filteredAssemblies[i];
             var types = assembly.GetTypes();
             for (int t = 0; t < types.Length; t++) {
-                if(types[t].IsGenericTypeDefinition) {
+                if (types[t].IsGenericTypeDefinition) {
                     continue;
                 }
                 if (types[t].IsSubclassOf(type) || includeInputType && types[t] == type) {
@@ -176,42 +187,46 @@ public static class Reflector {
 
         customPropertyDrawerTypes = new List<Meta>();
         BindingFlags bindFlags = BindingFlags.NonPublic | BindingFlags.Instance;
-        var assemblies = new Assembly[] { assembly };
 
-        for (int a = 0; a < assemblies.Length; a++) {
-            Type[] assemblyTypes = assemblies[a].GetTypes();
+        Type[] assemblyTypes = assembly.GetTypes();
 
-            for (int i = 0; i < assemblyTypes.Length; i++) {
-                object[] attributes = assemblyTypes[i].GetCustomAttributes(typeof(UnityEditor.CustomPropertyDrawer), true);
-                if (attributes.Length > 0) {
-                    FieldInfo m_TypeFieldInfo = attributes[0].GetType().GetField("m_Type", bindFlags);
-                    Type m_Type = m_TypeFieldInfo.GetValue(attributes[0]) as Type;
-                    customPropertyDrawerTypes.Add(new Meta(assemblyTypes[i], m_Type));
-                }
+        for (int i = 0; i < assemblyTypes.Length; i++) {
+            object[] attributes = assemblyTypes[i].GetCustomAttributes(typeof(UnityEditor.CustomPropertyDrawer), true);
+            if (attributes.Length > 0) {
+                FieldInfo m_TypeFieldInfo = attributes[0].GetType().GetField("m_Type", bindFlags);
+                Type m_Type = m_TypeFieldInfo.GetValue(attributes[0]) as Type;
+                customPropertyDrawerTypes.Add(new Meta(assemblyTypes[i], m_Type));
             }
-
         }
-
         return customPropertyDrawerTypes;
     }
 
-    public static UnityEditor.PropertyDrawer GetCustomPropertyDrawerFor(FieldInfo fieldInfo, Assembly assembly) {
+    public static UnityEditor.PropertyDrawer GetCustomPropertyDrawerFor(Type type, params Assembly[] assemblies) {
         if (drawerCache == null) {
             drawerCache = new Dictionary<Type, UnityEditor.PropertyDrawer>();
         }
         UnityEditor.PropertyDrawer drawer;
-        if (drawerCache.TryGetValue(fieldInfo.FieldType, out drawer)) {
+        if (drawerCache.TryGetValue(type, out drawer)) {
             return drawer;
         }
 
-        List<Meta> metaList = GetPropertyDrawerTypes(assembly);
-        for (int i = 0; i < metaList.Count; i++) {
-            Meta drawerMeta = metaList[i];
-            Type attrArgument = drawerMeta.attributeArgumentType;
-            if (fieldInfo.FieldType == attrArgument || fieldInfo.FieldType.IsSubclassOf(attrArgument)) {
-                drawer = Activator.CreateInstance(drawerMeta.attributeDrawerType) as UnityEditor.PropertyDrawer;
-                drawerCache[fieldInfo.FieldType] = drawer;
-                return drawer;
+        if (type == typeof(UnityEngine.RangeAttribute)) {
+
+            drawer = Activator.CreateInstance(typeof(UnityEditor.EditorGUI).Assembly.GetType("UnityEditor.RangeDrawer")) as UnityEditor.PropertyDrawer;
+            drawerCache[type] = drawer;
+            return drawer;
+        }
+
+        for (int a = 0; a < assemblies.Length; a++) {
+            List<Meta> metaList = GetPropertyDrawerTypes(assemblies[a]);
+            for (int i = 0; i < metaList.Count; i++) {
+                Meta drawerMeta = metaList[i];
+                Type attrArgument = drawerMeta.attributeArgumentType;
+                if (type == attrArgument || type.IsSubclassOf(attrArgument)) {
+                    drawer = Activator.CreateInstance(drawerMeta.attributeDrawerType) as UnityEditor.PropertyDrawer;
+                    drawerCache[type] = drawer;
+                    return drawer;
+                }
             }
         }
         return null;

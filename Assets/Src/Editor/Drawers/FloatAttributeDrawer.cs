@@ -5,7 +5,10 @@ using UnityEditor;
 public class FloatAttributeDrawer : PropertyDrawer {
 
 	public override void OnGUI (Rect pos, SerializedProperty prop, GUIContent label) {
-		EditorGUI.LabelField(pos, "Hello");
+        pos = new Rect(pos) {
+            width = Mathf.Min(425f, pos.width)
+        };
+        EditorGUI.PropertyField(pos, prop.FindPropertyRelative("baseValue"), label);
     }
 
 }

@@ -1,8 +1,10 @@
-﻿public abstract class AbilityRequirement {
+﻿using UnityEngine;
+
+public abstract class AbilityRequirement {
 
     protected bool supressed;
-    public string requirementId;
-    protected RequirementType appliesTo;
+    [EnumFlag] [SerializeField]
+    public RequirementType appliesTo = RequirementType.Disabled;
 
     public RequirementType RequirementType {
         get { return appliesTo; }

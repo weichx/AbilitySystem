@@ -62,7 +62,7 @@ public class StatusPage_MasterView : StatusPage_SectionBase {
     }
 
     private void CreateNewStatusEffect() {
-        StatusEffectWrapper wrapper = StatusEffectMenuItem.CreateScriptableObject();
+        StatusEffectCreator wrapper = StatusEffectMenuItem.CreateScriptableObject();
         string assetpath = AssetDatabase.GetAssetPath(wrapper);
         statusList.Add(new StatusListEntry(wrapper.name, wrapper, assetpath));
         page.SetActiveStatusEffect(statusList.Last());
@@ -90,7 +90,7 @@ public class StatusPage_MasterView : StatusPage_SectionBase {
         for(int i = 0; i < guids.Length; i++) {
             string assetpath = AssetDatabase.GUIDToAssetPath(guids[i]);
             string name = Path.GetFileNameWithoutExtension(assetpath);
-            StatusEffectWrapper item = AssetDatabase.LoadAssetAtPath(assetpath, typeof(StatusEffectWrapper)) as StatusEffectWrapper;
+            StatusEffectCreator item = AssetDatabase.LoadAssetAtPath(assetpath, typeof(StatusEffectCreator)) as StatusEffectCreator;
             statusList.Add(new StatusListEntry(name, item, assetpath));
         }
     }

@@ -1,59 +1,41 @@
 ﻿using System;
-using UnityEngine;
-using UnityEditor;
 
 public class AbilityListEntry {
-
-    public string abilityId;
     public bool isSelected;
-    private Ability ability;
+    public string name;
     public Type scriptableType;
-    private string originalId;
+    public Ability ability;
+    private string assetpath;
+    private AbilityCreator wrapper;
 
-    public AbilityListEntry(string abilityId) {
-        this.abilityId = abilityId;
-        originalId = abilityId;
-        isSelected = false;
+    public AbilityListEntry(string name, AbilityCreator wrapper, string assetpath) {
+        this.name = name;
+        this.wrapper = wrapper;
+        this.assetpath = assetpath;
     }
 
-    public Ability Ability {
-        get { return ability; }
-        set {
-            ability = value;
-            if (ability != null) {
-                abilityId = ability.abilityId;
-            }
-        }
-    }
-
-    public bool NameChanged {
-        get {
-            if (ability != null) {
-                return originalId != ability.abilityId;
-            }
-            else {
-                return originalId != abilityId;
-            }
-        }
-    }
-
-    public string OriginalId {
-        get { return originalId; }
+    public AbilityCreator Wrapper {
+        get { return wrapper; }
     }
 
     public string Name {
         get {
-            return ability != null ? ability.abilityId : abilityId;
+            return (ability != null) ? ability.abilityId : name;
         }
     }
 
-    public void Save() {
-        originalId = ability.abilityId;
+    public string FilePath {
+        get {
+            return assetpath;
+        }
+        set {
+            assetpath = value;
+        }
     }
 
-    public static GUIStyle style = new GUIStyle() {
-        fontSize = 14,
-        alignment = TextAnchor.MiddleCenter
-    };
-
+    public string Source {
+        get {
+            return wrapper.source;
+        }
+    }
 }

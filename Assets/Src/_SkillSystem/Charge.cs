@@ -6,30 +6,29 @@ using UnityEngine;
 public class Charge {
 
     private float lastUsed;
-    public float cooldown;
-    public FloatAttribute cooldownAttr;
+    public FloatAttribute cooldown;
     //todo this might also be responsible for cast time / channel time / tick time
 
     public Charge() {
-        cooldownAttr = new FloatAttribute();
+        cooldown = new FloatAttribute();
         lastUsed = -1;
     }
 
     public Charge(float cooldown, bool ready = true)  : this() {
         lastUsed = ready ? -1 : Timer.GetTimestamp;
-        this.cooldown = cooldown;
+        this.cooldown.BaseValue = cooldown;
     }
 
     public bool OnCooldown {
         get {
             if (lastUsed == -1) return false;
-            return Timer.GetTimestamp - lastUsed < cooldown;
+            return Timer.GetTimestamp - lastUsed < cooldown.Value;
         }
     }
 
     public float Cooldown {
-        get { return cooldown; }
-        set { cooldown = Mathf.Clamp(value, 0, float.MaxValue); }
+        get { return cooldown.Value; }
+        set { cooldown.BaseValue = Mathf.Clamp(value, 0, float.MaxValue); }
     }
 
     public void Expire() {

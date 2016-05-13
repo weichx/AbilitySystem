@@ -9,22 +9,19 @@ using UnityEditor;
 
 [SelectionBase]
 public class AIEntity : Entity {
-
     public string behaviorPath;
-
-    public NavMeshAgent agent;
+    [HideInInspector] public NavMeshAgent agent;
     public AIActionManager actionManager;
 
     private InfluenceMapSection iMapSection;
 
     private AIBehavior[] behaviors;
-    public GameObject nameplate;
+    [HideInInspector] public GameObject nameplate;
 
     public void Start() {
 
         agent = GetComponent<NavMeshAgent>();
         iMapSection = new InfluenceMapSection(9 * 9);
-
 
         if (!string.IsNullOrEmpty(behaviorPath)) {
             AIBehavior behavior = EntitySystemLoader.Instance.Create<AIBehavior>(behaviorPath);

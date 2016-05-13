@@ -4,6 +4,8 @@ using System.Collections.Generic;
 
 [Serializable]
 public partial class Ability : IDeserializable {
+    [NonSerialized]
+    private CastEvent currentEvent;
 
     public Vector3 tempVec3 = new Vector3(1, 2, 3);
     public string abilityId;
@@ -50,6 +52,12 @@ public partial class Ability : IDeserializable {
         channelTime = new FloatAttribute(3f);
         castTimer = new Timer();
         channelTimer = new Timer();
+    }
+
+    public CastEvent CurrentEvent {
+        get {
+            return currentEvent;
+        }
     }
 
     public AbilityComponent AddAbilityComponent<T>() where T : AbilityComponent, new() {
