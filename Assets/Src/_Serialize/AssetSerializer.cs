@@ -5,6 +5,7 @@ using System.IO;
 using System.Reflection;
 using UnityEngine;
 using Unity.IO.Compression;
+using System.Text.RegularExpressions;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -74,11 +75,11 @@ public class AssetSerializer : IWriter {
         RefId = 0;
     }
 
-    public bool AddItem<T>(T item) where T : class, new() {
+    public bool AddItem<T>(T item) where T : class {
         return AddItem("__default__", item);
     }
 
-    public bool AddItem<T>(string itemId, T item) where T : class, new() {
+    public bool AddItem<T>(string itemId, T item) where T : class {
         if (item == null) {
             return false;
         }

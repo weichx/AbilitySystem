@@ -1,10 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using UnityEditor;
+﻿using UnityEditor;
 using UnityEngine;
 using System.Reflection;
 
-public class StatusPage : Page {
+public class StatusPage : Page<StatusEffect> {
 
     public StatusListEntry activeEntry;
     private StatusPage_MasterView masterView;

@@ -44,7 +44,7 @@ public class Entity : MonoBehaviour {
         attributes["Health"] = new FloatAttribute(100);
         EntityManager.Instance.Register(this);
 
-        gameObject.layer = LayerMask.NameToLayer("Entity");
+        //gameObject.layer = LayerMask.NameToLayer("Entity");
     }
 
     public Entity Target { //todo remove this after fixing requirements

@@ -75,9 +75,9 @@ public class SearchBox<T> {
                 resultContent.text = results[i].Name;
                 EditorGUILayout.BeginHorizontal();
                 if (GUILayout.Button(resultContent, itemStyle)) {
-                    selected(results[i]);
                     searching = false;
                     searchString = string.Empty;
+                    selected(results[i]);
                     results.Clear();
                 }
                 EditorGUILayout.EndHorizontal();

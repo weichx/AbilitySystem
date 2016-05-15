@@ -22,6 +22,7 @@ public static class Util {
         return CultureInfo.CurrentCulture.TextInfo.ToTitleCase(Regex.Replace(input, "(\\B[A-Z])", " $1"));
     }
 
+    //public static string Split
     public static string RandomString(int charCount = 8) {
         var chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";// 0123456789";
         var stringChars = new char[charCount];

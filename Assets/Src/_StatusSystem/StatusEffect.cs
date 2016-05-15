@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 [Serializable]
 
-public class StatusEffect  {
+public class StatusEffect : EntitySystemBase {
     [HideInInspector] [SerializeField]
     public StatusEffectCreator Creator;
 
@@ -32,6 +32,12 @@ public class StatusEffect  {
         tags = new TagCollection();
         duration = new FloatAttribute();
         timer = new Timer();//can probably get rid of timer and just duration as a variable
+    }
+
+    public override string Id {
+        get {
+            return statusEffectId;
+        }
     }
 
     public StatusEffectComponent AddStatusComponent<T>() where T : StatusEffectComponent, new() {

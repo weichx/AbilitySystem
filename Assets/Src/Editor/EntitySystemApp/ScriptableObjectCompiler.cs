@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using UnityEngine;
 using UnityEditor;
 using Debug = UnityEngine.Debug;
+using System.Reflection;
 using System.Diagnostics;
 using System.IO;
 using System.Text;
@@ -43,7 +45,7 @@ public static class ScriptableObjectCompiler {
 #elif UNITY_EDITOR_WIN
                 process.StartInfo.FileName = @"C:\PROGRA~2\Unity\Editor\Data\Mono\bin\gmcs.bat";
                 //need to escape due to spaces in windows paths
-                for(int i = 0; i < assemblies.Length; i++) {
+                for (int i = 0; i < assemblies.Length; i++) {
                     assemblies[i] = "\"" + assemblies[i] + "\"";
                 }
 #endif
@@ -117,6 +119,20 @@ public static class ScriptableObjectCompiler {
         compileJobs.Add(job);
         job.Start(code, assemblyPaths, sync);
         return job.jobId;
+    }
+
+    public static Type CreateScriptableType(string code, string[] assemblyPaths, string typeName = "GeneratedScriptable") {
+        CompileJob job = new CompileJob(NextJobId);
+        compileJobs.Add(job);
+        job.Start(code, assemblyPaths, true);
+        CompileJobStatus result;
+        string dllPath;
+        if (TryGetJobResult(job.jobId, out result, out dllPath)) {
+            if (result == CompileJobStatus.Succeeded) {
+                return Assembly.LoadFrom(dllPath).GetType(typeName);
+            }
+        }
+        return null;
     }
 
     public static void UpdateCompileJobs() {

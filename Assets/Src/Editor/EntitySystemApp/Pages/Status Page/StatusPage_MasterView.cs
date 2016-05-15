@@ -86,7 +86,7 @@ public class StatusPage_MasterView : StatusPage_SectionBase {
     }
 
     private void LoadFiles() {
-        string[] guids = AssetDatabase.FindAssets("t:StatusEffectWrapper");
+        string[] guids = AssetDatabase.FindAssets("t:StatusEffectCreator");
         for(int i = 0; i < guids.Length; i++) {
             string assetpath = AssetDatabase.GUIDToAssetPath(guids[i]);
             string name = Path.GetFileNameWithoutExtension(assetpath);

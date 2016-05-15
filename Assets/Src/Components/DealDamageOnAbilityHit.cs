@@ -11,8 +11,8 @@ public class DealDamageOnAbilityHit : MonoBehaviour {
 
     void DealDamage(AbilityHitEntityEvent evt) {
         Entity target = evt.context["target"] as Entity;
-        FloatAttribute damage = evt.ability["damage"] as FloatAttribute;
-        target.resourceManager["health"].Decrease(damage.Value, evt.context);
+        //FloatAttribute damage = evt.ability["damage"] as FloatAttribute;
+        target.resourceManager["health"].Decrease(10, evt.context);
     }
 
 }

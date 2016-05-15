@@ -19,8 +19,8 @@ public class EntitySystemWindow : EditorWindow {
 
     private Page currentPage;
 
-
     void OnEnable() {
+        titleContent = new GUIContent("Entity Engine");
         string typeString = EditorPrefs.GetString("ESWindow.CurrentPage");
         if(typeString != null) {
             switch (typeString) {
@@ -29,6 +29,9 @@ public class EntitySystemWindow : EditorWindow {
                     break;
                 case "StatusPage":
                     currentPage = new StatusPage();
+                    break;
+                case "SkillSetPage":
+                    currentPage = new SkillSetPage();
                     break;
             }
         }
@@ -85,8 +88,9 @@ public class EntitySystemWindow : EditorWindow {
             currentPage = new StatusPage();
             currentPage.OnEnter();
         }
-        else if (GUI.Button(d, "Behaviors")) {
-
+        else if (GUI.Button(d, "Behaviors", GetStyle(typeof(SkillSetPage)))) {
+            currentPage = new SkillSetPage();
+            currentPage.OnEnter();
         }
         else if (GUI.Button(d, "AI Debugger")) {
 
