@@ -23,21 +23,22 @@ public class AbilityPage : Page<Ability> {
         GUILayout.EndArea();
     }
 
-    public override void SetActiveItem(EntitySystemItem<Ability> newItem) {
+    public override void SetActiveItem(AssetItem<Ability> newItem) {
         base.SetActiveItem(newItem);
         detailView.SetTargetObject(newItem);
     }
 
     public override void Update() {
 
-        if(activeItem != null) {
+        if (activeItem != null) {
             activeItem.Update();
-            // if(activeItem.PendingDelete) {
-            //    activeItem.Delete();
-            //}
-            detailView.SetTargetObject(null);
+            if (activeItem.IsDeletePending) {
+                detailView.SetTargetObject(null);
+                masterView.RemoveItem(activeItem as AbilityItem);
+                activeItem.Delete();
+            }
         }
-        
+
     }
-  
+
 }

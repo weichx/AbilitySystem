@@ -88,7 +88,7 @@ public class EntitySystemWindow : EditorWindow {
             currentPage = new StatusPage();
             currentPage.OnEnter();
         }
-        else if (GUI.Button(d, "Behaviors", GetStyle(typeof(SkillSetPage)))) {
+        else if (GUI.Button(d, "Skill Sets", GetStyle(typeof(SkillSetPage)))) {
             currentPage = new SkillSetPage();
             currentPage.OnEnter();
         }

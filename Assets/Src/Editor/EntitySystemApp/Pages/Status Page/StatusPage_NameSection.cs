@@ -3,12 +3,10 @@ using UnityEditor;
 
 public class StatusPage_NameSection : StatusPage_SectionBase {
 
-    public StatusPage_NameSection(StatusPage page) : base(page) { }
-
     public override void Render() {
-        if (target == null) return;
+        if (serialRoot == null) return;
         SerializedProperty iconProp = statusProperty.FindPropertyRelative("icon");
-        SerializedProperty nameProp = statusProperty.FindPropertyRelative("statusEffectId");
+        SerializedProperty nameProp = statusProperty.FindPropertyRelative("id");
         GUILayout.BeginHorizontal();
         iconProp.objectReferenceValue = EditorGUILayout.ObjectField(iconProp.objectReferenceValue, typeof(Texture2D), false, GUILayout.Width(64f), GUILayout.Height(64f));
         GUILayout.BeginVertical();
@@ -19,17 +17,15 @@ public class StatusPage_NameSection : StatusPage_SectionBase {
         EditorGUIUtility.labelWidth = labelWidth;
         GUILayout.BeginHorizontal();
         GUILayout.FlexibleSpace();
-        //GUI.enabled = false;
         if (GUILayout.Button("Restore")) {
-            page.Restore();
+            targetItem.Restore();
             GUIUtility.keyboardControl = 0;
         }
-        //GUI.enabled = true;
         if (GUILayout.Button("Delete")) {
-            page.Delete();
+            targetItem.QueueDelete();
         }
         if (GUILayout.Button("Save")) {
-            page.Save();
+            targetItem.Save();
         }
         GUILayout.EndHorizontal();
         GUILayout.EndVertical();

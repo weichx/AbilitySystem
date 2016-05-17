@@ -27,7 +27,7 @@ public class AbilityManager {
     public int AddAbility(string abilityId) {
         int idx = -1;
         for (int i = 0; i < abilities.Count; i++) {
-            if (abilities[i].abilityId == abilityId) {
+            if (abilities[i].Id == abilityId) {
                 idx = i;
                 break;
             }
@@ -68,7 +68,7 @@ public class AbilityManager {
     public int RemoveAbility(string abilityId) {
         int idx = -1;
         for (int i = 0; i < abilities.Count; i++) {
-            if (abilities[i].abilityId == abilityId) {
+            if (abilities[i].Id == abilityId) {
                 idx = i;
                 break;
             }
@@ -129,7 +129,7 @@ public class AbilityManager {
 
     public Ability GetAbility(string abilityId) {
         for (int i = 0; i < abilities.Count; i++) {
-            if (abilities[i].abilityId == abilityId) return abilities[i];
+            if (abilities[i].Id == abilityId) return abilities[i];
         }
         return null;
     }

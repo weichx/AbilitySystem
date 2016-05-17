@@ -14,13 +14,13 @@ public abstract class Page {
 
 public abstract class Page<T> : Page where T : EntitySystemBase {
 
-    protected EntitySystemItem<T> activeItem;
+    protected AssetItem<T> activeItem;
 
-    public EntitySystemItem<T> ActiveItem {
+    public AssetItem<T> ActiveItem {
         get { return activeItem; }
     }
 
-    public virtual void SetActiveItem(EntitySystemItem<T> newItem) {
+    public virtual void SetActiveItem(AssetItem<T> newItem) {
         if (activeItem != null) {
             activeItem.IsSelected = false;
         }

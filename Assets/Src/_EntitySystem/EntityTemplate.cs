@@ -27,7 +27,7 @@ public class EntityTemplate {
     protected virtual void AddAbilities(Entity entity) {
         if (abilities != null) {
             for (int i = 0; i < abilities.Length; i++) {
-                entity.abilityManager.AddAbility(abilities[i].abilityId);
+                entity.abilityManager.AddAbility(abilities[i].Id);
             }
         }
 

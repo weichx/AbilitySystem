@@ -2,23 +2,27 @@
 
 public abstract class StatusPage_SectionBase {
 
-    protected StatusPage page;
-    protected SerializedObject target;
+    protected AssetItem<StatusEffect> targetItem;
     protected SerializedProperty statusProperty;
 
-    public StatusPage_SectionBase(StatusPage page) {
-        this.page = page;
-    }
-
-    public virtual void SetTargetObject(SerializedObject target) {
-        this.target = target;
-        if (target != null) {
-            statusProperty = target.FindProperty("statusEffect");
+    public virtual void SetTargetObject(AssetItem<StatusEffect> targetItem) {
+        this.targetItem = targetItem;
+        if (targetItem == null) {
+            statusProperty = null;
+            return;
+        }
+        if (serialRoot != null) {
+            statusProperty = serialRoot.FindProperty("statusEffect");
         }
         else {
             statusProperty = null;
         }
     }
+
+    protected SerializedObject serialRoot {
+        get { return targetItem == null ? null : targetItem.SerializedObject; }
+    }
+
 
     public abstract void Render();
 

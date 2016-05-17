@@ -7,7 +7,6 @@ public class StatusEffect : EntitySystemBase {
     [HideInInspector] [SerializeField]
     public StatusEffectCreator Creator;
 
-    public string statusEffectId;
     public Texture2D icon;
     public StatusState state;
     public FloatAttribute duration;
@@ -32,12 +31,6 @@ public class StatusEffect : EntitySystemBase {
         tags = new TagCollection();
         duration = new FloatAttribute();
         timer = new Timer();//can probably get rid of timer and just duration as a variable
-    }
-
-    public override string Id {
-        get {
-            return statusEffectId;
-        }
     }
 
     public StatusEffectComponent AddStatusComponent<T>() where T : StatusEffectComponent, new() {

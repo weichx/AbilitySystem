@@ -34,7 +34,7 @@ public class Nameplate : MonoBehaviour {
         if(entity == null) return;
         if(entity.abilityManager.IsCasting) {
             Ability currentAbility = entity.abilityManager.ActiveAbility;
-            castTimeText.text = currentAbility.abilityId + " (" + currentAbility.ElapsedCastTime.ToString("0.00") + ")";
+            castTimeText.text = currentAbility.Id + " (" + currentAbility.ElapsedCastTime.ToString("0.00") + ")";
         }
         else {
             nameText.text = entity.name;

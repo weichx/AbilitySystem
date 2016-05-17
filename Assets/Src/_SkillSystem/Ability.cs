@@ -7,17 +7,15 @@ public partial class Ability : EntitySystemBase {
     [NonSerialized]
     private CastEvent currentEvent;
 
-    public Vector3 tempVec3 = new Vector3(1, 2, 3);
-    public string abilityId;
     [NonSerialized]
     public Entity caster;
-    private int nextCharge;
+    [SerializeField] private int nextCharge;
     [SerializeField] private Charge[] charges;
     public CastState castState;
     public CastMode castMode;
     public CastMode actualCastMode; //a cast time of <= 0 makes things instant. inverse possible as well
-    protected Timer castTimer;
-    protected Timer channelTimer;
+    [NonSerialized] protected Timer castTimer;
+    [NonSerialized] protected Timer channelTimer;
     public Texture2D icon;
     public AbilityContextCreator contextCreator;
 
@@ -34,10 +32,10 @@ public partial class Ability : EntitySystemBase {
 
     public bool IgnoreGCD = false;
 
-    public Ability() : this("New Ability") { }
+    public Ability() : this("") { }
 
     public Ability(string id) {
-        this.abilityId = id;
+        Id = id;
         nextCharge = 0;
         charges = new Charge[1] {
             new Charge()
@@ -52,12 +50,6 @@ public partial class Ability : EntitySystemBase {
         channelTime = new FloatAttribute(3f);
         castTimer = new Timer();
         channelTimer = new Timer();
-    }
-
-    public override string Id {
-        get {
-            return abilityId;
-        }
     }
 
     public CastEvent CurrentEvent {

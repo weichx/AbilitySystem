@@ -5,11 +5,11 @@ using UnityEditor;
 
 public class StatusPage_GeneralSection : StatusPage_SectionBase {
 
-    public StatusPage_GeneralSection(StatusPage page) : base(page) { }
+    public StatusPage_GeneralSection() : base() { }
 
 
     public override void Render() {
-        if (target == null) return;
+        if (serialRoot == null) return;
 
         SerializedProperty isExpirable = statusProperty.FindPropertyRelative("IsExpirable");
         SerializedProperty isDispellable = statusProperty.FindPropertyRelative("IsDispellable");

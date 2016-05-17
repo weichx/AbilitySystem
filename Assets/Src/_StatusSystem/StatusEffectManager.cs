@@ -24,7 +24,7 @@ public class StatusEffectManager {
     public StatusEffect AddStatusEffect(string effectId, Context context) {
         Entity caster = context.entity;
         StatusEffect existing = statusList.Find((StatusEffect s) => {
-            return s.statusEffectId == effectId && s.caster == caster || s.IsUnique;
+            return s.Id == effectId && s.caster == caster || s.IsUnique;
         });
 
         if (existing != null && existing.IsRefreshable) {
@@ -55,7 +55,7 @@ public class StatusEffectManager {
 
     public bool DispelStatus(Entity caster, string statusId) {
         StatusEffect effect = statusList.Find((status) => {
-            return status.caster == caster && status.statusEffectId == statusId;
+            return status.caster == caster && status.Id == statusId;
         });
         if (effect != null) {
             effect.Dispel();
@@ -69,7 +69,7 @@ public class StatusEffectManager {
 
     public bool RemoveStatus(string statusId, Entity caster) {
         StatusEffect effect = statusList.Find((status) => {
-            return status.caster == caster && status.statusEffectId == statusId;
+            return status.caster == caster && status.Id == statusId;
         });
         if (effect != null) {
             statusList.Remove(effect);
@@ -81,7 +81,7 @@ public class StatusEffectManager {
 
     public bool HasStatus(string statusName) {
         for (var i = 0; i < statusList.Count; i++) {
-            if (statusList[i].statusEffectId == statusName) {
+            if (statusList[i].Id == statusName) {
                 return true;
             }
         }
@@ -99,7 +99,7 @@ public class StatusEffectManager {
 
     public bool HasStatus(Entity caster, string statusName) {
         for (var i = 0; i < statusList.Count; i++) {
-            if (statusList[i].statusEffectId == statusName) {
+            if (statusList[i].Id == statusName) {
                 if (statusList[i].caster == caster) {
                     return true;
                 }

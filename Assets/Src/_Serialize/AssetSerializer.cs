@@ -147,7 +147,6 @@ public class AssetSerializer : IWriter {
             + tagBuilder.ToString();
         return output;
         // File.WriteAllBytes(path + ".gzip", AssetSerializerHelper.Zip(refBuilder.ToString() + fieldBuilder.ToString() + structBuilder.ToString() + tagBuilder.ToString()));
-
     }
 
     public void WriteDefault() {

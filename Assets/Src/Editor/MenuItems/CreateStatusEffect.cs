@@ -10,7 +10,7 @@ public static class StatusEffectMenuItem {
         string assetpath = "Assets/Status Effects/Status Effect.asset";
         string assetPathAndName = AssetDatabase.GenerateUniqueAssetPath(assetpath);
         var effect = new StatusEffect();
-        effect.statusEffectId = Path.GetFileNameWithoutExtension(assetPathAndName);
+        effect.Id = Path.GetFileNameWithoutExtension(assetPathAndName);
         AssetSerializer serializer = new AssetSerializer();
         serializer.AddItem(effect);
         asset.source = serializer.WriteToString();

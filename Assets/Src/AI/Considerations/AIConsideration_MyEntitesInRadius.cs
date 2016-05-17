@@ -1,9 +1,5 @@
-﻿
-using System;
-
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
-using AbilitySystem;
 
 public class AIConsideration_MyEntitiesInRadius : AIConsideration {
 

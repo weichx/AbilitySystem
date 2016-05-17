@@ -5,28 +5,19 @@ using UnityEditor;
 
 public class StatusPage_DetailView {
 
-    private StatusPage page;
-    private SerializedObject target;
-    private SerializedProperty statusProperty;
+    private AssetItem<StatusEffect> target;
     private StatusPage_NameSection nameSection;
     private StatusPage_GeneralSection generalSection;
     private StatusPage_ComponentSection componentSection;
 
-    public StatusPage_DetailView(StatusPage page) {
-        this.page = page;
-        nameSection = new StatusPage_NameSection(page);
-        generalSection = new StatusPage_GeneralSection(page);
-        componentSection = new StatusPage_ComponentSection(page);
+    public StatusPage_DetailView() {
+        nameSection = new StatusPage_NameSection();
+        generalSection = new StatusPage_GeneralSection();
+        componentSection = new StatusPage_ComponentSection();
     }
 
-    public void SetTargetObject(SerializedObject target) {
+    public void SetTargetObject(AssetItem<StatusEffect> target) {
         this.target = target;
-        if(target != null) {
-            statusProperty = target.FindProperty("statusEffect");
-        }
-        else {
-            statusProperty = null;
-        }
         nameSection.SetTargetObject(target);
         generalSection.SetTargetObject(target);
         componentSection.SetTargetObject(target);
