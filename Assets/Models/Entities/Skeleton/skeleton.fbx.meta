@@ -1,0 +1,865 @@
+fileFormatVersion: 2
+guid: 428faaf62e2c84c58b61267507b58c50
+timeCreated: 1449169017
+licenseType: Store
+ModelImporter:
+  serializedVersion: 18
+  fileIDToRecycleName:
+    100000: b_head
+    100002: b_L_armfore
+    100004: b_L_armup
+    100006: b_L_collar
+    100008: b_L_fingersA
+    100010: b_L_fingersB
+    100012: b_L_fingersC
+    100014: b_L_footheel
+    100016: b_L_footnub
+    100018: b_L_foottoe
+    100020: b_L_hand
+    100022: b_L_indexA
+    100024: b_L_indexB
+    100026: b_L_indexC
+    100028: b_L_legcalf
+    100030: b_L_legthigh
+    100032: b_L_thumbA
+    100034: b_L_thumbB
+    100036: b_L_thumbC
+    100038: b_neck
+    100040: b_pelvis
+    100042: b_R_armfore
+    100044: b_R_armup
+    100046: b_R_collar
+    100048: b_R_fingersA
+    100050: b_R_fingersB
+    100052: b_R_fingersC
+    100054: b_R_footheel
+    100056: b_R_footnub
+    100058: b_R_foottoe
+    100060: b_R_hand
+    100062: b_R_indexA
+    100064: b_R_indexB
+    100066: b_R_indexC
+    100068: b_R_legcalf
+    100070: b_R_legthigh
+    100072: b_R_thumbA
+    100074: b_R_thumbB
+    100076: b_R_thumbC
+    100078: b_spineHi
+    100080: b_spineLo
+    100082: b_spineMid
+    100084: head
+    100086: joint_L_arm
+    100088: joint_L_foot
+    100090: joint_L_leg
+    100092: joint_R_arm
+    100094: joint_R_foot
+    100096: joint_R_leg
+    100098: limbs
+    100100: skeleton
+    100102: //RootNode
+    100104: swordMount
+    100106: torso
+    400000: b_head
+    400002: b_L_armfore
+    400004: b_L_armup
+    400006: b_L_collar
+    400008: b_L_fingersA
+    400010: b_L_fingersB
+    400012: b_L_fingersC
+    400014: b_L_footheel
+    400016: b_L_footnub
+    400018: b_L_foottoe
+    400020: b_L_hand
+    400022: b_L_indexA
+    400024: b_L_indexB
+    400026: b_L_indexC
+    400028: b_L_legcalf
+    400030: b_L_legthigh
+    400032: b_L_thumbA
+    400034: b_L_thumbB
+    400036: b_L_thumbC
+    400038: b_neck
+    400040: b_pelvis
+    400042: b_R_armfore
+    400044: b_R_armup
+    400046: b_R_collar
+    400048: b_R_fingersA
+    400050: b_R_fingersB
+    400052: b_R_fingersC
+    400054: b_R_footheel
+    400056: b_R_footnub
+    400058: b_R_foottoe
+    400060: b_R_hand
+    400062: b_R_indexA
+    400064: b_R_indexB
+    400066: b_R_indexC
+    400068: b_R_legcalf
+    400070: b_R_legthigh
+    400072: b_R_thumbA
+    400074: b_R_thumbB
+    400076: b_R_thumbC
+    400078: b_spineHi
+    400080: b_spineLo
+    400082: b_spineMid
+    400084: head
+    400086: joint_L_arm
+    400088: joint_L_foot
+    400090: joint_L_leg
+    400092: joint_R_arm
+    400094: joint_R_foot
+    400096: joint_R_leg
+    400098: limbs
+    400100: skeleton
+    400102: //RootNode
+    400104: swordMount
+    400106: torso
+    4300000: head
+    4300002: limbs
+    4300004: torso
+    7400000: Full Anim
+    7400002: start01_Take_001_BaseLayer
+    7400004: start01_Take_001_BaseLayer_001
+    7400006: Animation
+    7400008: Idle
+    7400010: Run
+    7400012: Attack
+    7400014: Drop Dead
+    7400016: Default Take2
+    9500000: //RootNode
+    13700000: head
+    13700002: limbs
+    13700004: torso
+  materials:
+    importMaterials: 1
+    materialName: 0
+    materialSearch: 1
+  animations:
+    legacyGenerateAnimations: 4
+    bakeSimulation: 0
+    optimizeGameObjects: 0
+    motionNodeName: 
+    animationImportErrors: 
+    animationImportWarnings: 
+    animationRetargetingWarnings: 
+    animationDoRetargetingWarnings: 0
+    animationCompression: 1
+    animationRotationError: .5
+    animationPositionError: .5
+    animationScaleError: .5
+    animationWrapMode: 0
+    extraExposedTransformPaths: []
+    clipAnimations:
+    - serializedVersion: 16
+      name: Full Anim
+      takeName: Default Take
+      firstFrame: 0
+      lastFrame: 230
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      loopTime: 0
+      loopBlend: 0
+      loopBlendOrientation: 0
+      loopBlendPositionY: 0
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask:
+      - path: 
+        weight: 1
+      - path: head
+        weight: 1
+      - path: limbs
+        weight: 1
+      - path: skeleton
+        weight: 1
+      - path: skeleton/b_pelvis
+        weight: 1
+      - path: skeleton/b_pelvis/b_spineLo
+        weight: 1
+      - path: skeleton/b_pelvis/b_spineLo/b_spineMid
+        weight: 1
+      - path: skeleton/b_pelvis/b_spineLo/b_spineMid/b_spineHi
+        weight: 1
+      - path: skeleton/b_pelvis/b_spineLo/b_spineMid/b_spineHi/b_L_collar
+        weight: 1
+      - path: skeleton/b_pelvis/b_spineLo/b_spineMid/b_spineHi/b_L_collar/joint_L_arm
+        weight: 1
+      - path: skeleton/b_pelvis/b_spineLo/b_spineMid/b_spineHi/b_L_collar/joint_L_arm/b_L_armup
+        weight: 1
+      - path: skeleton/b_pelvis/b_spineLo/b_spineMid/b_spineHi/b_L_collar/joint_L_arm/b_L_armup/b_L_armfore
+        weight: 1
+      - path: skeleton/b_pelvis/b_spineLo/b_spineMid/b_spineHi/b_L_collar/joint_L_arm/b_L_armup/b_L_armfore/b_L_hand
+        weight: 1
+      - path: skeleton/b_pelvis/b_spineLo/b_spineMid/b_spineHi/b_L_collar/joint_L_arm/b_L_armup/b_L_armfore/b_L_hand/b_L_fingersA
+        weight: 1
+      - path: skeleton/b_pelvis/b_spineLo/b_spineMid/b_spineHi/b_L_collar/joint_L_arm/b_L_armup/b_L_armfore/b_L_hand/b_L_fingersA/b_L_fingersB
+        weight: 1
+      - path: skeleton/b_pelvis/b_spineLo/b_spineMid/b_spineHi/b_L_collar/joint_L_arm/b_L_armup/b_L_armfore/b_L_hand/b_L_fingersA/b_L_fingersB/b_L_fingersC
+        weight: 1
+      - path: skeleton/b_pelvis/b_spineLo/b_spineMid/b_spineHi/b_L_collar/joint_L_arm/b_L_armup/b_L_armfore/b_L_hand/b_L_indexA
+        weight: 1
+      - path: skeleton/b_pelvis/b_spineLo/b_spineMid/b_spineHi/b_L_collar/joint_L_arm/b_L_armup/b_L_armfore/b_L_hand/b_L_indexA/b_L_indexB
+        weight: 1
+      - path: skeleton/b_pelvis/b_spineLo/b_spineMid/b_spineHi/b_L_collar/joint_L_arm/b_L_armup/b_L_armfore/b_L_hand/b_L_indexA/b_L_indexB/b_L_indexC
+        weight: 1
+      - path: skeleton/b_pelvis/b_spineLo/b_spineMid/b_spineHi/b_L_collar/joint_L_arm/b_L_armup/b_L_armfore/b_L_hand/b_L_thumbA
+        weight: 1
+      - path: skeleton/b_pelvis/b_spineLo/b_spineMid/b_spineHi/b_L_collar/joint_L_arm/b_L_armup/b_L_armfore/b_L_hand/b_L_thumbA/b_L_thumbB
+        weight: 1
+      - path: skeleton/b_pelvis/b_spineLo/b_spineMid/b_spineHi/b_L_collar/joint_L_arm/b_L_armup/b_L_armfore/b_L_hand/b_L_thumbA/b_L_thumbB/b_L_thumbC
+        weight: 1
+      - path: skeleton/b_pelvis/b_spineLo/b_spineMid/b_spineHi/b_neck
+        weight: 1
+      - path: skeleton/b_pelvis/b_spineLo/b_spineMid/b_spineHi/b_neck/b_head
+        weight: 1
+      - path: skeleton/b_pelvis/b_spineLo/b_spineMid/b_spineHi/b_R_collar
+        weight: 1
+      - path: skeleton/b_pelvis/b_spineLo/b_spineMid/b_spineHi/b_R_collar/joint_R_arm
+        weight: 1
+      - path: skeleton/b_pelvis/b_spineLo/b_spineMid/b_spineHi/b_R_collar/joint_R_arm/b_R_armup
+        weight: 1
+      - path: skeleton/b_pelvis/b_spineLo/b_spineMid/b_spineHi/b_R_collar/joint_R_arm/b_R_armup/b_R_armfore
+        weight: 1
+      - path: skeleton/b_pelvis/b_spineLo/b_spineMid/b_spineHi/b_R_collar/joint_R_arm/b_R_armup/b_R_armfore/b_R_hand
+        weight: 1
+      - path: skeleton/b_pelvis/b_spineLo/b_spineMid/b_spineHi/b_R_collar/joint_R_arm/b_R_armup/b_R_armfore/b_R_hand/b_R_fingersA
+        weight: 1
+      - path: skeleton/b_pelvis/b_spineLo/b_spineMid/b_spineHi/b_R_collar/joint_R_arm/b_R_armup/b_R_armfore/b_R_hand/b_R_fingersA/b_R_fingersB
+        weight: 1
+      - path: skeleton/b_pelvis/b_spineLo/b_spineMid/b_spineHi/b_R_collar/joint_R_arm/b_R_armup/b_R_armfore/b_R_hand/b_R_fingersA/b_R_fingersB/b_R_fingersC
+        weight: 1
+      - path: skeleton/b_pelvis/b_spineLo/b_spineMid/b_spineHi/b_R_collar/joint_R_arm/b_R_armup/b_R_armfore/b_R_hand/b_R_indexA
+        weight: 1
+      - path: skeleton/b_pelvis/b_spineLo/b_spineMid/b_spineHi/b_R_collar/joint_R_arm/b_R_armup/b_R_armfore/b_R_hand/b_R_indexA/b_R_indexB
+        weight: 1
+      - path: skeleton/b_pelvis/b_spineLo/b_spineMid/b_spineHi/b_R_collar/joint_R_arm/b_R_armup/b_R_armfore/b_R_hand/b_R_indexA/b_R_indexB/b_R_indexC
+        weight: 1
+      - path: skeleton/b_pelvis/b_spineLo/b_spineMid/b_spineHi/b_R_collar/joint_R_arm/b_R_armup/b_R_armfore/b_R_hand/b_R_thumbA
+        weight: 1
+      - path: skeleton/b_pelvis/b_spineLo/b_spineMid/b_spineHi/b_R_collar/joint_R_arm/b_R_armup/b_R_armfore/b_R_hand/b_R_thumbA/b_R_thumbB
+        weight: 1
+      - path: skeleton/b_pelvis/b_spineLo/b_spineMid/b_spineHi/b_R_collar/joint_R_arm/b_R_armup/b_R_armfore/b_R_hand/b_R_thumbA/b_R_thumbB/b_R_thumbC
+        weight: 1
+      - path: skeleton/b_pelvis/joint_L_leg
+        weight: 1
+      - path: skeleton/b_pelvis/joint_L_leg/b_L_legthigh
+        weight: 1
+      - path: skeleton/b_pelvis/joint_L_leg/b_L_legthigh/b_L_legcalf
+        weight: 1
+      - path: skeleton/b_pelvis/joint_L_leg/b_L_legthigh/b_L_legcalf/joint_L_foot
+        weight: 1
+      - path: skeleton/b_pelvis/joint_L_leg/b_L_legthigh/b_L_legcalf/joint_L_foot/b_L_footheel
+        weight: 1
+      - path: skeleton/b_pelvis/joint_L_leg/b_L_legthigh/b_L_legcalf/joint_L_foot/b_L_footheel/b_L_foottoe
+        weight: 1
+      - path: skeleton/b_pelvis/joint_L_leg/b_L_legthigh/b_L_legcalf/joint_L_foot/b_L_footheel/b_L_foottoe/b_L_footnub
+        weight: 1
+      - path: skeleton/b_pelvis/joint_R_leg
+        weight: 1
+      - path: skeleton/b_pelvis/joint_R_leg/b_R_legthigh
+        weight: 1
+      - path: skeleton/b_pelvis/joint_R_leg/b_R_legthigh/b_R_legcalf
+        weight: 1
+      - path: skeleton/b_pelvis/joint_R_leg/b_R_legthigh/b_R_legcalf/joint_R_foot
+        weight: 1
+      - path: skeleton/b_pelvis/joint_R_leg/b_R_legthigh/b_R_legcalf/joint_R_foot/b_R_footheel
+        weight: 1
+      - path: skeleton/b_pelvis/joint_R_leg/b_R_legthigh/b_R_legcalf/joint_R_foot/b_R_footheel/b_R_foottoe
+        weight: 1
+      - path: skeleton/b_pelvis/joint_R_leg/b_R_legthigh/b_R_legcalf/joint_R_foot/b_R_footheel/b_R_foottoe/b_R_footnub
+        weight: 1
+      - path: skeleton/swordMount
+        weight: 1
+      - path: torso
+        weight: 1
+      maskType: 0
+      maskSource: {instanceID: 0}
+    - serializedVersion: 16
+      name: Idle
+      takeName: Default Take
+      firstFrame: 12
+      lastFrame: 62
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      loopTime: 1
+      loopBlend: 0
+      loopBlendOrientation: 0
+      loopBlendPositionY: 0
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask:
+      - path: 
+        weight: 1
+      - path: head
+        weight: 1
+      - path: limbs
+        weight: 1
+      - path: skeleton
+        weight: 1
+      - path: skeleton/b_pelvis
+        weight: 1
+      - path: skeleton/b_pelvis/b_spineLo
+        weight: 1
+      - path: skeleton/b_pelvis/b_spineLo/b_spineMid
+        weight: 1
+      - path: skeleton/b_pelvis/b_spineLo/b_spineMid/b_spineHi
+        weight: 1
+      - path: skeleton/b_pelvis/b_spineLo/b_spineMid/b_spineHi/b_L_collar
+        weight: 1
+      - path: skeleton/b_pelvis/b_spineLo/b_spineMid/b_spineHi/b_L_collar/joint_L_arm
+        weight: 1
+      - path: skeleton/b_pelvis/b_spineLo/b_spineMid/b_spineHi/b_L_collar/joint_L_arm/b_L_armup
+        weight: 1
+      - path: skeleton/b_pelvis/b_spineLo/b_spineMid/b_spineHi/b_L_collar/joint_L_arm/b_L_armup/b_L_armfore
+        weight: 1
+      - path: skeleton/b_pelvis/b_spineLo/b_spineMid/b_spineHi/b_L_collar/joint_L_arm/b_L_armup/b_L_armfore/b_L_hand
+        weight: 1
+      - path: skeleton/b_pelvis/b_spineLo/b_spineMid/b_spineHi/b_L_collar/joint_L_arm/b_L_armup/b_L_armfore/b_L_hand/b_L_fingersA
+        weight: 1
+      - path: skeleton/b_pelvis/b_spineLo/b_spineMid/b_spineHi/b_L_collar/joint_L_arm/b_L_armup/b_L_armfore/b_L_hand/b_L_fingersA/b_L_fingersB
+        weight: 1
+      - path: skeleton/b_pelvis/b_spineLo/b_spineMid/b_spineHi/b_L_collar/joint_L_arm/b_L_armup/b_L_armfore/b_L_hand/b_L_fingersA/b_L_fingersB/b_L_fingersC
+        weight: 1
+      - path: skeleton/b_pelvis/b_spineLo/b_spineMid/b_spineHi/b_L_collar/joint_L_arm/b_L_armup/b_L_armfore/b_L_hand/b_L_indexA
+        weight: 1
+      - path: skeleton/b_pelvis/b_spineLo/b_spineMid/b_spineHi/b_L_collar/joint_L_arm/b_L_armup/b_L_armfore/b_L_hand/b_L_indexA/b_L_indexB
+        weight: 1
+      - path: skeleton/b_pelvis/b_spineLo/b_spineMid/b_spineHi/b_L_collar/joint_L_arm/b_L_armup/b_L_armfore/b_L_hand/b_L_indexA/b_L_indexB/b_L_indexC
+        weight: 1
+      - path: skeleton/b_pelvis/b_spineLo/b_spineMid/b_spineHi/b_L_collar/joint_L_arm/b_L_armup/b_L_armfore/b_L_hand/b_L_thumbA
+        weight: 1
+      - path: skeleton/b_pelvis/b_spineLo/b_spineMid/b_spineHi/b_L_collar/joint_L_arm/b_L_armup/b_L_armfore/b_L_hand/b_L_thumbA/b_L_thumbB
+        weight: 1
+      - path: skeleton/b_pelvis/b_spineLo/b_spineMid/b_spineHi/b_L_collar/joint_L_arm/b_L_armup/b_L_armfore/b_L_hand/b_L_thumbA/b_L_thumbB/b_L_thumbC
+        weight: 1
+      - path: skeleton/b_pelvis/b_spineLo/b_spineMid/b_spineHi/b_neck
+        weight: 1
+      - path: skeleton/b_pelvis/b_spineLo/b_spineMid/b_spineHi/b_neck/b_head
+        weight: 1
+      - path: skeleton/b_pelvis/b_spineLo/b_spineMid/b_spineHi/b_R_collar
+        weight: 1
+      - path: skeleton/b_pelvis/b_spineLo/b_spineMid/b_spineHi/b_R_collar/joint_R_arm
+        weight: 1
+      - path: skeleton/b_pelvis/b_spineLo/b_spineMid/b_spineHi/b_R_collar/joint_R_arm/b_R_armup
+        weight: 1
+      - path: skeleton/b_pelvis/b_spineLo/b_spineMid/b_spineHi/b_R_collar/joint_R_arm/b_R_armup/b_R_armfore
+        weight: 1
+      - path: skeleton/b_pelvis/b_spineLo/b_spineMid/b_spineHi/b_R_collar/joint_R_arm/b_R_armup/b_R_armfore/b_R_hand
+        weight: 1
+      - path: skeleton/b_pelvis/b_spineLo/b_spineMid/b_spineHi/b_R_collar/joint_R_arm/b_R_armup/b_R_armfore/b_R_hand/b_R_fingersA
+        weight: 1
+      - path: skeleton/b_pelvis/b_spineLo/b_spineMid/b_spineHi/b_R_collar/joint_R_arm/b_R_armup/b_R_armfore/b_R_hand/b_R_fingersA/b_R_fingersB
+        weight: 1
+      - path: skeleton/b_pelvis/b_spineLo/b_spineMid/b_spineHi/b_R_collar/joint_R_arm/b_R_armup/b_R_armfore/b_R_hand/b_R_fingersA/b_R_fingersB/b_R_fingersC
+        weight: 1
+      - path: skeleton/b_pelvis/b_spineLo/b_spineMid/b_spineHi/b_R_collar/joint_R_arm/b_R_armup/b_R_armfore/b_R_hand/b_R_indexA
+        weight: 1
+      - path: skeleton/b_pelvis/b_spineLo/b_spineMid/b_spineHi/b_R_collar/joint_R_arm/b_R_armup/b_R_armfore/b_R_hand/b_R_indexA/b_R_indexB
+        weight: 1
+      - path: skeleton/b_pelvis/b_spineLo/b_spineMid/b_spineHi/b_R_collar/joint_R_arm/b_R_armup/b_R_armfore/b_R_hand/b_R_indexA/b_R_indexB/b_R_indexC
+        weight: 1
+      - path: skeleton/b_pelvis/b_spineLo/b_spineMid/b_spineHi/b_R_collar/joint_R_arm/b_R_armup/b_R_armfore/b_R_hand/b_R_thumbA
+        weight: 1
+      - path: skeleton/b_pelvis/b_spineLo/b_spineMid/b_spineHi/b_R_collar/joint_R_arm/b_R_armup/b_R_armfore/b_R_hand/b_R_thumbA/b_R_thumbB
+        weight: 1
+      - path: skeleton/b_pelvis/b_spineLo/b_spineMid/b_spineHi/b_R_collar/joint_R_arm/b_R_armup/b_R_armfore/b_R_hand/b_R_thumbA/b_R_thumbB/b_R_thumbC
+        weight: 1
+      - path: skeleton/b_pelvis/joint_L_leg
+        weight: 1
+      - path: skeleton/b_pelvis/joint_L_leg/b_L_legthigh
+        weight: 1
+      - path: skeleton/b_pelvis/joint_L_leg/b_L_legthigh/b_L_legcalf
+        weight: 1
+      - path: skeleton/b_pelvis/joint_L_leg/b_L_legthigh/b_L_legcalf/joint_L_foot
+        weight: 1
+      - path: skeleton/b_pelvis/joint_L_leg/b_L_legthigh/b_L_legcalf/joint_L_foot/b_L_footheel
+        weight: 1
+      - path: skeleton/b_pelvis/joint_L_leg/b_L_legthigh/b_L_legcalf/joint_L_foot/b_L_footheel/b_L_foottoe
+        weight: 1
+      - path: skeleton/b_pelvis/joint_L_leg/b_L_legthigh/b_L_legcalf/joint_L_foot/b_L_footheel/b_L_foottoe/b_L_footnub
+        weight: 1
+      - path: skeleton/b_pelvis/joint_R_leg
+        weight: 1
+      - path: skeleton/b_pelvis/joint_R_leg/b_R_legthigh
+        weight: 1
+      - path: skeleton/b_pelvis/joint_R_leg/b_R_legthigh/b_R_legcalf
+        weight: 1
+      - path: skeleton/b_pelvis/joint_R_leg/b_R_legthigh/b_R_legcalf/joint_R_foot
+        weight: 1
+      - path: skeleton/b_pelvis/joint_R_leg/b_R_legthigh/b_R_legcalf/joint_R_foot/b_R_footheel
+        weight: 1
+      - path: skeleton/b_pelvis/joint_R_leg/b_R_legthigh/b_R_legcalf/joint_R_foot/b_R_footheel/b_R_foottoe
+        weight: 1
+      - path: skeleton/b_pelvis/joint_R_leg/b_R_legthigh/b_R_legcalf/joint_R_foot/b_R_footheel/b_R_foottoe/b_R_footnub
+        weight: 1
+      - path: skeleton/swordMount
+        weight: 1
+      - path: torso
+        weight: 1
+      maskType: 0
+      maskSource: {instanceID: 0}
+    - serializedVersion: 16
+      name: Run
+      takeName: Default Take
+      firstFrame: 66
+      lastFrame: 86
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      loopTime: 1
+      loopBlend: 0
+      loopBlendOrientation: 0
+      loopBlendPositionY: 0
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask:
+      - path: 
+        weight: 1
+      - path: head
+        weight: 1
+      - path: limbs
+        weight: 1
+      - path: skeleton
+        weight: 1
+      - path: skeleton/b_pelvis
+        weight: 1
+      - path: skeleton/b_pelvis/b_spineLo
+        weight: 1
+      - path: skeleton/b_pelvis/b_spineLo/b_spineMid
+        weight: 1
+      - path: skeleton/b_pelvis/b_spineLo/b_spineMid/b_spineHi
+        weight: 1
+      - path: skeleton/b_pelvis/b_spineLo/b_spineMid/b_spineHi/b_L_collar
+        weight: 1
+      - path: skeleton/b_pelvis/b_spineLo/b_spineMid/b_spineHi/b_L_collar/joint_L_arm
+        weight: 1
+      - path: skeleton/b_pelvis/b_spineLo/b_spineMid/b_spineHi/b_L_collar/joint_L_arm/b_L_armup
+        weight: 1
+      - path: skeleton/b_pelvis/b_spineLo/b_spineMid/b_spineHi/b_L_collar/joint_L_arm/b_L_armup/b_L_armfore
+        weight: 1
+      - path: skeleton/b_pelvis/b_spineLo/b_spineMid/b_spineHi/b_L_collar/joint_L_arm/b_L_armup/b_L_armfore/b_L_hand
+        weight: 1
+      - path: skeleton/b_pelvis/b_spineLo/b_spineMid/b_spineHi/b_L_collar/joint_L_arm/b_L_armup/b_L_armfore/b_L_hand/b_L_fingersA
+        weight: 1
+      - path: skeleton/b_pelvis/b_spineLo/b_spineMid/b_spineHi/b_L_collar/joint_L_arm/b_L_armup/b_L_armfore/b_L_hand/b_L_fingersA/b_L_fingersB
+        weight: 1
+      - path: skeleton/b_pelvis/b_spineLo/b_spineMid/b_spineHi/b_L_collar/joint_L_arm/b_L_armup/b_L_armfore/b_L_hand/b_L_fingersA/b_L_fingersB/b_L_fingersC
+        weight: 1
+      - path: skeleton/b_pelvis/b_spineLo/b_spineMid/b_spineHi/b_L_collar/joint_L_arm/b_L_armup/b_L_armfore/b_L_hand/b_L_indexA
+        weight: 1
+      - path: skeleton/b_pelvis/b_spineLo/b_spineMid/b_spineHi/b_L_collar/joint_L_arm/b_L_armup/b_L_armfore/b_L_hand/b_L_indexA/b_L_indexB
+        weight: 1
+      - path: skeleton/b_pelvis/b_spineLo/b_spineMid/b_spineHi/b_L_collar/joint_L_arm/b_L_armup/b_L_armfore/b_L_hand/b_L_indexA/b_L_indexB/b_L_indexC
+        weight: 1
+      - path: skeleton/b_pelvis/b_spineLo/b_spineMid/b_spineHi/b_L_collar/joint_L_arm/b_L_armup/b_L_armfore/b_L_hand/b_L_thumbA
+        weight: 1
+      - path: skeleton/b_pelvis/b_spineLo/b_spineMid/b_spineHi/b_L_collar/joint_L_arm/b_L_armup/b_L_armfore/b_L_hand/b_L_thumbA/b_L_thumbB
+        weight: 1
+      - path: skeleton/b_pelvis/b_spineLo/b_spineMid/b_spineHi/b_L_collar/joint_L_arm/b_L_armup/b_L_armfore/b_L_hand/b_L_thumbA/b_L_thumbB/b_L_thumbC
+        weight: 1
+      - path: skeleton/b_pelvis/b_spineLo/b_spineMid/b_spineHi/b_neck
+        weight: 1
+      - path: skeleton/b_pelvis/b_spineLo/b_spineMid/b_spineHi/b_neck/b_head
+        weight: 1
+      - path: skeleton/b_pelvis/b_spineLo/b_spineMid/b_spineHi/b_R_collar
+        weight: 1
+      - path: skeleton/b_pelvis/b_spineLo/b_spineMid/b_spineHi/b_R_collar/joint_R_arm
+        weight: 1
+      - path: skeleton/b_pelvis/b_spineLo/b_spineMid/b_spineHi/b_R_collar/joint_R_arm/b_R_armup
+        weight: 1
+      - path: skeleton/b_pelvis/b_spineLo/b_spineMid/b_spineHi/b_R_collar/joint_R_arm/b_R_armup/b_R_armfore
+        weight: 1
+      - path: skeleton/b_pelvis/b_spineLo/b_spineMid/b_spineHi/b_R_collar/joint_R_arm/b_R_armup/b_R_armfore/b_R_hand
+        weight: 1
+      - path: skeleton/b_pelvis/b_spineLo/b_spineMid/b_spineHi/b_R_collar/joint_R_arm/b_R_armup/b_R_armfore/b_R_hand/b_R_fingersA
+        weight: 1
+      - path: skeleton/b_pelvis/b_spineLo/b_spineMid/b_spineHi/b_R_collar/joint_R_arm/b_R_armup/b_R_armfore/b_R_hand/b_R_fingersA/b_R_fingersB
+        weight: 1
+      - path: skeleton/b_pelvis/b_spineLo/b_spineMid/b_spineHi/b_R_collar/joint_R_arm/b_R_armup/b_R_armfore/b_R_hand/b_R_fingersA/b_R_fingersB/b_R_fingersC
+        weight: 1
+      - path: skeleton/b_pelvis/b_spineLo/b_spineMid/b_spineHi/b_R_collar/joint_R_arm/b_R_armup/b_R_armfore/b_R_hand/b_R_indexA
+        weight: 1
+      - path: skeleton/b_pelvis/b_spineLo/b_spineMid/b_spineHi/b_R_collar/joint_R_arm/b_R_armup/b_R_armfore/b_R_hand/b_R_indexA/b_R_indexB
+        weight: 1
+      - path: skeleton/b_pelvis/b_spineLo/b_spineMid/b_spineHi/b_R_collar/joint_R_arm/b_R_armup/b_R_armfore/b_R_hand/b_R_indexA/b_R_indexB/b_R_indexC
+        weight: 1
+      - path: skeleton/b_pelvis/b_spineLo/b_spineMid/b_spineHi/b_R_collar/joint_R_arm/b_R_armup/b_R_armfore/b_R_hand/b_R_thumbA
+        weight: 1
+      - path: skeleton/b_pelvis/b_spineLo/b_spineMid/b_spineHi/b_R_collar/joint_R_arm/b_R_armup/b_R_armfore/b_R_hand/b_R_thumbA/b_R_thumbB
+        weight: 1
+      - path: skeleton/b_pelvis/b_spineLo/b_spineMid/b_spineHi/b_R_collar/joint_R_arm/b_R_armup/b_R_armfore/b_R_hand/b_R_thumbA/b_R_thumbB/b_R_thumbC
+        weight: 1
+      - path: skeleton/b_pelvis/joint_L_leg
+        weight: 1
+      - path: skeleton/b_pelvis/joint_L_leg/b_L_legthigh
+        weight: 1
+      - path: skeleton/b_pelvis/joint_L_leg/b_L_legthigh/b_L_legcalf
+        weight: 1
+      - path: skeleton/b_pelvis/joint_L_leg/b_L_legthigh/b_L_legcalf/joint_L_foot
+        weight: 1
+      - path: skeleton/b_pelvis/joint_L_leg/b_L_legthigh/b_L_legcalf/joint_L_foot/b_L_footheel
+        weight: 1
+      - path: skeleton/b_pelvis/joint_L_leg/b_L_legthigh/b_L_legcalf/joint_L_foot/b_L_footheel/b_L_foottoe
+        weight: 1
+      - path: skeleton/b_pelvis/joint_L_leg/b_L_legthigh/b_L_legcalf/joint_L_foot/b_L_footheel/b_L_foottoe/b_L_footnub
+        weight: 1
+      - path: skeleton/b_pelvis/joint_R_leg
+        weight: 1
+      - path: skeleton/b_pelvis/joint_R_leg/b_R_legthigh
+        weight: 1
+      - path: skeleton/b_pelvis/joint_R_leg/b_R_legthigh/b_R_legcalf
+        weight: 1
+      - path: skeleton/b_pelvis/joint_R_leg/b_R_legthigh/b_R_legcalf/joint_R_foot
+        weight: 1
+      - path: skeleton/b_pelvis/joint_R_leg/b_R_legthigh/b_R_legcalf/joint_R_foot/b_R_footheel
+        weight: 1
+      - path: skeleton/b_pelvis/joint_R_leg/b_R_legthigh/b_R_legcalf/joint_R_foot/b_R_footheel/b_R_foottoe
+        weight: 1
+      - path: skeleton/b_pelvis/joint_R_leg/b_R_legthigh/b_R_legcalf/joint_R_foot/b_R_footheel/b_R_foottoe/b_R_footnub
+        weight: 1
+      - path: skeleton/swordMount
+        weight: 1
+      - path: torso
+        weight: 1
+      maskType: 0
+      maskSource: {instanceID: 0}
+    - serializedVersion: 16
+      name: Attack
+      takeName: Default Take
+      firstFrame: 89
+      lastFrame: 133
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      loopTime: 0
+      loopBlend: 0
+      loopBlendOrientation: 0
+      loopBlendPositionY: 0
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask:
+      - path: 
+        weight: 1
+      - path: head
+        weight: 1
+      - path: limbs
+        weight: 1
+      - path: skeleton
+        weight: 1
+      - path: skeleton/b_pelvis
+        weight: 1
+      - path: skeleton/b_pelvis/b_spineLo
+        weight: 1
+      - path: skeleton/b_pelvis/b_spineLo/b_spineMid
+        weight: 1
+      - path: skeleton/b_pelvis/b_spineLo/b_spineMid/b_spineHi
+        weight: 1
+      - path: skeleton/b_pelvis/b_spineLo/b_spineMid/b_spineHi/b_L_collar
+        weight: 1
+      - path: skeleton/b_pelvis/b_spineLo/b_spineMid/b_spineHi/b_L_collar/joint_L_arm
+        weight: 1
+      - path: skeleton/b_pelvis/b_spineLo/b_spineMid/b_spineHi/b_L_collar/joint_L_arm/b_L_armup
+        weight: 1
+      - path: skeleton/b_pelvis/b_spineLo/b_spineMid/b_spineHi/b_L_collar/joint_L_arm/b_L_armup/b_L_armfore
+        weight: 1
+      - path: skeleton/b_pelvis/b_spineLo/b_spineMid/b_spineHi/b_L_collar/joint_L_arm/b_L_armup/b_L_armfore/b_L_hand
+        weight: 1
+      - path: skeleton/b_pelvis/b_spineLo/b_spineMid/b_spineHi/b_L_collar/joint_L_arm/b_L_armup/b_L_armfore/b_L_hand/b_L_fingersA
+        weight: 1
+      - path: skeleton/b_pelvis/b_spineLo/b_spineMid/b_spineHi/b_L_collar/joint_L_arm/b_L_armup/b_L_armfore/b_L_hand/b_L_fingersA/b_L_fingersB
+        weight: 1
+      - path: skeleton/b_pelvis/b_spineLo/b_spineMid/b_spineHi/b_L_collar/joint_L_arm/b_L_armup/b_L_armfore/b_L_hand/b_L_fingersA/b_L_fingersB/b_L_fingersC
+        weight: 1
+      - path: skeleton/b_pelvis/b_spineLo/b_spineMid/b_spineHi/b_L_collar/joint_L_arm/b_L_armup/b_L_armfore/b_L_hand/b_L_indexA
+        weight: 1
+      - path: skeleton/b_pelvis/b_spineLo/b_spineMid/b_spineHi/b_L_collar/joint_L_arm/b_L_armup/b_L_armfore/b_L_hand/b_L_indexA/b_L_indexB
+        weight: 1
+      - path: skeleton/b_pelvis/b_spineLo/b_spineMid/b_spineHi/b_L_collar/joint_L_arm/b_L_armup/b_L_armfore/b_L_hand/b_L_indexA/b_L_indexB/b_L_indexC
+        weight: 1
+      - path: skeleton/b_pelvis/b_spineLo/b_spineMid/b_spineHi/b_L_collar/joint_L_arm/b_L_armup/b_L_armfore/b_L_hand/b_L_thumbA
+        weight: 1
+      - path: skeleton/b_pelvis/b_spineLo/b_spineMid/b_spineHi/b_L_collar/joint_L_arm/b_L_armup/b_L_armfore/b_L_hand/b_L_thumbA/b_L_thumbB
+        weight: 1
+      - path: skeleton/b_pelvis/b_spineLo/b_spineMid/b_spineHi/b_L_collar/joint_L_arm/b_L_armup/b_L_armfore/b_L_hand/b_L_thumbA/b_L_thumbB/b_L_thumbC
+        weight: 1
+      - path: skeleton/b_pelvis/b_spineLo/b_spineMid/b_spineHi/b_neck
+        weight: 1
+      - path: skeleton/b_pelvis/b_spineLo/b_spineMid/b_spineHi/b_neck/b_head
+        weight: 1
+      - path: skeleton/b_pelvis/b_spineLo/b_spineMid/b_spineHi/b_R_collar
+        weight: 1
+      - path: skeleton/b_pelvis/b_spineLo/b_spineMid/b_spineHi/b_R_collar/joint_R_arm
+        weight: 1
+      - path: skeleton/b_pelvis/b_spineLo/b_spineMid/b_spineHi/b_R_collar/joint_R_arm/b_R_armup
+        weight: 1
+      - path: skeleton/b_pelvis/b_spineLo/b_spineMid/b_spineHi/b_R_collar/joint_R_arm/b_R_armup/b_R_armfore
+        weight: 1
+      - path: skeleton/b_pelvis/b_spineLo/b_spineMid/b_spineHi/b_R_collar/joint_R_arm/b_R_armup/b_R_armfore/b_R_hand
+        weight: 1
+      - path: skeleton/b_pelvis/b_spineLo/b_spineMid/b_spineHi/b_R_collar/joint_R_arm/b_R_armup/b_R_armfore/b_R_hand/b_R_fingersA
+        weight: 1
+      - path: skeleton/b_pelvis/b_spineLo/b_spineMid/b_spineHi/b_R_collar/joint_R_arm/b_R_armup/b_R_armfore/b_R_hand/b_R_fingersA/b_R_fingersB
+        weight: 1
+      - path: skeleton/b_pelvis/b_spineLo/b_spineMid/b_spineHi/b_R_collar/joint_R_arm/b_R_armup/b_R_armfore/b_R_hand/b_R_fingersA/b_R_fingersB/b_R_fingersC
+        weight: 1
+      - path: skeleton/b_pelvis/b_spineLo/b_spineMid/b_spineHi/b_R_collar/joint_R_arm/b_R_armup/b_R_armfore/b_R_hand/b_R_indexA
+        weight: 1
+      - path: skeleton/b_pelvis/b_spineLo/b_spineMid/b_spineHi/b_R_collar/joint_R_arm/b_R_armup/b_R_armfore/b_R_hand/b_R_indexA/b_R_indexB
+        weight: 1
+      - path: skeleton/b_pelvis/b_spineLo/b_spineMid/b_spineHi/b_R_collar/joint_R_arm/b_R_armup/b_R_armfore/b_R_hand/b_R_indexA/b_R_indexB/b_R_indexC
+        weight: 1
+      - path: skeleton/b_pelvis/b_spineLo/b_spineMid/b_spineHi/b_R_collar/joint_R_arm/b_R_armup/b_R_armfore/b_R_hand/b_R_thumbA
+        weight: 1
+      - path: skeleton/b_pelvis/b_spineLo/b_spineMid/b_spineHi/b_R_collar/joint_R_arm/b_R_armup/b_R_armfore/b_R_hand/b_R_thumbA/b_R_thumbB
+        weight: 1
+      - path: skeleton/b_pelvis/b_spineLo/b_spineMid/b_spineHi/b_R_collar/joint_R_arm/b_R_armup/b_R_armfore/b_R_hand/b_R_thumbA/b_R_thumbB/b_R_thumbC
+        weight: 1
+      - path: skeleton/b_pelvis/joint_L_leg
+        weight: 1
+      - path: skeleton/b_pelvis/joint_L_leg/b_L_legthigh
+        weight: 1
+      - path: skeleton/b_pelvis/joint_L_leg/b_L_legthigh/b_L_legcalf
+        weight: 1
+      - path: skeleton/b_pelvis/joint_L_leg/b_L_legthigh/b_L_legcalf/joint_L_foot
+        weight: 1
+      - path: skeleton/b_pelvis/joint_L_leg/b_L_legthigh/b_L_legcalf/joint_L_foot/b_L_footheel
+        weight: 1
+      - path: skeleton/b_pelvis/joint_L_leg/b_L_legthigh/b_L_legcalf/joint_L_foot/b_L_footheel/b_L_foottoe
+        weight: 1
+      - path: skeleton/b_pelvis/joint_L_leg/b_L_legthigh/b_L_legcalf/joint_L_foot/b_L_footheel/b_L_foottoe/b_L_footnub
+        weight: 1
+      - path: skeleton/b_pelvis/joint_R_leg
+        weight: 1
+      - path: skeleton/b_pelvis/joint_R_leg/b_R_legthigh
+        weight: 1
+      - path: skeleton/b_pelvis/joint_R_leg/b_R_legthigh/b_R_legcalf
+        weight: 1
+      - path: skeleton/b_pelvis/joint_R_leg/b_R_legthigh/b_R_legcalf/joint_R_foot
+        weight: 1
+      - path: skeleton/b_pelvis/joint_R_leg/b_R_legthigh/b_R_legcalf/joint_R_foot/b_R_footheel
+        weight: 1
+      - path: skeleton/b_pelvis/joint_R_leg/b_R_legthigh/b_R_legcalf/joint_R_foot/b_R_footheel/b_R_foottoe
+        weight: 1
+      - path: skeleton/b_pelvis/joint_R_leg/b_R_legthigh/b_R_legcalf/joint_R_foot/b_R_footheel/b_R_foottoe/b_R_footnub
+        weight: 1
+      - path: skeleton/swordMount
+        weight: 1
+      - path: torso
+        weight: 1
+      maskType: 0
+      maskSource: {instanceID: 0}
+    - serializedVersion: 16
+      name: Drop Dead
+      takeName: Default Take
+      firstFrame: 198
+      lastFrame: 229
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      loopTime: 0
+      loopBlend: 0
+      loopBlendOrientation: 0
+      loopBlendPositionY: 0
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask:
+      - path: 
+        weight: 1
+      - path: head
+        weight: 1
+      - path: limbs
+        weight: 1
+      - path: skeleton
+        weight: 1
+      - path: skeleton/b_pelvis
+        weight: 1
+      - path: skeleton/b_pelvis/b_spineLo
+        weight: 1
+      - path: skeleton/b_pelvis/b_spineLo/b_spineMid
+        weight: 1
+      - path: skeleton/b_pelvis/b_spineLo/b_spineMid/b_spineHi
+        weight: 1
+      - path: skeleton/b_pelvis/b_spineLo/b_spineMid/b_spineHi/b_L_collar
+        weight: 1
+      - path: skeleton/b_pelvis/b_spineLo/b_spineMid/b_spineHi/b_L_collar/joint_L_arm
+        weight: 1
+      - path: skeleton/b_pelvis/b_spineLo/b_spineMid/b_spineHi/b_L_collar/joint_L_arm/b_L_armup
+        weight: 1
+      - path: skeleton/b_pelvis/b_spineLo/b_spineMid/b_spineHi/b_L_collar/joint_L_arm/b_L_armup/b_L_armfore
+        weight: 1
+      - path: skeleton/b_pelvis/b_spineLo/b_spineMid/b_spineHi/b_L_collar/joint_L_arm/b_L_armup/b_L_armfore/b_L_hand
+        weight: 1
+      - path: skeleton/b_pelvis/b_spineLo/b_spineMid/b_spineHi/b_L_collar/joint_L_arm/b_L_armup/b_L_armfore/b_L_hand/b_L_fingersA
+        weight: 1
+      - path: skeleton/b_pelvis/b_spineLo/b_spineMid/b_spineHi/b_L_collar/joint_L_arm/b_L_armup/b_L_armfore/b_L_hand/b_L_fingersA/b_L_fingersB
+        weight: 1
+      - path: skeleton/b_pelvis/b_spineLo/b_spineMid/b_spineHi/b_L_collar/joint_L_arm/b_L_armup/b_L_armfore/b_L_hand/b_L_fingersA/b_L_fingersB/b_L_fingersC
+        weight: 1
+      - path: skeleton/b_pelvis/b_spineLo/b_spineMid/b_spineHi/b_L_collar/joint_L_arm/b_L_armup/b_L_armfore/b_L_hand/b_L_indexA
+        weight: 1
+      - path: skeleton/b_pelvis/b_spineLo/b_spineMid/b_spineHi/b_L_collar/joint_L_arm/b_L_armup/b_L_armfore/b_L_hand/b_L_indexA/b_L_indexB
+        weight: 1
+      - path: skeleton/b_pelvis/b_spineLo/b_spineMid/b_spineHi/b_L_collar/joint_L_arm/b_L_armup/b_L_armfore/b_L_hand/b_L_indexA/b_L_indexB/b_L_indexC
+        weight: 1
+      - path: skeleton/b_pelvis/b_spineLo/b_spineMid/b_spineHi/b_L_collar/joint_L_arm/b_L_armup/b_L_armfore/b_L_hand/b_L_thumbA
+        weight: 1
+      - path: skeleton/b_pelvis/b_spineLo/b_spineMid/b_spineHi/b_L_collar/joint_L_arm/b_L_armup/b_L_armfore/b_L_hand/b_L_thumbA/b_L_thumbB
+        weight: 1
+      - path: skeleton/b_pelvis/b_spineLo/b_spineMid/b_spineHi/b_L_collar/joint_L_arm/b_L_armup/b_L_armfore/b_L_hand/b_L_thumbA/b_L_thumbB/b_L_thumbC
+        weight: 1
+      - path: skeleton/b_pelvis/b_spineLo/b_spineMid/b_spineHi/b_neck
+        weight: 1
+      - path: skeleton/b_pelvis/b_spineLo/b_spineMid/b_spineHi/b_neck/b_head
+        weight: 1
+      - path: skeleton/b_pelvis/b_spineLo/b_spineMid/b_spineHi/b_R_collar
+        weight: 1
+      - path: skeleton/b_pelvis/b_spineLo/b_spineMid/b_spineHi/b_R_collar/joint_R_arm
+        weight: 1
+      - path: skeleton/b_pelvis/b_spineLo/b_spineMid/b_spineHi/b_R_collar/joint_R_arm/b_R_armup
+        weight: 1
+      - path: skeleton/b_pelvis/b_spineLo/b_spineMid/b_spineHi/b_R_collar/joint_R_arm/b_R_armup/b_R_armfore
+        weight: 1
+      - path: skeleton/b_pelvis/b_spineLo/b_spineMid/b_spineHi/b_R_collar/joint_R_arm/b_R_armup/b_R_armfore/b_R_hand
+        weight: 1
+      - path: skeleton/b_pelvis/b_spineLo/b_spineMid/b_spineHi/b_R_collar/joint_R_arm/b_R_armup/b_R_armfore/b_R_hand/b_R_fingersA
+        weight: 1
+      - path: skeleton/b_pelvis/b_spineLo/b_spineMid/b_spineHi/b_R_collar/joint_R_arm/b_R_armup/b_R_armfore/b_R_hand/b_R_fingersA/b_R_fingersB
+        weight: 1
+      - path: skeleton/b_pelvis/b_spineLo/b_spineMid/b_spineHi/b_R_collar/joint_R_arm/b_R_armup/b_R_armfore/b_R_hand/b_R_fingersA/b_R_fingersB/b_R_fingersC
+        weight: 1
+      - path: skeleton/b_pelvis/b_spineLo/b_spineMid/b_spineHi/b_R_collar/joint_R_arm/b_R_armup/b_R_armfore/b_R_hand/b_R_indexA
+        weight: 1
+      - path: skeleton/b_pelvis/b_spineLo/b_spineMid/b_spineHi/b_R_collar/joint_R_arm/b_R_armup/b_R_armfore/b_R_hand/b_R_indexA/b_R_indexB
+        weight: 1
+      - path: skeleton/b_pelvis/b_spineLo/b_spineMid/b_spineHi/b_R_collar/joint_R_arm/b_R_armup/b_R_armfore/b_R_hand/b_R_indexA/b_R_indexB/b_R_indexC
+        weight: 1
+      - path: skeleton/b_pelvis/b_spineLo/b_spineMid/b_spineHi/b_R_collar/joint_R_arm/b_R_armup/b_R_armfore/b_R_hand/b_R_thumbA
+        weight: 1
+      - path: skeleton/b_pelvis/b_spineLo/b_spineMid/b_spineHi/b_R_collar/joint_R_arm/b_R_armup/b_R_armfore/b_R_hand/b_R_thumbA/b_R_thumbB
+        weight: 1
+      - path: skeleton/b_pelvis/b_spineLo/b_spineMid/b_spineHi/b_R_collar/joint_R_arm/b_R_armup/b_R_armfore/b_R_hand/b_R_thumbA/b_R_thumbB/b_R_thumbC
+        weight: 1
+      - path: skeleton/b_pelvis/joint_L_leg
+        weight: 1
+      - path: skeleton/b_pelvis/joint_L_leg/b_L_legthigh
+        weight: 1
+      - path: skeleton/b_pelvis/joint_L_leg/b_L_legthigh/b_L_legcalf
+        weight: 1
+      - path: skeleton/b_pelvis/joint_L_leg/b_L_legthigh/b_L_legcalf/joint_L_foot
+        weight: 1
+      - path: skeleton/b_pelvis/joint_L_leg/b_L_legthigh/b_L_legcalf/joint_L_foot/b_L_footheel
+        weight: 1
+      - path: skeleton/b_pelvis/joint_L_leg/b_L_legthigh/b_L_legcalf/joint_L_foot/b_L_footheel/b_L_foottoe
+        weight: 1
+      - path: skeleton/b_pelvis/joint_L_leg/b_L_legthigh/b_L_legcalf/joint_L_foot/b_L_footheel/b_L_foottoe/b_L_footnub
+        weight: 1
+      - path: skeleton/b_pelvis/joint_R_leg
+        weight: 1
+      - path: skeleton/b_pelvis/joint_R_leg/b_R_legthigh
+        weight: 1
+      - path: skeleton/b_pelvis/joint_R_leg/b_R_legthigh/b_R_legcalf
+        weight: 1
+      - path: skeleton/b_pelvis/joint_R_leg/b_R_legthigh/b_R_legcalf/joint_R_foot
+        weight: 1
+      - path: skeleton/b_pelvis/joint_R_leg/b_R_legthigh/b_R_legcalf/joint_R_foot/b_R_footheel
+        weight: 1
+      - path: skeleton/b_pelvis/joint_R_leg/b_R_legthigh/b_R_legcalf/joint_R_foot/b_R_footheel/b_R_foottoe
+        weight: 1
+      - path: skeleton/b_pelvis/joint_R_leg/b_R_legthigh/b_R_legcalf/joint_R_foot/b_R_footheel/b_R_foottoe/b_R_footnub
+        weight: 1
+      - path: skeleton/swordMount
+        weight: 1
+      - path: torso
+        weight: 1
+      maskType: 0
+      maskSource: {instanceID: 0}
+    isReadable: 1
+  meshes:
+    lODScreenPercentages: []
+    globalScale: 100
+    meshCompression: 0
+    addColliders: 0
+    importBlendShapes: 1
+    swapUVChannels: 0
+    generateSecondaryUV: 0
+    useFileUnits: 1
+    optimizeMeshForGPU: 1
+    keepQuads: 0
+    weldVertices: 1
+    secondaryUVAngleDistortion: 8
+    secondaryUVAreaDistortion: 15.000001
+    secondaryUVHardAngle: 88
+    secondaryUVPackMargin: 4
+    useFileScale: 1
+  tangentSpace:
+    normalSmoothAngle: 60
+    splitTangentsAcrossUV: 1
+    normalImportMode: 0
+    tangentImportMode: 1
+  importAnimation: 1
+  copyAvatar: 0
+  humanDescription:
+    human: []
+    skeleton: []
+    armTwist: .5
+    foreArmTwist: .5
+    upperLegTwist: .5
+    legTwist: .5
+    armStretch: .0500000007
+    legStretch: .0500000007
+    feetSpacing: 0
+    rootMotionBoneName: 
+    hasTranslationDoF: 0
+  lastHumanDescriptionAvatarSource: {instanceID: 0}
+  animationType: 2
+  humanoidOversampling: 1
+  additionalBone: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
