@@ -61,6 +61,7 @@ public class MethodPointer : AbstractMethodPointer {
 
     protected Action fn;
 
+    public MethodPointer() : base() { }
     public MethodPointer(MethodInfo info) : base(info) { }
     public MethodPointer(AbstractMethodPointer ptr) : base(ptr) { }
 
@@ -79,6 +80,7 @@ public class MethodPointer<T> : AbstractMethodPointer {
 
     protected Func<T> fn;
 
+    public MethodPointer() : base() { }
     public MethodPointer(MethodInfo info) : base(info) { }
     public MethodPointer(AbstractMethodPointer ptr) : base(ptr) { }
 
@@ -116,6 +118,7 @@ public class MethodPointer<T, U, V> : AbstractMethodPointer, ISerializationCallb
 
     protected Func<T, U, V> fn = null;
 
+    public MethodPointer() : base() { }
     public MethodPointer(MethodInfo methodInfo) : base(methodInfo) { }
     public MethodPointer(AbstractMethodPointer ptr) : base(ptr) { }
 
@@ -135,6 +138,7 @@ public class MethodPointer<T, U, V, W> : AbstractMethodPointer, ISerializationCa
 
     protected Func<T, U, V, W> fn;
 
+    public MethodPointer() : base() { }
     public MethodPointer(MethodInfo methodInfo) : base(methodInfo) { }
     public MethodPointer(AbstractMethodPointer ptr) : base(ptr) { }
 

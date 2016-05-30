@@ -1,11 +1,14 @@
 ﻿using UnityEditor;
 using UnityEngine;
 
-public class AbilityPage_NameSection : AbilityPage_SectionBase {
+public class AbilityPage_NameSection : SectionBase<Ability> {
+
+    public AbilityPage_NameSection(float spacing) : base(spacing) {}
 
     public override void Render() {
-        SerializedPropertyX id = targetItem.SerialObjectX.FindProperty("id");
-        SerializedPropertyX icon = targetItem.SerialObjectX.FindProperty("icon");
+        if (rootProperty == null) return;
+        SerializedPropertyX id = rootProperty.FindProperty("id");
+        SerializedPropertyX icon = rootProperty.FindProperty("icon");
         GUILayout.BeginHorizontal();
         EditorGUILayoutX.PropertyField(icon, GUIContent.none, false, GUILayout.Width(64f), GUILayout.Height(64f));
 

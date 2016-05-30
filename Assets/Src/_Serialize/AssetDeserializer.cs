@@ -32,6 +32,7 @@ public class AssetDeserializer : IReader {
     protected static char[] SpaceArray = new char[] { ' ' };
     private static string[] EmptyStringArray = new string[0];
 
+    protected const char TypeSymbol = 'T';
     protected const char ValueSymbol = ':';
     protected const char ReferenceSymbol = '*';
     protected const char StructSymbol = '{';
@@ -160,6 +161,8 @@ public class AssetDeserializer : IReader {
         string strVal = result.strVal;
         Type type = result.type;
         switch (symbol) {
+            case TypeSymbol:
+                return Type.GetType(strVal);
             case StructSymbol:
                 return GetInstance(structMap[strVal]);
             case ValueSymbol:

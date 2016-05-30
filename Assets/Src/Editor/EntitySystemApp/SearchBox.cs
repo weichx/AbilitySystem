@@ -3,7 +3,8 @@ using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
-public class SearchBox<T> {
+public class SearchBox {
+
     private Texture2D blue;
     private bool hasResults;
     private List<Type> results;
@@ -15,11 +16,9 @@ public class SearchBox<T> {
     private string buttonText;
     private string labelText;
 
-    public SearchBox(Texture2D resultIcon, Action<Type> selectedAction, string buttonText, string labelText) {
+    public SearchBox(Texture2D resultIcon, Type searchType, Action<Type> selectedAction, string buttonText, string labelText) {
         searchString = string.Empty;
-        searchSet = Reflector.FindSubClasses<T>().FindAll((type) => {
-            return type.IsSerializable;
-        });
+        searchSet = Reflector.FindSubClasses(searchType);
         this.buttonText = buttonText;
         this.labelText = labelText;
         results = new List<Type>();
@@ -31,12 +30,7 @@ public class SearchBox<T> {
         blue.Apply();
     }
 
-    public void RenderLayout() {
-        Rect rect = GUILayoutUtility.GetRect(GUIContent.none, GUIStyle.none);
-        Render(rect);
-    }
-
-    public void Render(Rect rect) {
+    public void Render() {
 
         if (!searching && GUILayout.Button(buttonText, GUILayout.Width(225))) {
             searching = !searching;

@@ -5,7 +5,6 @@ using System;
 public class AssetItem<T> where T : EntitySystemBase {
 
     protected string assetpath;
-    protected T instanceRef;
     protected Type scriptableType;
     protected ScriptableObject scriptable;
     protected AssetCreator creator;
@@ -20,9 +19,6 @@ public class AssetItem<T> where T : EntitySystemBase {
 
     public bool IsSelected { get; set; }
 
-    public T InstanceRef {
-        get { return instanceRef; }
-    }
 
     public string AssetPath {
         get { return assetpath; }
@@ -31,7 +27,7 @@ public class AssetItem<T> where T : EntitySystemBase {
 
     public string Name {
         get {
-            return (instanceRef != null) ? instanceRef.Id : creator.name;
+            return creator.name;
         }
     }
 
@@ -51,22 +47,16 @@ public class AssetItem<T> where T : EntitySystemBase {
         get { return isDeletePending; }
     }
 
-    public virtual void Update() {
-        if (serialRoot != null) {
-            serialRoot.ApplyModifiedProperties();
-        }
-    }
+    public virtual void Update() {}
 
     public virtual void Save() {
-       // if (serialRoot == null) return;
-        //serialRoot.ApplyModifiedProperties();
         serialRootObjectX.ApplyModifiedProperties();
         AssetSerializer serializer = new AssetSerializer();
-        serializer.AddItem(instanceRef);
+        serializer.AddItem(serialRootObjectX.Root.Value);
         creator.source = serializer.WriteToString();
         EditorUtility.SetDirty(creator);
         AssetDatabase.SaveAssets();
-        AssetPath = AssetDatabase.RenameAsset(AssetPath, instanceRef.Id);
+        AssetPath = AssetDatabase.RenameAsset(AssetPath, serialRootObjectX.FindProperty("id").Value as string);
         AssetDatabase.Refresh();
     }
 
@@ -81,79 +71,65 @@ public class AssetItem<T> where T : EntitySystemBase {
         scriptable = null;
         scriptableType = null;
         serialRoot = null;
-        instanceRef = null;
         creator = null;
     }
 
     public virtual void Restore() {
-        instanceRef = null;
         serialRoot = null;
         Load();
     }
 
     public virtual void Load() {
-        if (instanceRef == null) {
-            instanceRef = (creator as IAssetCreator<T>).CreateForEditor();
-        }
-        if (scriptableType == null) {
-            ///<summary>This is totally cheating. We need to handle serialization seperately 
-            ///from unity's system so we use our own asset file format. However we still need
-            ///to render fields like the Unity inspector does so we need to use SerializableObject
-            ///but only things that extend UnityEngine.Object are serializable, which we dont want
-            ///want to do because it will truncate lists of subclasses and generics in general.
-            ///Solution: cheat. Use editor-time in-memory code generation to create new subclasses
-            ///of ScriptableObject and attach the properties we want to that. Then use that 
-            ///instance to handle all our rendering, then save all the properties on the
-            ///scriptable object into our regular class to be serialized and saved.
-            ///</summary>
-            string code = GetCodeString();
-            string[] assemblies = GetAssemblies();
-            scriptableType = ScriptableObjectCompiler.CreateScriptableType(code, assemblies);
-        }
-        if (scriptableType != null) {
-            CreateScriptableObject();
-        }
-        else {
-            Debug.LogError("Failed to compile");
-        }
+            serialRootObjectX = new SerializedObjectX((creator as IAssetCreator<T>).CreateForEditor());
     }
 
-    public virtual void Rebuild() {
-        if (instanceRef == null) {
-            return;
-        }
-        string code = GetCodeString();
-        string[] assemblies = GetAssemblies();
-        scriptableType = ScriptableObjectCompiler.CreateScriptableType(code, assemblies);
-        if (scriptableType != null) {
-            CreateScriptableObject();
-        }
-    }
+    //if (scriptableType == null) {
+    //    ///<summary>This is totally cheating. We need to handle serialization seperately 
+    //    ///from unity's system so we use our own asset file format. However we still need
+    //    ///to render fields like the Unity inspector does so we need to use SerializableObject
+    //    ///but only things that extend UnityEngine.Object are serializable, which we dont want
+    //    ///want to do because it will truncate lists of subclasses and generics in general.
+    //    ///Solution: cheat. Use editor-time in-memory code generation to create new subclasses
+    //    ///of ScriptableObject and attach the properties we want to that. Then use that 
+    //    ///instance to handle all our rendering, then save all the properties on the
+    //    ///scriptable object into our regular class to be serialized and saved.
+    //    ///</summary>
+    //    string code = GetCodeString();
+    //    string[] assemblies = GetAssemblies();
+    //    scriptableType = ScriptableObjectCompiler.CreateScriptableType(code, assemblies);
+    //}
+    //if (scriptableType != null) {
+    //    CreateScriptableObject();
+    //}
+    //else {
+    //    Debug.LogError("Failed to compile");
+    //}
 
-    protected void CreateScriptableObject() {
-        scriptable = ScriptableObject.CreateInstance(scriptableType);
-        InitializeScriptable();
-        serialRoot = new SerializedObject(scriptable);
-        serialRoot.Update();
-    }
 
-    protected virtual void InitializeScriptable() { }
+    //protected void CreateScriptableObject() {
+    //    scriptable = ScriptableObject.CreateInstance(scriptableType);
+    //    InitializeScriptable();
+    //    serialRoot = new SerializedObject(scriptable);
+    //    serialRoot.Update();
+    //}
 
-    protected virtual string GetCodeString() {
-        string code = "using UnityEngine;\n";
-        code += "public class GeneratedScriptable : ScriptableObject {\n";
-        code += "\tpublic " + typeof(T).Name + " instance;\n";
-        code += "}";
-        return code;
-    }
+    //protected virtual void InitializeScriptable() { }
 
-    protected virtual string[] GetAssemblies() {
-        return new string[] {
-                typeof(GameObject).Assembly.Location,
-                typeof(EditorGUIUtility).Assembly.Location,
-                typeof(UnityEngine.UI.Image).Assembly.Location,
-                typeof(Ability).Assembly.Location
-            };
-    }
+    //protected virtual string GetCodeString() {
+    //    string code = "using UnityEngine;\n";
+    //    code += "public class GeneratedScriptable : ScriptableObject {\n";
+    //    code += "\tpublic " + typeof(T).Name + " instance;\n";
+    //    code += "}";
+    //    return code;
+    //}
+
+    //protected virtual string[] GetAssemblies() {
+    //    return new string[] {
+    //            typeof(GameObject).Assembly.Location,
+    //            typeof(EditorGUIUtility).Assembly.Location,
+    //            typeof(UnityEngine.UI.Image).Assembly.Location,
+    //            typeof(Ability).Assembly.Location
+    //        };
+    //}
 
 }

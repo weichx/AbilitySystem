@@ -31,7 +31,7 @@ public class SerializedObjectX {
             property.ApplyModifiedProperties(rootProperty);
             type.GetField(property.name, BindFlags).SetValue(root, property.Value);
         }
-        int z =1;
+        int z = -1;
     }
 
     public SerializedPropertyX GetChildAt(int idx) {
@@ -46,7 +46,11 @@ public class SerializedObjectX {
         get { return rootProperty; }
     }
 
-    public int childCount {
+    public int ChildCount {
         get { return rootProperty.ChildCount; }
+    }
+
+    public SerializedPropertyX this[string path] {
+        get { return rootProperty.FindProperty(path); }
     }
 }

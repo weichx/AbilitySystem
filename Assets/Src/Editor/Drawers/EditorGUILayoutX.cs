@@ -6,7 +6,7 @@ using System;
 public static class EditorGUILayoutX {
 
     public static void DrawProperties(SerializedObjectX obj) {
-        for (int i = 0; i < obj.childCount; i++) {
+        for (int i = 0; i < obj.ChildCount; i++) {
             SerializedPropertyX property = obj.GetChildAt(i);
             bool isExpanded = property.isExpanded;
             PropertyField(property, property.label, property.isExpanded);

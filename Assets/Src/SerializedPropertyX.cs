@@ -23,14 +23,21 @@ public class SerializedPropertyX {
         if (type == typeof(string)) {
             return "";
         }
-        else if (type.IsSubclassOf(typeof(UnityEngine.Object))) {
+        //we need these to be null on initialization since there isnt a default constructor 
+        //and they are not value types. Type is weird since its tied to the runtime so tightly
+        else if (typeof(Type) == type || type.IsSubclassOf(typeof(UnityEngine.Object))) {
             return null;
         }
         var ctor = type.GetConstructor(Type.EmptyTypes);
-        if (ctor == null) {
+        if (ctor != null && !type.IsAbstract) {
+            return Activator.CreateInstance(type);
+        }
+        else if (type.IsValueType) { //todo -- maybe drop this, uninitialized things are unpredictable i think
             return FormatterServices.GetUninitializedObject(type);
         }
-        return Activator.CreateInstance(type);
+        else {
+            return null;
+        }
     }
 
     public SerializedPropertyX(SerializedObjectX serializedObjectX, string fieldName, Type type, object value) {
@@ -89,7 +96,7 @@ public class SerializedPropertyX {
             for (int i = 0; i < fields.Length; i++) {
                 FieldInfo fInfo = fields[i];
                 if (fInfo.IsNotSerialized) continue;
-                if (fInfo.IsPrivate) {
+                if (!fInfo.IsPublic) {
                     var attrs = fInfo.GetCustomAttributes(false);
                     if (attrs.Length == 0) continue;
                     bool isSerialized = Array.Find(attrs, (object a) => { return a.GetType() == typeof(SerializeField); }) != null;
@@ -186,10 +193,8 @@ public class SerializedPropertyX {
             }
         }
         else {
-            int i = children.Count - 1;
-            while (i != size) {
-                list.RemoveAt(i);
-                i--;
+            while (list.Count != size) {
+                list.RemoveAt(list.Count - 1);
             }
             children.RemoveRange(size, (children.Count - size));
         }
@@ -238,8 +243,8 @@ public class SerializedPropertyX {
         if (!IsArrayLike) return;
         direction = Mathf.Clamp(direction, -1, 1);
         var tempChild = children[index];
-        children[index + direction] = children[index];
-        children[index] = tempChild;
+        children[index] = children[index + direction];
+        children[index + direction] = tempChild;
         IList list = value as IList;
         var temp = list[index];
         list[index] = list[index + direction];
@@ -261,7 +266,7 @@ public class SerializedPropertyX {
         else {
             IList list = value as IList;
             if (list != null) {
-                
+
                 for (int i = start; i < list.Count; i++) {
                     var element = list[i];
                     list[i - 1] = element;
@@ -294,4 +299,18 @@ public class SerializedPropertyX {
         }
     }
 
+    public Type Type {
+        get {
+            if (value == null) return type;
+            return value.GetType();
+        }
+    }
+
+    public SerializedPropertyX this[string path] {
+        get { return FindProperty(path); }
+    }
+
+    public override string ToString() {
+        return name;
+    }
 }

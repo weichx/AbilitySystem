@@ -3,43 +3,41 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 
-public class StatusPage_GeneralSection : StatusPage_SectionBase {
+public class StatusPage_GeneralSection : SectionBase<StatusEffect> {
 
-    public StatusPage_GeneralSection() : base() { }
-
+    public StatusPage_GeneralSection(float spacing) : base(spacing) { }
 
     public override void Render() {
-        if (serialRoot == null) return;
-
-        SerializedProperty isExpirable = statusProperty.FindPropertyRelative("IsExpirable");
-        SerializedProperty isDispellable = statusProperty.FindPropertyRelative("IsDispellable");
-        SerializedProperty isRefreshable = statusProperty.FindPropertyRelative("IsRefreshable");
-        SerializedProperty isUnique = statusProperty.FindPropertyRelative("IsUnique");
-        SerializedProperty duration = statusProperty.FindPropertyRelative("duration").FindPropertyRelative("baseValue");
-        SerializedProperty tickRate = statusProperty.FindPropertyRelative("tickRate").FindPropertyRelative("baseValue");
-        SerializedProperty ticks = statusProperty.FindPropertyRelative("ticks").FindPropertyRelative("baseValue");
+        if (rootProperty == null) return;
+        SerializedPropertyX isExpirable = rootProperty.FindProperty("IsExpirable");
+        SerializedPropertyX isDispellable = rootProperty.FindProperty("IsDispellable");
+        SerializedPropertyX isRefreshable = rootProperty.FindProperty("IsRefreshable");
+        SerializedPropertyX isUnique = rootProperty.FindProperty("IsUnique");
+        SerializedPropertyX duration = rootProperty.FindProperty("duration").FindProperty("baseValue");
+        SerializedPropertyX tickRate = rootProperty.FindProperty("tickRate").FindProperty("baseValue");
+        SerializedPropertyX ticks = rootProperty.FindProperty("ticks").FindProperty("baseValue");
 
         GUILayout.BeginHorizontal();
-        isExpirable.boolValue = EditorGUILayout.ToggleLeft(new GUIContent("Is Expirable"), isExpirable.boolValue);
-        isDispellable.boolValue = EditorGUILayout.ToggleLeft(new GUIContent("Is Dispellable"), isDispellable.boolValue);
+        isExpirable.Value = EditorGUILayout.ToggleLeft(new GUIContent("Is Expirable"), (bool)isExpirable.Value);
+        isDispellable.Value = EditorGUILayout.ToggleLeft(new GUIContent("Is Dispellable"), (bool)isDispellable.Value);
         GUILayout.EndHorizontal();
         GUILayout.BeginHorizontal();
-        isRefreshable.boolValue = EditorGUILayout.ToggleLeft(new GUIContent("Is Refreshable"), isRefreshable.boolValue);
-        isUnique.boolValue = EditorGUILayout.ToggleLeft(new GUIContent("Is Unique"), isUnique.boolValue);
+        isRefreshable.Value = EditorGUILayout.ToggleLeft(new GUIContent("Is Refreshable"), (bool)isRefreshable.Value);
+        isUnique.Value = EditorGUILayout.ToggleLeft(new GUIContent("Is Unique"), (bool)isUnique.Value);
         GUILayout.EndHorizontal();
 
         GUILayout.Space(10f);
 
         using (var h = new EditorGUILayout.HorizontalScope()) {
-            duration.floatValue = EditorGUILayout.FloatField("Duration", duration.floatValue);
+            duration.Value = EditorGUILayout.FloatField("Duration", duration.GetValue<float>());
         }
 
         using (var h = new EditorGUILayout.HorizontalScope()) {
-            ticks.floatValue = EditorGUILayout.FloatField("Ticks", ticks.floatValue);
+            ticks.Value = EditorGUILayout.FloatField("Ticks", ticks.GetValue<float>());
         }
 
         using (var h = new EditorGUILayout.HorizontalScope()) {
-            tickRate.floatValue = EditorGUILayout.FloatField("Tick Rate", tickRate.floatValue);
+            tickRate.Value = EditorGUILayout.FloatField("Tick Rate", tickRate.GetValue<float>());
         }
     }
 

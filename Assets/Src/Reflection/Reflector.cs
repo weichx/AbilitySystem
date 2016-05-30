@@ -80,10 +80,9 @@ public static class Reflector {
     public static List<MethodPointer> FindMethodPointersWithAttribute<T>(Type retnType, params Type[] parameterTypes) where T : Attribute {
         return FindMethodPointersWithAttribute(typeof(T), retnType, parameterTypes);
     }
-  
-    public static List<Type> FindSubClasses<T>(bool includeInputType = false) {
+
+    public static List<Type> FindSubClasses(Type type, bool includeInputType = false) {
         var retn = new List<Type>();
-        var type = typeof(T);
         for (int i = 0; i < filteredAssemblies.Count; i++) {
             var assembly = filteredAssemblies[i];
             var types = assembly.GetTypes();
@@ -97,6 +96,10 @@ public static class Reflector {
             }
         }
         return retn;
+    }
+
+    public static List<Type> FindSubClasses<T>(bool includeInputType = false) {
+        return FindSubClasses(typeof(T), includeInputType);
     }
 
     public static List<Type> FindSubClassesWithAttribute<T, U>(bool includeInputType = false) where T : class where U : Attribute {

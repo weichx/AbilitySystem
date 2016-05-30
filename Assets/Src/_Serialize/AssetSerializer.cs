@@ -44,6 +44,7 @@ public class AssetSerializer : IWriter {
     protected static BindingFlags FieldBindFlags = BindingFlags.Public | BindingFlags.Instance | BindingFlags.NonPublic;
     private static string[] EmptyStringArray = new string[0];
 
+    protected const string TypeSymbol = "T ";
     protected const string ValueSymbol = ": ";
     protected const string StringSymbol = "\" ";
     protected const string ObjectSymbol = "* ";
@@ -146,6 +147,11 @@ public class AssetSerializer : IWriter {
             + structBuilder.ToString()
             + fieldBuilder.ToString()
             + tagBuilder.ToString();
+#if DEBUG //for debugging to see file output split by line
+        Regex regex = new Regex("(\r\n|\r|\n)");
+        string source = regex.Replace(output, "\n");
+        string[] lines = source.Split('\n');
+#endif
         return output;
         // File.WriteAllBytes(path + ".gzip", AssetSerializerHelper.Zip(refBuilder.ToString() + fieldBuilder.ToString() + structBuilder.ToString() + tagBuilder.ToString()));
     }
@@ -157,12 +163,12 @@ public class AssetSerializer : IWriter {
     public void WriteDefaultExcept(string[] exceptions) {
         FieldInfo[] fields = context.GetType().GetFields(FieldBindFlags);
         for (int i = 0; i < fields.Length; i++) {
-            //object[] attrs = fields[i].GetCustomAttributes(typeof(SerializeField), true);
             FieldInfo fieldInfo = fields[i];
+            object[] attrs = fields[i].GetCustomAttributes(typeof(SerializeField), true);
+            if (!fieldInfo.IsPublic && attrs.Length == 0) continue;
             if (fieldInfo.IsNotSerialized || Array.IndexOf(exceptions, fieldInfo.Name) != -1) {
                 continue;
             }
-
             WriteField(fieldInfo);
         }
     }
@@ -219,7 +225,10 @@ public class AssetSerializer : IWriter {
             return "-1";
         }
         Type type = value.GetType();
-        if (type.IsPrimitive) {
+        if (typeof(Type).IsAssignableFrom(type)) {
+            return TypeSymbol + ((Type) value).AssemblyQualifiedName;
+        }
+        else if (type.IsPrimitive) {
             if (value is float) {
                 return ValueSymbol + ((float)value).ToString("R");
             }
@@ -238,7 +247,6 @@ public class AssetSerializer : IWriter {
         }
         else if (type.IsArray) {
             IList list = value as IList;
-           // object[] valArray = value as object[]; //todo this may not work for structs?
             if (list == null || list.Count == 0) {
                 return EmptyListSymbol;
             }

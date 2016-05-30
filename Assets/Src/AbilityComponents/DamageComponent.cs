@@ -5,7 +5,7 @@ public class DamageComponent : AbilityComponent {
 
     public string element;
     public float baseValue;
-    public DamageFormula formula;
+    public MethodPointer<OldContext, float, float> formula;
 
     public float GetDamage(OldContext context) {
         if(formula == null) {

@@ -25,7 +25,7 @@ public partial class Ability : EntitySystemBase {
     public List<AbilityComponent> components;
 
     public TagCollection tags;
-	public Type contextType;
+    public Type contextType;//= typeof(Intelligence.Context);
 
     [NonSerialized] private OldContext context;
 

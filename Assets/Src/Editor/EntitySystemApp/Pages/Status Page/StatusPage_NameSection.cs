@@ -1,19 +1,22 @@
-﻿using UnityEngine;
-using UnityEditor;
+﻿using UnityEditor;
+using UnityEngine;
 
-public class StatusPage_NameSection : StatusPage_SectionBase {
+public class StatusPage_NameSection : SectionBase<StatusEffect> {
+
+    public StatusPage_NameSection(float spacing) : base(spacing) {}
 
     public override void Render() {
-        if (serialRoot == null) return;
-        SerializedProperty iconProp = statusProperty.FindPropertyRelative("icon");
-        SerializedProperty nameProp = statusProperty.FindPropertyRelative("id");
+        if (rootProperty == null) return;
+        SerializedPropertyX id = rootProperty.FindProperty("id");
+        SerializedPropertyX icon = rootProperty.FindProperty("icon");
         GUILayout.BeginHorizontal();
-        iconProp.objectReferenceValue = EditorGUILayout.ObjectField(iconProp.objectReferenceValue, typeof(Texture2D), false, GUILayout.Width(64f), GUILayout.Height(64f));
+        EditorGUILayoutX.PropertyField(icon, GUIContent.none, false, GUILayout.Width(64f), GUILayout.Height(64f));
+
         GUILayout.BeginVertical();
         GUILayout.Space(20f);
         float labelWidth = EditorGUIUtility.labelWidth;
-        EditorGUIUtility.labelWidth = 150f;
-        EditorGUILayout.PropertyField(nameProp, new GUIContent("Status Effect Name"));
+        EditorGUIUtility.labelWidth = 100f;
+        EditorGUILayoutX.PropertyField(id, new GUIContent("Status Effect Name"), true);
         EditorGUIUtility.labelWidth = labelWidth;
         GUILayout.BeginHorizontal();
         GUILayout.FlexibleSpace();

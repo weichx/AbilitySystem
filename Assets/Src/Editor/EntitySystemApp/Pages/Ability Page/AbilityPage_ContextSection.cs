@@ -2,18 +2,17 @@
 using UnityEditor;
 using UnityEngine;
 using Intelligence;
-using Context = Intelligence.Context;
 using System.Collections.Generic;
 
-public class AbilityPage_ContextSection : AbilityPage_SectionBase {
+public class AbilityPage_ContextSection : SectionBase<Ability> {
 
 	private bool shown;
 	private List<Type> contextTypeList;
 	private string[] contextTypeNames;
-
-	public AbilityPage_ContextSection() {
+    
+	public AbilityPage_ContextSection(float spacing) : base(spacing) {
 		shown = true;
-		contextTypeList = Reflector.FindSubClasses<Intelligence.Context>(true);
+		contextTypeList = Reflector.FindSubClasses<Context>(true);
 		contextTypeNames = new string[contextTypeList.Count];
 		for(int i = 0; i < contextTypeList.Count; i++) {
 			contextTypeNames[i] = contextTypeList[i].Name;
@@ -21,30 +20,24 @@ public class AbilityPage_ContextSection : AbilityPage_SectionBase {
 	}
 
 	public override void Render() {
-		if (serialRoot == null) return;
-		if(targetItem.InstanceRef.contextType == null) {
-			targetItem.InstanceRef.contextType = typeof(Intelligence.Context);
+		if (targetItem == null) return;
+	    SerializedPropertyX property = rootProperty.FindProperty("contextType");
+	    Type contextType = property.GetValue<Type>();
+
+        if (contextType == null) {
+			contextType = typeof(Context);
 		}
 		//shown = EditorGUILayout.Foldout(shown, "Context");
 		//action : context factory
-		int idx = GetContextTypeIndex();
-		int newIdx = EditorGUILayout.Popup("Context Type", idx, contextTypeNames);
+        int idx = contextTypeList.IndexOf(contextType);
+        if (idx == -1) {
+            idx = 0;
+        }
+        int newIdx = EditorGUILayout.Popup("Context Type", idx, contextTypeNames);
 		if(newIdx != idx) {
 			//todo pop up revalidate dialog
 			//todo remove components / requirements where T does not match context type selected
-			targetItem.InstanceRef.contextType = contextTypeList[newIdx];
-			//type might not be serializable through unity, may store type name ref instead
-			targetItem.SerializedObject.Update();
+			property.Value = contextTypeList[newIdx];
 		}
 	}
-
-	private int GetContextTypeIndex() {
-		Type type = targetItem.InstanceRef.contextType;
-		int retn = contextTypeList.IndexOf(type);
-		if(retn == -1) {
-			retn = 0;
-		}
-		return retn;
-	}
-
 }

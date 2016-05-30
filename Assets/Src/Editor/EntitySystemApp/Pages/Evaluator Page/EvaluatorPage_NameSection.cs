@@ -1,10 +1,13 @@
 ﻿using UnityEngine;
 using UnityEditor;
 
-public class EvaluatorPage_NameSection : EvaluatorPage_SectionBase {
+public class EvaluatorPage_NameSection : SectionBase<DecisionScoreEvaluator> {
 
-	public override void Render() {
-		SerializedPropertyX nameProp = targetItem.SerialObjectX.FindProperty("id");
+    public EvaluatorPage_NameSection(float spacing) : base(spacing) {}
+
+    public override void Render() {
+        if(rootProperty == null) return;
+		SerializedPropertyX nameProp = rootProperty["id"];
 		GUILayout.BeginHorizontal();
 		GUILayout.BeginVertical();
 		GUILayout.Space(20f);

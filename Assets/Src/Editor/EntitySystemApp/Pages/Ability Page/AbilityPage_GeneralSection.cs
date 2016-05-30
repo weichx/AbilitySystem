@@ -1,17 +1,19 @@
 ﻿using UnityEngine;
 using UnityEditor;
 
-public class AbilityPage_GeneralSection : AbilityPage_SectionBase {
+public class AbilityPage_GeneralSection : SectionBase<Ability> {
+
+    public AbilityPage_GeneralSection(float spacing) : base(spacing) {}
+
 
     public override void Render() {
         if (targetItem == null) return;
-        SerializedPropertyX abilityProperty = targetItem.SerialObjectX.FindProperty("ability");
-        SerializedPropertyX castMode = targetItem.SerialObjectX.FindProperty("castMode");
-        SerializedPropertyX ignoreGCD = targetItem.SerialObjectX.FindProperty("IgnoreGCD");
-        SerializedPropertyX castTime = targetItem.SerialObjectX.FindProperty("castTime");
-        SerializedPropertyX channelTime = targetItem.SerialObjectX.FindProperty("channelTime");
-        SerializedPropertyX channelTicks = targetItem.SerialObjectX.FindProperty("channelTicks");
-        SerializedPropertyX charges = targetItem.SerialObjectX.FindProperty("charges");
+        SerializedPropertyX castMode = rootProperty.FindProperty("castMode");
+        SerializedPropertyX ignoreGCD = rootProperty.FindProperty("IgnoreGCD");
+        SerializedPropertyX castTime = rootProperty.FindProperty("castTime").FindProperty("baseValue");
+        SerializedPropertyX channelTime = rootProperty.FindProperty("channelTime").FindProperty("baseValue");
+        SerializedPropertyX channelTicks = rootProperty.FindProperty("channelTicks").FindProperty("baseValue");
+        SerializedPropertyX charges = rootProperty.FindProperty("charges");
 
         GUILayout.BeginHorizontal();
         EditorGUILayoutX.PropertyField(castMode, false);
@@ -21,11 +23,11 @@ public class AbilityPage_GeneralSection : AbilityPage_SectionBase {
         int castVal = (int) castMode.Value;
         if (castVal != (int)CastMode.Instant) {
             if (castVal != (int)CastMode.Channel) {
-                EditorGUILayoutX.PropertyField(castTime);
+                castTime.Value = EditorGUILayout.FloatField(new GUIContent("Cast Time"), (float) castTime.Value);
             }
             if (castVal != (int)CastMode.Cast) {
-                EditorGUILayoutX.PropertyField(channelTime);
-                EditorGUILayoutX.PropertyField(channelTicks);
+                channelTime.Value = EditorGUILayout.FloatField(new GUIContent("Channel Time"), (float)channelTime.Value);
+                channelTicks.Value = EditorGUILayout.IntField(new GUIContent("Channel Ticks"), (int)channelTicks.Value);
             }
         }
         EditorGUILayout.BeginHorizontal();
@@ -38,7 +40,8 @@ public class AbilityPage_GeneralSection : AbilityPage_SectionBase {
         for (int i = 0; i < charges.ArraySize; i++) {
             EditorGUILayout.BeginHorizontal();
             SerializedPropertyX chargeProp = charges.GetChildAt(i);
-            EditorGUILayoutX.PropertyField(chargeProp.FindProperty("cooldown"));
+            SerializedPropertyX cooldown = chargeProp.FindProperty("cooldown").FindProperty("baseValue");
+            cooldown.Value = EditorGUILayout.FloatField(new GUIContent("Cooldown"), (float)cooldown.Value);
             GUI.enabled = charges.ArraySize > 1;
             if (GUILayout.Button("-", GUILayout.Width(25f), GUILayout.Height(15f))) {
                 charges.DeleteArrayElementAt(i);

@@ -39,3 +39,49 @@ public abstract class Page<T> : Page where T : EntitySystemBase {
     }
 
 }
+
+public abstract class MasterDetailPage<T> : Page<T> where T : EntitySystemBase {
+
+
+    protected MasterView2<T> masterView;
+    protected DetailView<T> detailView;
+
+    public MasterDetailPage() {
+        masterView = new MasterView2<T>(SetActiveItem);
+        detailView = new DetailView<T>();
+    }
+
+    public override void OnEnter(string itemId = null) {
+        GUIUtility.keyboardControl = 0;
+        if (itemId != null) {
+            masterView.SelectItemById(itemId);
+        }
+    }
+
+    public override void Render(Rect rect) {
+        GUILayout.BeginArea(rect);
+        GUILayout.BeginHorizontal();
+        masterView.Render();
+        GUILayout.Space(10f);
+        detailView.Render();
+        GUILayout.EndHorizontal();
+        GUILayout.EndArea();
+    }
+
+    public override void SetActiveItem(AssetItem<T> newItem) {
+        base.SetActiveItem(newItem);
+        detailView.SetTargetObject(newItem);
+    }
+
+    public override void Update() {
+        if (activeItem != null) {
+            activeItem.Update();
+            if (activeItem.IsDeletePending) {
+                detailView.SetTargetObject(null);
+                masterView.RemoveItem(activeItem);
+                activeItem.Delete();
+            }
+        }
+    }
+
+}
