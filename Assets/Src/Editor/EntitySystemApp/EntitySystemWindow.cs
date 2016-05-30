@@ -2,9 +2,6 @@
 using UnityEditor;
 using EntitySystemUtil;
 using System;
-using System.CodeDom.Compiler;
-using Microsoft.CSharp;
-using System.Collections.Generic;
 
 public enum ESWMode {
     Ability, StatusEffect, Behaviors, AIDebugger
@@ -17,12 +14,23 @@ public class EntitySystemWindow : EditorWindow {
         GetWindow<EntitySystemWindow>();
     }
 
+    public static GUIStyle CardStyle;
+
     private Page currentPage;
 
     void OnEnable() {
+        CardStyle = new GUIStyle();
+        CardStyle.normal.background = EditorGUIUtility.Load("bg_lighter.png") as Texture2D;
+        CardStyle.border.left = 3;
+        CardStyle.border.right = 3;
+        CardStyle.border.top = 3;
+        CardStyle.border.bottom = 3;
+        CardStyle.padding.top = 5;
+        CardStyle.padding.bottom = 5;
+        CardStyle.padding.right = 5;
         titleContent = new GUIContent("Entity Engine");
         string typeString = EditorPrefs.GetString("ESWindow.CurrentPage");
-        if(typeString != null) {
+        if (typeString != null) {
             switch (typeString) {
                 case "AbilityPage":
                     currentPage = new AbilityPage();
@@ -33,35 +41,37 @@ public class EntitySystemWindow : EditorWindow {
                 case "DecisionSetPage":
                     currentPage = new DecisionSetPage();
                     break;
-				case "EvaluatorPage":
-					currentPage = new EvaluatorPage();
-					break;
+                case "EvaluatorPage":
+                    currentPage = new EvaluatorPage();
+                    break;
             }
         }
         if (currentPage == null) {
             currentPage = new AbilityPage();
         }
-        currentPage.OnEnter();
+        currentPage.OnEnter(EditorPrefs.GetString("ESWindow.CurrentPage.SelectedItem"));
         Repaint();
     }
 
     void OnDisable() {
         EditorPrefs.SetString("ESWindow.CurrentPage", currentPage.GetType().Name);
+        EditorPrefs.SetString("ESWindow.CurrentPage.SelectedItem", currentPage.GetActiveItemId());
     }
 
     void OnDestroy() {
         EditorPrefs.DeleteKey("ESWindow.CurrentPage");
+        EditorPrefs.DeleteKey("ESWindow.CurrentPage.SelectedItem");
     }
 
     public void Update() {
         ScriptableObjectCompiler.UpdateCompileJobs();
-        //todo make this current page
         if (currentPage != null) {
             currentPage.Update();
         }
     }
 
     public void OnGUI() {
+        EditorGUIUtility.wideMode = true;
         Rect window = new Rect(0, 0, position.width, position.height)
             .ShrinkTopBottom(10f)
             .ShrinkLeftRight(20f);
@@ -95,7 +105,7 @@ public class EntitySystemWindow : EditorWindow {
             currentPage = new DecisionSetPage();
             currentPage.OnEnter();
         }
-        else if (GUI.Button(d, "Decision Evaluators")) {
+        else if (GUI.Button(d, "Decision Evaluators", GetStyle(typeof(EvaluatorPage)))) {
 			currentPage = new EvaluatorPage();
 			currentPage.OnEnter();
         }

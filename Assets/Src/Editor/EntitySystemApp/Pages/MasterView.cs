@@ -22,16 +22,25 @@ public class MasterView<T, U> where T : AssetItem<U> where U : EntitySystemBase 
     }
 
     protected virtual string NewButtonText {
-        get { return "New " + typeof(U).Name;  }
+        get { return "New " + typeof(U).Name; }
     }
 
     public void AddItem(T item) {
         if (itemList.Contains(item)) return;
         itemList.Add(item);
-        if(!string.IsNullOrEmpty(searchString)) {
+        if (!string.IsNullOrEmpty(searchString)) {
             filteredList = itemList.FindAll((current) => {
                 return current.Name.Contains(searchString);
             });
+        }
+    }
+
+    public void SelectItemById(string itemId) {
+        for (int i = 0; i < itemList.Count; i++) {
+            if (itemList[i].Name == itemId && SetActiveItem != null) {
+                SetActiveItem(itemList[i]);
+                return;
+            }
         }
     }
 
@@ -61,7 +70,7 @@ public class MasterView<T, U> where T : AssetItem<U> where U : EntitySystemBase 
             T item = filteredList[i];
             GUI.backgroundColor = item.IsSelected ? Color.green : original;
             if (GUILayout.Button(filteredList[i].Name, listStyle, GUILayout.ExpandWidth(true))) {
-                if(SetActiveItem != null) {
+                if (SetActiveItem != null) {
                     SetActiveItem(filteredList[i]);
                 }
             }

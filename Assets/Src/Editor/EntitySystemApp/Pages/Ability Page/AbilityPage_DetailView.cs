@@ -23,13 +23,13 @@ public class AbilityPage_DetailView {
         this.target = target;
         nameSection.SetTargetObject(target);
         generalSection.SetTargetObject(target);
-		contextSection.SetTargetObject(target);
+		//contextSection.SetTargetObject(target);
         componentSection.SetTargetObject(target);
         requirementSection.SetTargetObject(target);
     }
 
     public void Render() {
-        if (target == null || target.SerializedObject == null) return;
+        if (target == null) return;
         scrollPosition = GUILayout.BeginScrollView(scrollPosition);
         GUILayout.BeginVertical();
         nameSection.Render();
@@ -39,10 +39,10 @@ public class AbilityPage_DetailView {
         generalSection.Render();
         GUILayout.EndVertical();
         GUILayout.Space(20f);
-		GUILayout.BeginVertical();
-		contextSection.Render();
-		GUILayout.EndVertical();
-		GUILayout.Space(20f);
+        //GUILayout.BeginVertical();
+        //contextSection.Render();
+        //GUILayout.EndVertical();
+        //GUILayout.Space(20f);
         GUILayout.BeginVertical();
         componentSection.Render();
         GUILayout.EndVertical();

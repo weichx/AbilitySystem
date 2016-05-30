@@ -1,5 +1,9 @@
 ﻿
 public static class DamageFormulas {
+    [Pointable]
+    public static float Fn(float f) {
+        return 0;
+    }
 
     [DamageFormula]
     public static float Slash(OldContext context, float baseValue) {

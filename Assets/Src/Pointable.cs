@@ -1,5 +1,6 @@
 ﻿using System;
 
-//[AttributeUsag] todo make this fn only
+[AttributeUsage(AttributeTargets.Method, AllowMultiple = false, Inherited = false)]
 public class Pointable : Attribute {
+
 }

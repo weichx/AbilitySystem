@@ -1,7 +1,9 @@
 ﻿
+using System;
+
 public abstract class AbilityContextCreator {
 
-    public OldContext context;
+    [NonSerialized] public OldContext context;
 
     public bool IsContextReady { get; private set; }
 

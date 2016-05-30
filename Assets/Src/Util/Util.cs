@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using System.Text.RegularExpressions;
 using UnityEngine;
 
@@ -8,6 +9,12 @@ using UnityEngine;
 public struct Vector2I {
     public int x;
     public int y;
+
+    public Vector2I(int x, int y) {
+        this.x = x;
+        this.y = y;
+    }
+
 }
 
 public struct Vector3I {
@@ -22,7 +29,6 @@ public static class Util {
         return CultureInfo.CurrentCulture.TextInfo.ToTitleCase(Regex.Replace(input, "(\\B[A-Z])", " $1"));
     }
 
-    //public static string Split
     public static string RandomString(int charCount = 8) {
         var chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";// 0123456789";
         var stringChars = new char[charCount];
@@ -168,6 +174,14 @@ public static class DictionaryExtensions {
 
 public static class ListExtensions {
 
+    public static void Resize<T>(this List<T> list, int sz, T c = default(T)) {
+        int cur = list.Count;
+        if (sz < cur)
+            list.RemoveRange(sz, cur - sz);
+        else if (sz > cur)
+            list.AddRange(Enumerable.Repeat(c, sz - cur));
+    }
+
     public static T First<T>(this List<T> list) {
         return list.Count > 0 ? list[0] : default(T);
     }
@@ -176,12 +190,12 @@ public static class ListExtensions {
         return list.Count > 0 ? list[list.Count - 1] : default(T);
     }
 
-	//todo figure this out
-//	public static U[] Map<T, U>(this List<T> list, Func<T, U> fn) {
-//		for(int i = 0; i < list.Count; i++) {
-//		}
-//		return null;
-//	}
+    //todo figure this out
+    //	public static U[] Map<T, U>(this List<T> list, Func<T, U> fn) {
+    //		for(int i = 0; i < list.Count; i++) {
+    //		}
+    //		return null;
+    //	}
 }
 
 public static class Vector3Extensions {

@@ -4,8 +4,6 @@ using System.Collections.Generic;
 
 [Serializable]
 public partial class Ability : EntitySystemBase {
-    [NonSerialized]
-    private CastEvent currentEvent;
 
     [NonSerialized]
     public Entity caster;
@@ -17,7 +15,7 @@ public partial class Ability : EntitySystemBase {
     [NonSerialized] protected Timer castTimer;
     [NonSerialized] protected Timer channelTimer;
     public Texture2D icon;
-    public AbilityContextCreator contextCreator;
+    [NonSerialized]public AbilityContextCreator contextCreator;
 
     public FloatAttribute castTime;
     public FloatAttribute channelTime;
@@ -29,7 +27,7 @@ public partial class Ability : EntitySystemBase {
     public TagCollection tags;
 	public Type contextType;
 
-    private OldContext context;
+    [NonSerialized] private OldContext context;
 
     public bool IgnoreGCD = false;
 
@@ -51,12 +49,6 @@ public partial class Ability : EntitySystemBase {
         channelTime = new FloatAttribute(3f);
         castTimer = new Timer();
         channelTimer = new Timer();
-    }
-
-    public CastEvent CurrentEvent {
-        get {
-            return currentEvent;
-        }
     }
 
     public AbilityComponent AddAbilityComponent<T>() where T : AbilityComponent, new() {

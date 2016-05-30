@@ -4,44 +4,44 @@ using UnityEditor;
 public class AbilityPage_GeneralSection : AbilityPage_SectionBase {
 
     public override void Render() {
-        if (serialRoot == null) return;
-        SerializedProperty castMode = abilityProperty.FindPropertyRelative("castMode");
-        SerializedProperty ignoreGCD = abilityProperty.FindPropertyRelative("IgnoreGCD");
-        SerializedProperty castTime = abilityProperty.FindPropertyRelative("castTime");
-        SerializedProperty channelTime = abilityProperty.FindPropertyRelative("channelTime");
-        SerializedProperty channelTicks = abilityProperty.FindPropertyRelative("channelTicks");
-        SerializedProperty charges = abilityProperty.FindPropertyRelative("charges");
+        if (targetItem == null) return;
+        SerializedPropertyX abilityProperty = targetItem.SerialObjectX.FindProperty("ability");
+        SerializedPropertyX castMode = targetItem.SerialObjectX.FindProperty("castMode");
+        SerializedPropertyX ignoreGCD = targetItem.SerialObjectX.FindProperty("IgnoreGCD");
+        SerializedPropertyX castTime = targetItem.SerialObjectX.FindProperty("castTime");
+        SerializedPropertyX channelTime = targetItem.SerialObjectX.FindProperty("channelTime");
+        SerializedPropertyX channelTicks = targetItem.SerialObjectX.FindProperty("channelTicks");
+        SerializedPropertyX charges = targetItem.SerialObjectX.FindProperty("charges");
 
         GUILayout.BeginHorizontal();
-        EditorGUILayout.PropertyField(castMode, false);
-        ignoreGCD.boolValue = EditorGUILayout.ToggleLeft("Ignore GCD", ignoreGCD.boolValue);
+        EditorGUILayoutX.PropertyField(castMode, false);
+        ignoreGCD.Value = EditorGUILayout.ToggleLeft("Ignore GCD", (bool)ignoreGCD.Value);
         GUILayout.EndHorizontal();
 
-        int castVal = castMode.intValue;
+        int castVal = (int) castMode.Value;
         if (castVal != (int)CastMode.Instant) {
             if (castVal != (int)CastMode.Channel) {
-                DrawerUtil.DrawProperty(castTime, typeof(Ability));
+                EditorGUILayoutX.PropertyField(castTime);
             }
             if (castVal != (int)CastMode.Cast) {
-                DrawerUtil.DrawProperty(channelTime, typeof(Ability));
-                DrawerUtil.DrawProperty(channelTicks, typeof(Ability));
-
+                EditorGUILayoutX.PropertyField(channelTime);
+                EditorGUILayoutX.PropertyField(channelTicks);
             }
         }
         EditorGUILayout.BeginHorizontal();
-        EditorGUILayout.LabelField("Charges (" + charges.arraySize + ")");
+        EditorGUILayout.LabelField("Charges (" + charges.ArraySize + ")");
         if (GUILayout.Button("+", GUILayout.Width(25f))) {
-            charges.arraySize++;
+            charges.ArraySize++;
         }
         EditorGUILayout.EndHorizontal();
         EditorGUI.indentLevel++;
-        for (int i = 0; i < charges.arraySize; i++) {
+        for (int i = 0; i < charges.ArraySize; i++) {
             EditorGUILayout.BeginHorizontal();
-            SerializedProperty chargeProp = charges.GetArrayElementAtIndex(i);
-            DrawerUtil.DrawProperty(chargeProp.FindPropertyRelative("cooldown"), typeof(Charge));
-            GUI.enabled = charges.arraySize > 1;
+            SerializedPropertyX chargeProp = charges.GetChildAt(i);
+            EditorGUILayoutX.PropertyField(chargeProp.FindProperty("cooldown"));
+            GUI.enabled = charges.ArraySize > 1;
             if (GUILayout.Button("-", GUILayout.Width(25f), GUILayout.Height(15f))) {
-                charges.DeleteArrayElementAtIndex(i);
+                charges.DeleteArrayElementAt(i);
             }
             GUI.enabled = true;
             EditorGUILayout.EndHorizontal();

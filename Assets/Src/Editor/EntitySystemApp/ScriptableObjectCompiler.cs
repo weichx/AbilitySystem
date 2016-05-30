@@ -7,6 +7,8 @@ using System.Reflection;
 using System.Diagnostics;
 using System.IO;
 using System.Text;
+using System.Security.AccessControl;
+using System.Security.Principal;
 
 public static class ScriptableObjectCompiler {
     public enum CompileJobStatus {
@@ -114,6 +116,7 @@ public static class ScriptableObjectCompiler {
 
     }
 
+
     public static int QueueCompileJob(string code, string[] assemblyPaths, bool sync = false) {
         CompileJob job = new CompileJob(NextJobId);
         compileJobs.Add(job);
@@ -130,7 +133,10 @@ public static class ScriptableObjectCompiler {
         if (TryGetJobResult(job.jobId, out result, out dllPath)) {
             if (result == CompileJobStatus.Succeeded) {
 				Assembly assembly = Assembly.LoadFrom(dllPath);
-				File.Delete(dllPath);
+                try {
+                    File.Delete(dllPath);
+                }
+                catch { }
 				return assembly.GetType(typeName);
             }
         }

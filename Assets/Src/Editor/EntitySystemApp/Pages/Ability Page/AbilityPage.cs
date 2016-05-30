@@ -7,10 +7,13 @@ public class AbilityPage : Page<Ability> {
     private MasterView<AbilityItem, Ability> masterView;
     private AbilityPage_DetailView detailView;
 
-    public override void OnEnter() {
+    public override void OnEnter(string itemId = null) {
         masterView = new MasterView<AbilityItem, Ability>(SetActiveItem);
         detailView = new AbilityPage_DetailView();
         GUIUtility.keyboardControl = 0;
+        if (itemId != null) {
+            masterView.SelectItemById(itemId);
+        }
     }
 
     public override void Render(Rect rect) {

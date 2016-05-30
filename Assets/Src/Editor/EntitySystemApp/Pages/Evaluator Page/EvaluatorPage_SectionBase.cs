@@ -3,9 +3,13 @@ using Intelligence;
 
 public abstract class EvaluatorPage_SectionBase : SectionBase<DecisionScoreEvaluator> {
 
-	protected override string RootPropertyName {
-		get {
-			return "dse";
-		}
-	}
+    public override void SetTargetObject(AssetItem<DecisionScoreEvaluator> targetItem) {
+        this.targetItem = targetItem;
+        if (targetItem == null) {
+            rootProperty = null;
+            instanceRef = null;
+            return;
+        }
+        instanceRef = targetItem.InstanceRef;
+    }
 }

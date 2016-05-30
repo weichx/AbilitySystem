@@ -28,6 +28,9 @@ public static class Reflector {
             }
         }
         FindPublicStaticMethods();
+#if UNITY_EDITOR
+        BuildExtendedDrawerCache();
+#endif
     }
 
     //todo probably add an attribute requirement as well to narrow search space even more
@@ -75,29 +78,9 @@ public static class Reflector {
     }
 
     public static List<MethodPointer> FindMethodPointersWithAttribute<T>(Type retnType, params Type[] parameterTypes) where T : Attribute {
-        var list = new List<MethodPointer>();
-        var attrType = typeof(T);
-        for (int i = 0; i < methodSet.Count; i++) {
-            MethodInfo methodInfo = methodSet[i];
-            if (HasAttribute(methodInfo, attrType) && MatchesSignature(methodInfo, retnType, parameterTypes)) {
-                list.Add(new MethodPointer(methodInfo));
-            }
-        }
-        return list;
+        return FindMethodPointersWithAttribute(typeof(T), retnType, parameterTypes);
     }
-
-    public static List<MethodPointer> FindMethodPointersWithAttribute<T>(SignatureAttribute signatureAttr) where T : Attribute {
-        var list = new List<MethodPointer>();
-        var attrType = typeof(T);
-        for (int i = 0; i < methodSet.Count; i++) {
-            MethodInfo methodInfo = methodSet[i];
-            if (HasAttribute(methodInfo, attrType) && MatchesSignature(methodInfo, signatureAttr.retnType, signatureAttr.parameterTypes)) {
-                list.Add(new MethodPointer(methodInfo));
-            }
-        }
-        return list;
-    }
-
+  
     public static List<Type> FindSubClasses<T>(bool includeInputType = false) {
         var retn = new List<Type>();
         var type = typeof(T);
@@ -115,43 +98,6 @@ public static class Reflector {
         }
         return retn;
     }
-
-	public static bool IsAssignableToGenericType(Type givenType, Type genericType){
-		var interfaceTypes = givenType.GetInterfaces();
-
-		foreach (var it in interfaceTypes)
-		{
-			if (it.IsGenericType && it.GetGenericTypeDefinition() == genericType)
-				return true;
-		}
-
-		if (givenType.IsGenericType && givenType.GetGenericTypeDefinition() == genericType)
-			return true;
-
-		Type baseType = givenType.BaseType;
-		if (baseType == null) return false;
-
-		return IsAssignableToGenericType(baseType, genericType);
-	}
-
-	public static List<Type> FindAssignableTypes<T>(bool includeInputType = false) {
-		var retn = new List<Type>();
-		var type = typeof(T);
-		for (int i = 0; i < filteredAssemblies.Count; i++) {
-			var assembly = filteredAssemblies[i];
-			var types = assembly.GetTypes();
-			for (int t = 0; t < types.Length; t++) {
-				if (types[t].IsGenericTypeDefinition && IsAssignableToGenericType(type, types[t])) {
-					UnityEngine.Debug.Log("Yep, assignable to " + types[t].Name);
-					continue;
-				}
-				if (types[t].IsAssignableFrom(type) || includeInputType && types[t] == type) {
-					retn.Add(types[t]);
-				}
-			}
-		}
-		return retn;
-	}
 
     public static List<Type> FindSubClassesWithAttribute<T, U>(bool includeInputType = false) where T : class where U : Attribute {
         return FindSubClasses<T>(includeInputType).FindAll((type) => {
@@ -172,7 +118,6 @@ public static class Reflector {
         return null;
     }
 
-    #region private methods
     private static bool MatchesSignature(MethodInfo methodInfo, Type retnType, Type[] parameters = null) {
         if (retnType == null) retnType = typeof(void);
         if (methodInfo.ReturnType != retnType) return false;
@@ -219,6 +164,7 @@ public static class Reflector {
         }
     }
 
+    //todo this isnt well cached
     private static List<Meta> GetPropertyDrawerTypes(Assembly assembly) {
         if (customPropertyDrawerTypes != null) return customPropertyDrawerTypes;
 
@@ -236,6 +182,33 @@ public static class Reflector {
             }
         }
         return customPropertyDrawerTypes;
+    }
+    
+    private static Dictionary<Type, ExtendedPropertyDrawer> extendedDrawerCache;
+
+    private static void BuildExtendedDrawerCache() {
+        if (extendedDrawerCache != null) return;
+        extendedDrawerCache = new Dictionary<Type, ExtendedPropertyDrawer>();
+        List<Type> extendedDrawerSubclasses = FindSubClasses<ExtendedPropertyDrawer>();
+        for (int i = 0; i < extendedDrawerSubclasses.Count; i++) {
+            Type drawerType = extendedDrawerSubclasses[i];
+            ExtendedPropertyDrawer drawer = Activator.CreateInstance(drawerType) as ExtendedPropertyDrawer;
+            object[] attributes = drawerType.GetCustomAttributes(typeof(PropertyDrawerFor), false);
+            for (int j = 0; j < attributes.Length; j++) {
+                PropertyDrawerFor attr = attributes[j] as PropertyDrawerFor;
+                extendedDrawerCache[attr.type] = drawer;
+            }
+        }
+    }
+    
+    public static ExtendedPropertyDrawer GetExtendedPropertyDrawerFor(Type type) {
+        BuildExtendedDrawerCache();
+        ExtendedPropertyDrawer drawer = extendedDrawerCache.Get(type);
+        while (drawer == null && type.BaseType != null && type.BaseType != typeof(object)) {
+            type = type.BaseType;
+            drawer = extendedDrawerCache.Get(type);
+        }
+        return drawer;
     }
 
     public static UnityEditor.PropertyDrawer GetCustomPropertyDrawerFor(Type type, params Assembly[] assemblies) {
@@ -281,14 +254,13 @@ public static class Reflector {
         && !assembly.FullName.StartsWith("ICSharp")
         && !assembly.FullName.StartsWith("Unity")
         && !assembly.FullName.StartsWith("Microsoft")
-        && assembly.FullName.IndexOf("CSharp-Editor") == -1
         && assembly.Location.IndexOf("App_Web") == -1
         && assembly.Location.IndexOf("App_global") == -1
         && assembly.FullName.IndexOf("CppCodeProvider") == -1
         && assembly.FullName.IndexOf("WebMatrix") == -1
         && assembly.FullName.IndexOf("SMDiagnostics") == -1
+        && assembly.FullName.IndexOf("UnityScript") == -1
         && !string.IsNullOrEmpty(assembly.Location);
     }
-    #endregion
 }
 

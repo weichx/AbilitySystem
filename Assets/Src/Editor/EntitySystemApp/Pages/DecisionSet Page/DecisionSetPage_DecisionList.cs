@@ -38,8 +38,10 @@ public class DecisionSetPage_DecisionList : DecisionSetPage_SectionBase {
 		for(int i = 0; i < item.InstanceRef.decisions.Count; i++) {
 			EditorGUILayout.BeginVertical();
 			item.displayed[i] = RenderDecision(item.InstanceRef.decisions[i], item.displayed[i]);
-			item.serializedDecisions[i].ApplyModifiedProperties();
-			GUILayout.Space(10);
+		    if (item.serializedDecisions[i] != null) {
+		        item.serializedDecisions[i].ApplyModifiedProperties();
+		    }
+		    GUILayout.Space(10);
 			EditorGUILayout.EndVertical();
 		}
 			
@@ -57,12 +59,18 @@ public class DecisionSetPage_DecisionList : DecisionSetPage_SectionBase {
 		EditorGUILayout.BeginHorizontal();
 
 		if(isDisplayed) {
-			isDisplayed = EditorGUILayout.Foldout(isDisplayed, "Name");
+			isDisplayed = EditorGUILayout.Foldout(isDisplayed, "", new GUIStyle(EditorStyles.foldout) { fixedWidth = 15f });
 			decision.name = EditorGUILayout.TextField(decision.name);
 		}
-		else {
+        else {
 			isDisplayed = EditorGUILayout.Foldout(isDisplayed, decision.name);
 		}
+
+        int decisionIndex = item.InstanceRef.decisions.IndexOf(decision);
+
+        if (isDisplayed && !item.IsCompiled(decisionIndex)) {
+	        item.Compile(decisionIndex);
+	    }
 
 		EditorGUILayout.EndHorizontal();
 
@@ -95,7 +103,6 @@ public class DecisionSetPage_DecisionList : DecisionSetPage_SectionBase {
 		if(idx == -1) {
 			idx = 0;
 			item.ChangeDSEType(decisionIndex, typeof(NoOpDSE));
-			Debug.Log("Changing");
 		}
 
 		int newIdx = EditorGUILayout.Popup("Evaluator", idx, dseNames);

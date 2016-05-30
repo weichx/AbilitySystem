@@ -1,10 +1,6 @@
 ﻿using UnityEngine;
 using UnityEditor;
-using System.Collections.Generic;
-using System.Reflection;
-using System;
 
-namespace AbilitySystem {
 
     [CustomPropertyDrawer(typeof(VisibleAttribute))]
     public class VisibleAttributeDrawer : PropertyDrawer {
@@ -28,4 +24,3 @@ namespace AbilitySystem {
         }
 
     }
-}

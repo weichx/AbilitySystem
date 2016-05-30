@@ -97,6 +97,7 @@ public class MethodPointer<T, U> : AbstractMethodPointer {
 
     protected Func<T, U> fn;
 
+    public MethodPointer() : base() {}
     public MethodPointer(MethodInfo methodInfo) : base(methodInfo) { }
     public MethodPointer(AbstractMethodPointer ptr) : base(ptr) { }
 

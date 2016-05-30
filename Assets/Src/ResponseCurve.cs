@@ -3,158 +3,147 @@ using System;
 using System.Collections.Generic;
 
 public enum ResponseCurveType {
-	Linear, Polynomial, InversePolynomial, Logarithmic, Logit, Threshold
+    Constant,
+    Polynomial,
+    InversePolynomial,
+    Logistic,
+    Logit,
+    Threshold,
+    Quadratic,
+    Parabolic,
+    NormalDistribution,
+    Bounce,
+    Sin
 }
 
 [Serializable]
-public class ResponseCurve {
+public class ResponseCurve : ICloneable {
 
-	public const string Polynomial = "Polynomial";
-	public const string InversePolynomial = "InversePolynomial";
-	public const string Logarithmic = "Logarithmic";
-	public const string Logit = "Logit";
-	public const string Threshold = "Threshold";
+    public const string Polynomial = "Polynomial";
+    public const string InversePolynomial = "InversePolynomial";
+    public const string Logarithmic = "Logarithmic";
+    public const string Logit = "Logit";
+    public const string Threshold = "Threshold";
 
-	[NonSerialized]
-	public ResponseCurveType type;
-	public float slope; //(m)
-	public float exp; //(k)
-	public float vShift; //vertical shift (b)
-	public float hShift; //horizonal shift (c)
-	public float threshold;
+    public ResponseCurveType curveType;
+    public float slope; //(m)
+    public float exp; //(k)
+    public float vShift; //vertical shift (b)
+    public float hShift; //horizonal shift (c)
+    public float threshold;
+    public bool invert;
 
-	public ResponseCurve(ResponseCurveType type, float slope, float exp, float vShift, float hShift, float threshold = 0) {
-		this.type = type;
-		this.slope = slope;
-		this.exp = exp;
-		this.vShift = vShift;
-		this.hShift = hShift;
-		this.threshold = threshold;
-	}
+    public ResponseCurve() {
+        curveType = ResponseCurveType.Polynomial;
+        slope = 1;
+        exp = 1;
+        vShift = 0;
+        hShift = 0;
+        threshold = 0;
+        invert = false;
+    }
+    
+    public float Evaluate(float input) {
+        input = Mathf.Clamp01(input);
+        float output = 0;
+        if (input < threshold && curveType != ResponseCurveType.Constant) return 0;
+        switch (curveType) {
+            case ResponseCurveType.Constant:
+                output = threshold;
+                break;
+            case ResponseCurveType.Polynomial: // y = m(x - c)^k + b 
+                output = slope * (Mathf.Pow((input - hShift), exp)) + vShift;
+                break;
+            case ResponseCurveType.Logistic: // y = (k * (1 / (1 + (1000m^-1*x + c))) + b
+                output = (exp * (1.0f / (1.0f + Mathf.Pow(Mathf.Abs(1000.0f * slope), (-1.0f * input) + hShift + 0.5f)))) + vShift; // Note, addition of 0.5 to keep default 0 hShift sane
+                break;
+            case ResponseCurveType.Logit: // y = -log(1 / (x + c)^K - 1) * m + b
+                output = (-Mathf.Log((1.0f / Mathf.Pow(Mathf.Abs(input - hShift), exp)) - 1.0f) * 0.05f * slope) + (0.5f + vShift); // Note, addition of 0.5f to keep default 0 XIntercept sane
+                break;
+            case ResponseCurveType.Quadratic: // y = mx * (x - c)^K + b
+                output = ((slope * input) * Mathf.Pow(Mathf.Abs(input + hShift), exp)) + vShift;
+                break;
+            case ResponseCurveType.Sin: //sin(m * (x + c) ^ K + b
+                output = (Mathf.Sin((2 * Mathf.PI * slope) * Mathf.Pow(input + (hShift - 0.5f), exp)) * 0.5f) + vShift + 0.5f;
+                break;
+            case ResponseCurveType.InversePolynomial:
+                output = slope * (Mathf.Pow((input - hShift), exp)) + vShift;
+                output = slope * (Mathf.Pow((output - hShift), exp)) + vShift;
+                break;
+            case ResponseCurveType.Parabolic:
+                output = Mathf.Pow(slope * (input + hShift), 2) + (exp * (input + hShift)) + vShift;
+                break;
+            case ResponseCurveType.Bounce:
+                output = Mathf.Abs(Mathf.Sin((2f * Mathf.PI * exp) * (input + hShift + 1f) * (input + hShift + 1f)) * (1f - input) * slope) + vShift;
+                break;
+            case ResponseCurveType.NormalDistribution: // y = K / sqrt(2 * PI) * 2^-(1/m * (x - c)^2) + b
+                output = (exp / (Mathf.Sqrt(2 * Mathf.PI))) * Mathf.Pow(2.0f, (-(1.0f / (Mathf.Abs(slope) * 0.01f)) * Mathf.Pow(input - (hShift + 0.5f), 2.0f))) + vShift;
+                break;
+            default:
+                throw new Exception(curveType + " curve has not been implemented yet");
+        }
+        if (invert) output = 1f - output;
+        return Mathf.Clamp01(output);
+    }
 
-	public ResponseCurve() {
-		type = ResponseCurveType.Polynomial;
-		slope = 1;
-		exp = 1;
-		vShift = 0;
-		hShift = 0;
-		threshold = 0;
-	}
+    public void Reset() {
+        slope = 1;
+        exp = 1;
+        vShift = 0;
+        hShift = 0;
+        threshold = 0;
+        invert = false;
+    }
 
-	public ResponseCurve(float slope, float exp, float vShift, float hShift, float threshold = 0) {
-		type = ResponseCurveType.Polynomial;
-		this.slope = slope;
-		this.exp = exp;
-		this.vShift = vShift;
-		this.hShift = hShift;
-		this.threshold = threshold;
-	}
+    public string DisplayString {
+        get { return " slope: " + slope + " exp: " + exp + " vShift: " + vShift + " hShift: " + hShift + " \n threshold: " + threshold + " inverted: " + invert; }
+    }
 
-	public void CopyFrom(ResponseCurve curve) {
-		slope = curve.slope;
-		exp = curve.exp;
-		vShift = curve.vShift;
-		hShift = curve.hShift;
-		threshold = curve.threshold;
-		type = curve.type;
-	}
+    public override string ToString() {
+        return "{type: " + curveType + ", slope: " + slope +
+            ", exp: " + exp + ", vShift: " + vShift + ", hShift: " + hShift + "}";
+    }
 
-	protected void OnDeserialized(Dictionary<string, object> jsonTable) {
-		object accessor;
-		if (jsonTable.TryGetValue("preset", out accessor)) {
-			string presetName = accessor as string;
-			if (presetName != null) {
-				var curve = GetPreset(presetName);
-				CopyFrom(curve);
-			}
-		}
-		if (jsonTable.TryGetValue("type", out accessor)) {
-			string typeName = accessor as string;
-			if(typeName != null) {
-				type = StringToCurveType(typeName);
-			}
-		}
-	}
+    static ResponseCurve() {
+       // presetCurves = new Dictionary<string, ResponseCurve>() {
+            //{ "Linear", new ResponseCurve(1, 1, 0, 0) },
+            //{ "1 Poly", new ResponseCurve(1, 1, 0, 0) },
+            //{ "2 Poly", new ResponseCurve(1, 2, 0, 0) },
+            //{ "4 Poly", new ResponseCurve(1, 4, 0, 0) },
+            //{ "6 Poly", new ResponseCurve(1, 6, 0, 0) },
+            //{ "8 Poly", new ResponseCurve(1, 8, 0, 0) },
+            //{ "-1 Poly", new ResponseCurve(-1, 1, 1, 0) },
+            //{ "-2 Poly", new ResponseCurve(-1, 2, 1, 0) },
+            //{ "-4 Poly", new ResponseCurve(-1, 4, 1, 0) },
+            //{ "-6 Poly", new ResponseCurve(-1, 6, 1, 0) },
+            //{ "-8 Poly", new ResponseCurve(-1, 8, 1, 0) }
+        //};
+    }
 
-	public static ResponseCurveType StringToCurveType(string curveType) {
-		switch (curveType) {
-			case Polynomial:
-				return ResponseCurveType.Polynomial;
-			case InversePolynomial:
-				return ResponseCurveType.InversePolynomial;
-			case Logarithmic:
-				return ResponseCurveType.Logarithmic;
-			case Logit:
-				return ResponseCurveType.Logit;
-		}
-		return ResponseCurveType.Polynomial;
-	}
+    //private static Dictionary<string, ResponseCurve> presetCurves;
 
-	public float Evaluate(float input) {
-		input = Mathf.Clamp01(input);
-		float output = 0;
-		if (input < threshold) return 0;
-		switch (type) {
-			case ResponseCurveType.Linear:
-			case ResponseCurveType.Polynomial:
-				output = slope * (Mathf.Pow((input - hShift), exp)) + vShift;
-				break;
+    public static ResponseCurve GetPreset(string presetCurve) {
+        //ResponseCurve curve;
+        //if (presetCurves.TryGetValue(presetCurve, out curve)) {
+        //    return curve;
+        //}
+        //else {
+        //    Debug.Log("Cant find prest curve called `" + presetCurve + "` Using linear instead");
+        //    return new ResponseCurve(1, 1, 0, 0);
+        //}
+        return null;
+    }
 
-			case ResponseCurveType.InversePolynomial:
-				output = slope * (Mathf.Pow((input - hShift), exp)) + vShift;
-				output = slope * (Mathf.Pow((output - hShift), exp)) + vShift;
-				break;
-			default:
-				throw new Exception(type + " curve has not been implemented yet");
-		}
-		return Mathf.Clamp01(output);
-	}
-
-	public override string ToString() {
-		return "{type: " + type + ", slope: " + slope +
-			", exp: " + exp + ", vShift: " + vShift + ", hShift: " + hShift + "}";
-	}
-
-	public string ToShortString() {
-		return type + "," + slope + "," + exp + "," + vShift + "," + hShift + "," + threshold;
-	}
-
-	static ResponseCurve() {
-		presetCurves = new Dictionary<string, ResponseCurve>() {
-			{ "Linear", new ResponseCurve(1, 1, 0, 0) },
-			{ "1 Poly", new ResponseCurve(1, 1, 0, 0) },
-			{ "2 Poly", new ResponseCurve(1, 2, 0, 0) },
-			{ "4 Poly", new ResponseCurve(1, 4, 0, 0) },
-			{ "6 Poly", new ResponseCurve(1, 6, 0, 0) },
-			{ "8 Poly", new ResponseCurve(1, 8, 0, 0) },
-			{ "-1 Poly", new ResponseCurve(-1, 1, 1, 0) },
-			{ "-2 Poly", new ResponseCurve(-1, 2, 1, 0) },
-			{ "-4 Poly", new ResponseCurve(-1, 4, 1, 0) },
-			{ "-6 Poly", new ResponseCurve(-1, 6, 1, 0) },
-			{ "-8 Poly", new ResponseCurve(-1, 8, 1, 0) },
-			//{ "Invert 2 Poly", new ResponseCurve(InversePolynomial, 1, 2, 0, 0)  },
-			//{ "Invert 4 Poly", new ResponseCurve(InversePolynomial, 1, 4, 0, 0)  },
-			//{ "Invert 6 Poly", new ResponseCurve(InversePolynomial, 1, 6, 0, 0)  },
-			//{ "Invert 8 Poly", new ResponseCurve(InversePolynomial, 1, 8, 0, 0)  },
-			//{ "Invert -2 Poly", new ResponseCurve(InversePolynomial, -1, 2, 0, 0)  },
-			//{ "Invert -4 Poly", new ResponseCurve(InversePolynomial, -1, 4, 0, 0)  },
-			//{ "Invert -6 Poly", new ResponseCurve(InversePolynomial, -1, 6, 0, 0)  },
-			//{ "Invert -8 Poly", new ResponseCurve(InversePolynomial, -1, 8, 0, 0)  },
-		};
-	}
-
-	private static Dictionary<string, ResponseCurve> presetCurves;
-
-	public static ResponseCurve GetPreset(string presetCurve) {
-		ResponseCurve curve;
-		if (presetCurves.TryGetValue(presetCurve, out curve)) {
-			return curve;
-		}
-		else {
-			Debug.Log("Cant find prest curve called `" + presetCurve + "` Using linear instead");
-			return new ResponseCurve(1, 1, 0, 0);
-		}
-	}
+    public object Clone() {
+        ResponseCurve curve = new ResponseCurve();
+        curve.slope = slope;
+        curve.exp = exp;
+        curve.vShift = vShift;
+        curve.hShift = hShift;
+        curve.threshold = threshold;
+        curve.curveType = curveType;
+        return curve;
+    }
 }
 /*
 switch (CurveShape)

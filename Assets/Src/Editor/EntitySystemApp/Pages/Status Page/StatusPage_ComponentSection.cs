@@ -24,7 +24,7 @@ public class StatusPage_ComponentSection : StatusPage_SectionBase {
             if (p.name.StartsWith("__component")) {
                 break;
             }
-            DrawerUtil.DrawProperty(p, componentType);
+            DrawerUtil.DrawPropertyLayout(p, componentType);
         }
         EditorGUI.indentLevel -= 2;
     }

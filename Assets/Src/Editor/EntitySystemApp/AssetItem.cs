@@ -11,6 +11,7 @@ public class AssetItem<T> where T : EntitySystemBase {
     protected AssetCreator creator;
     protected SerializedObject serialRoot;
     protected bool isDeletePending;
+    protected SerializedObjectX serialRootObjectX;
 
     public AssetItem(AssetCreator creator) {
         this.creator = creator;
@@ -34,6 +35,12 @@ public class AssetItem<T> where T : EntitySystemBase {
         }
     }
 
+    public SerializedObjectX SerialObjectX {
+        get {
+            return serialRootObjectX;
+        }
+    }
+
     public SerializedObject SerializedObject {
         get {
             return serialRoot;
@@ -51,8 +58,9 @@ public class AssetItem<T> where T : EntitySystemBase {
     }
 
     public virtual void Save() {
-        if (serialRoot == null) return;
-        serialRoot.ApplyModifiedProperties();
+       // if (serialRoot == null) return;
+        //serialRoot.ApplyModifiedProperties();
+        serialRootObjectX.ApplyModifiedProperties();
         AssetSerializer serializer = new AssetSerializer();
         serializer.AddItem(instanceRef);
         creator.source = serializer.WriteToString();
@@ -110,7 +118,7 @@ public class AssetItem<T> where T : EntitySystemBase {
         }
     }
 
-    public void Rebuild() {
+    public virtual void Rebuild() {
         if (instanceRef == null) {
             return;
         }

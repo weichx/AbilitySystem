@@ -6,10 +6,13 @@ public class StatusPage : Page<StatusEffect> {
     private MasterView<StatusItem, StatusEffect> masterView;
     private StatusPage_DetailView detailView;
 
-    public override void OnEnter() {
+    public override void OnEnter(string itemId = null) {
         masterView = new MasterView<StatusItem, StatusEffect>(SetActiveItem);
         detailView = new StatusPage_DetailView();
         GUIUtility.keyboardControl = 0;
+        if (itemId != null) {
+            masterView.SelectItemById(itemId);
+        }
     }
 
     public override void Render(Rect rect) {
@@ -28,7 +31,6 @@ public class StatusPage : Page<StatusEffect> {
     }
 
     public override void Update() {
-
         if (activeItem != null) {
             activeItem.Update();
             if (activeItem.IsDeletePending) {

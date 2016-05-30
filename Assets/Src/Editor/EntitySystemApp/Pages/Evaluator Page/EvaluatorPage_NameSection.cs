@@ -4,13 +4,13 @@ using UnityEditor;
 public class EvaluatorPage_NameSection : EvaluatorPage_SectionBase {
 
 	public override void Render() {
-		SerializedProperty nameProp = rootProperty.FindPropertyRelative("id");
+		SerializedPropertyX nameProp = targetItem.SerialObjectX.FindProperty("id");
 		GUILayout.BeginHorizontal();
 		GUILayout.BeginVertical();
 		GUILayout.Space(20f);
 		float labelWidth = EditorGUIUtility.labelWidth;
 		EditorGUIUtility.labelWidth = 100f;
-		EditorGUILayout.PropertyField(nameProp, new GUIContent("Evaluator Name"));
+		EditorGUILayoutX.PropertyField(nameProp, new GUIContent("Evaluator Name"), true);
 		EditorGUIUtility.labelWidth = labelWidth;
 		GUILayout.BeginHorizontal();
 		GUILayout.FlexibleSpace();

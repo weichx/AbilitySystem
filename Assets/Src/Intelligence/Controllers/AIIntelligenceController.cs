@@ -28,7 +28,7 @@ namespace Intelligence {
         protected void UpdateDecisionPairs() {
             decisionContextPairs = new List<DecisionContextPair>(20);
             for (int i = 0; i < decisions.Count; i++) {
-				Decision decision = decisions[i];
+				//Decision decision = decisions[i];
 //				Context[] contexts = decisions[i].contextFactory.CreateContexts(entity); //todo caching this might be possible
 //                for (int j = 0; j < contexts.Length; j++) {
 //                    decisionContextPairs.Add(new DecisionContextPair(decision, contexts[j]));
@@ -60,8 +60,8 @@ namespace Intelligence {
             /*return definition.GetDecision(decisions)*/
             //todo keeping these in a priority queue based on score makes more sense
             decisionContextPairs.Sort();
-			Decision d = decisionContextPairs[0].decision;
-			Context c = decisionContextPairs[0].context;
+			//Decision d = decisionContextPairs[0].decision;
+			//Context c = decisionContextPairs[0].context;
 			//d.Run(c);
             //return decisionContextPairs[0].decision;
         }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 using System.IO;
@@ -236,8 +237,9 @@ public class AssetSerializer : IWriter {
             return StringSymbol + SerializerUtil.EscapeString(value as string);
         }
         else if (type.IsArray) {
-            object[] valArray = value as object[];
-            if (valArray.Length == 0) {
+            IList list = value as IList;
+           // object[] valArray = value as object[]; //todo this may not work for structs?
+            if (list == null || list.Count == 0) {
                 return EmptyListSymbol;
             }
             else {

@@ -2,8 +2,8 @@
 using UnityEngine;
 using UnityEditor;
 using Intelligence;
-using System.Reflection;
 using System.Collections.Generic;
+using System.Text;
 
 public class DecisionSetItem : AssetItem<DecisionSet> {
 
@@ -49,10 +49,18 @@ public class DecisionSetItem : AssetItem<DecisionSet> {
 		displayed = new List<bool>(instanceRef.decisions.Count);
 		serializedDecisions = new List<SerializedObject>(instanceRef.decisions.Count);
 		for(int i = 0; i < count; i++) {
-			displayed.Add(false); //true?
-			serializedDecisions.Add(CreateSerializedObject(instanceRef.decisions[i]));
+			displayed.Add(false);
+			serializedDecisions.Add(null);
 		}
 	}
+
+    public bool IsCompiled(int index) {
+        return serializedDecisions[index] != null;
+    }
+
+    public void Compile(int index) {
+        serializedDecisions[index] = CreateSerializedObject(instanceRef.decisions[index]);
+    }
 
 	protected override void InitializeScriptable() {
 		scriptableType.GetField("decisionSet").SetValue(scriptable, instanceRef);
@@ -76,7 +84,7 @@ public class DecisionSetItem : AssetItem<DecisionSet> {
 	}
 
 	private string GenerateDecisionCode(Decision decision) {
-		var builder = new System.Text.StringBuilder();
+		StringBuilder builder = new StringBuilder();
 		builder.AppendLine("using UnityEngine;");
 		builder.AppendLine("using Intelligence;");
 		builder.AppendLine("public class GeneratedDecision : ScriptableObject {");

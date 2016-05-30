@@ -1,6 +1,4 @@
 ﻿using UnityEngine;
-using UnityEditor;
-using System.Reflection;
 using Intelligence;
 
 public class EvaluatorPage : Page<DecisionScoreEvaluator> {
@@ -8,11 +6,14 @@ public class EvaluatorPage : Page<DecisionScoreEvaluator> {
 	private MasterView<EvaluatorItem, DecisionScoreEvaluator> masterView;
 	private EvaluatorPage_DetailView detailView;
 
-	public override void OnEnter() {
+	public override void OnEnter(string itemId = null) {
 		masterView = new MasterView<EvaluatorItem, DecisionScoreEvaluator>(SetActiveItem);
 		detailView = new EvaluatorPage_DetailView();
 		GUIUtility.keyboardControl = 0;
-	}
+        if (itemId != null) {
+            masterView.SelectItemById(itemId);
+        }
+    }
 
 	public override void Render(Rect rect) {
 		GUILayout.BeginArea(rect);

@@ -3,56 +3,37 @@ using UnityEngine;
 using UnityEditor;
 using System.Collections.Generic;
 
-[CustomPropertyDrawer(typeof(MethodPointer))]
-[CustomPropertyDrawer(typeof(AbstractMethodPointer))]
-public class MethodPointerDrawer : PropertyDrawer {
+[PropertyDrawerFor(typeof(AbstractMethodPointer))]
+public class MethodPointerDrawer : ExtendedPropertyDrawer {
 
-    protected GUIContent[] content;
     protected List<MethodPointer> pointableMethods;
 
-    public override void OnGUI(Rect position, SerializedProperty property, GUIContent label) {
-        SerializedProperty sigProp = property.FindPropertyRelative("signature");
-        int idx = GetIndex(sigProp.stringValue);
-        int newIdx = EditorGUI.Popup(position, label, idx, GetPointableMethods());
-        if (newIdx != -1 && idx != newIdx) {
-            sigProp.stringValue = pointableMethods[newIdx].signature;
-        }
-    }
-
-    public int GetIndex(string signature) {
-        GetPointableMethods();
-        for(int i = 0; i < pointableMethods.Count; i++) {
-            if(pointableMethods[i].signature == signature) {
-                return i;
+    public override void OnGUI(Rect position, SerializedPropertyX source, GUIContent label) {
+        Type sourceType = source.Value.GetType();
+        if (sourceType.IsGenericType) {
+            Type[] genericTypes = sourceType.GetGenericArguments();
+            Type[] args = new Type[genericTypes.Length - 1];
+            for (int i = 0; i < args.Length; i++) {
+                args[0] = genericTypes[i + 1];
             }
+            pointableMethods = Reflector.FindMethodPointersWithAttribute(typeof(Pointable), genericTypes[0], args);
         }
-        return -1;
-    }
-
-    public GUIContent[] GetPointableMethods() {
-        if (content != null) {
-            return content;
+        else {
+            pointableMethods = Reflector.FindMethodPointersWithAttribute(typeof(Pointable), typeof(void), Type.EmptyTypes);
         }
-        pointableMethods = Reflector.FindMethodPointersWithAttribute(GetAttrType(), GetReturnType(), GetSignature());
-        var retn = new List<GUIContent>(pointableMethods.Count);
-        for (int i = 0; i < pointableMethods.Count; i++) {
-            retn.Add(new GUIContent(pointableMethods[i].ShortSignature));
+        var displayList = new GUIContent[pointableMethods.Count + 1];
+        displayList[0] = new GUIContent("-- None --");
+        for (int i = 1; i < displayList.Length; i++) {
+            displayList[i] = new GUIContent(pointableMethods[i - 1].signature);
         }
-        retn.TrimExcess();
-        content = retn.ToArray();
-        return content;
-    }
+        SerializedPropertyX signature = source.FindProperty("signature");
 
-    protected virtual Type GetAttrType() {
-        return typeof(Pointable);
-    }
-
-    protected virtual Type GetReturnType() {
-        return typeof(float);
-    }
-
-    protected virtual Type[] GetSignature() {
-        return null;
+        int idx = Array.FindIndex(displayList, content => {
+            return content.text == signature.Value as string;
+        }); 
+        if (idx == -1) idx = 0;
+        int newIdx = EditorGUI.Popup(position, label, idx, displayList);
+        signature.Value = displayList[newIdx].text;
     }
 }
 

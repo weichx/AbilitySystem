@@ -19,7 +19,7 @@ public class EvaluatorPage_DetailView {
 	}
 
 	public void Render() {
-		if(target == null || target.SerializedObject == null) return;
+	    if (target == null) return;
 		scrollPosition = GUILayout.BeginScrollView(scrollPosition);
 
 		GUILayout.BeginVertical();
@@ -27,22 +27,22 @@ public class EvaluatorPage_DetailView {
 		GUILayout.Space(5);
 		GUILayout.EndVertical();
 
-		GUILayout.BeginVertical();
-		generalSection.Render();
-		GUILayout.Space(5);
-		GUILayout.EndVertical();
+        //GUILayout.BeginVertical();
+        //generalSection.Render();
+        //GUILayout.Space(5);
+        //GUILayout.EndVertical();
 
-		GUILayout.BeginVertical();
-		requirementSection.Render();
-		GUILayout.Space(5);
-		GUILayout.EndVertical();
+        GUILayout.BeginVertical();
+        requirementSection.Render();
+        GUILayout.Space(5);
+        GUILayout.EndVertical();
 
-		GUILayout.BeginVertical();
-		considerationSection.Render();
-		GUILayout.Space(5);
-		GUILayout.EndVertical();
+        GUILayout.BeginVertical();
+        considerationSection.Render();
+        GUILayout.Space(5);
+        GUILayout.EndVertical();
 
-		GUILayout.EndScrollView();
+        GUILayout.EndScrollView();
 	}
 
 	public void SetTargetObject(AssetItem<DecisionScoreEvaluator> target) {
@@ -50,7 +50,7 @@ public class EvaluatorPage_DetailView {
 		nameSection.SetTargetObject(target);
 		requirementSection.SetTargetObject(target);
 		considerationSection.SetTargetObject(target);
-		generalSection.SetTargetObject(target);
+		//generalSection.SetTargetObject(target);
 	}
 
 }

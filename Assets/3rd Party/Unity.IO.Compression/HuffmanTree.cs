@@ -29,9 +29,6 @@ namespace Unity.IO.Compression
         short[]      left; 
         short[]      right;
         byte[]       codeLengthArray;
-#if DEBUG
-        uint[]       codeArrayDebug;
-#endif
 
         int tableMask;         
 
@@ -136,9 +133,6 @@ namespace Unity.IO.Compression
 
             uint[] codeArray = CalculateHuffmanCode();
             table = new short[ 1 << tableBits];
-#if DEBUG            
-            codeArrayDebug = codeArray;
-#endif
             
             // I need to find proof that left and right array will always be 
             // enough. I think they are.
