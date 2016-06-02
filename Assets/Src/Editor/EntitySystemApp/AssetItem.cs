@@ -2,61 +2,50 @@
 using UnityEditor;
 using System;
 
-public class AssetItem<T> where T : EntitySystemBase {
+public class AssetItem<T> where T : EntitySystemBase, new() {
 
-    protected string assetpath;
-    protected Type scriptableType;
-    protected ScriptableObject scriptable;
-    protected AssetCreator creator;
-    protected SerializedObject serialRoot;
+    protected string assetguid;
     protected bool isDeletePending;
     protected SerializedObjectX serialRootObjectX;
+    protected string name;
 
-    public AssetItem(AssetCreator creator) {
-        this.creator = creator;
-        assetpath = AssetDatabase.GetAssetPath(creator);
+    public AssetItem(string assetguid) {
+        this.assetguid = assetguid;
+        string path = AssetDatabase.GUIDToAssetPath(assetguid);
+        name = System.IO.Path.GetFileNameWithoutExtension(path);
+    }
+
+    protected AssetCreator<T> GetAssetCreator() {
+        Type creatorType = typeof(EntitySystemBase).Assembly.GetType(typeof(T).Name + "Creator");
+        string assetpath = AssetDatabase.GUIDToAssetPath(assetguid);
+        AssetCreator<T> creator = AssetDatabase.LoadAssetAtPath(assetpath, creatorType) as AssetCreator<T>;
+        return creator;
     }
 
     public bool IsSelected { get; set; }
 
-
-    public string AssetPath {
-        get { return assetpath; }
-        set { assetpath = value; }
-    }
-
     public string Name {
-        get {
-            return creator.name;
-        }
+        get { return serialRootObjectX == null ? name : serialRootObjectX.FindProperty("id").GetValue<string>(); }
     }
 
     public SerializedObjectX SerialObjectX {
-        get {
-            return serialRootObjectX;
-        }
-    }
-
-    public SerializedObject SerializedObject {
-        get {
-            return serialRoot;
-        }
+        get { return serialRootObjectX; }
     }
 
     public bool IsDeletePending {
         get { return isDeletePending; }
     }
 
-    public virtual void Update() {}
+    public virtual void Update() { }
 
     public virtual void Save() {
         serialRootObjectX.ApplyModifiedProperties();
-        AssetSerializer serializer = new AssetSerializer();
-        serializer.AddItem(serialRootObjectX.Root.Value);
-        creator.source = serializer.WriteToString();
+        AssetCreator<T> creator = GetAssetCreator();
+        creator.SetSourceAsset(serialRootObjectX.Root.Value as T);
         EditorUtility.SetDirty(creator);
         AssetDatabase.SaveAssets();
-        AssetPath = AssetDatabase.RenameAsset(AssetPath, serialRootObjectX.FindProperty("id").Value as string);
+        string path = AssetDatabase.GUIDToAssetPath(assetguid);
+        AssetDatabase.RenameAsset(path, serialRootObjectX["id"].GetValue<string>());
         AssetDatabase.Refresh();
     }
 
@@ -66,21 +55,16 @@ public class AssetItem<T> where T : EntitySystemBase {
 
     public virtual void Delete() {
         isDeletePending = false;
-        AssetDatabase.DeleteAsset(AssetPath);
+        AssetDatabase.DeleteAsset(AssetDatabase.GUIDToAssetPath(assetguid));
         AssetDatabase.Refresh();
-        scriptable = null;
-        scriptableType = null;
-        serialRoot = null;
-        creator = null;
     }
 
     public virtual void Restore() {
-        serialRoot = null;
         Load();
     }
 
     public virtual void Load() {
-            serialRootObjectX = new SerializedObjectX((creator as IAssetCreator<T>).CreateForEditor());
+        serialRootObjectX = new SerializedObjectX(GetAssetCreator().Create());
     }
 
     //if (scriptableType == null) {

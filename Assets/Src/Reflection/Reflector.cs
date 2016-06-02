@@ -82,6 +82,9 @@ public static class Reflector {
     }
 
     public static List<Type> FindSubClasses(Type type, bool includeInputType = false) {
+        if (type.IsGenericTypeDefinition) {
+            return FindGenericSubClasses(type);
+        }
         var retn = new List<Type>();
         for (int i = 0; i < filteredAssemblies.Count; i++) {
             var assembly = filteredAssemblies[i];
@@ -100,6 +103,32 @@ public static class Reflector {
 
     public static List<Type> FindSubClasses<T>(bool includeInputType = false) {
         return FindSubClasses(typeof(T), includeInputType);
+    }
+
+    private static List<Type> FindGenericSubClasses(Type type, bool includeInputType = false) {
+        var retn = new List<Type>();
+        for (int i = 0; i < filteredAssemblies.Count; i++) {
+            var assembly = filteredAssemblies[i];
+            var types = assembly.GetTypes();
+            for (int t = 0; t < types.Length; t++) {
+                if (IsDerivedOfGenericType(types[t], type, includeInputType)) {
+                    retn.Add(types[t]);
+                }
+            }
+        }
+        return retn;
+    }
+
+    private static bool IsDerivedOfGenericType(Type type, Type genericType, bool includeInputType) {
+        if (type.IsGenericType && type.GetGenericTypeDefinition() == genericType) {
+            return type != genericType || includeInputType;
+        }
+        else if (type.BaseType != null) {
+            return IsDerivedOfGenericType(type.BaseType, genericType, includeInputType);
+        }
+        else {
+            return false;
+        }
     }
 
     public static List<Type> FindSubClassesWithAttribute<T, U>(bool includeInputType = false) where T : class where U : Attribute {
@@ -186,7 +215,7 @@ public static class Reflector {
         }
         return customPropertyDrawerTypes;
     }
-    
+
     private static Dictionary<Type, ExtendedPropertyDrawer> extendedDrawerCache;
 
     private static void BuildExtendedDrawerCache() {
@@ -203,7 +232,7 @@ public static class Reflector {
             }
         }
     }
-    
+
     public static ExtendedPropertyDrawer GetExtendedPropertyDrawerFor(Type type) {
         BuildExtendedDrawerCache();
         ExtendedPropertyDrawer drawer = extendedDrawerCache.Get(type);

@@ -23,7 +23,21 @@ public class SearchBox {
         this.labelText = labelText;
         results = new List<Type>();
         resultContent = new GUIContent();
-        resultContent.image = resultIcon;
+        resultContent.image = resultIcon ?? EditorGUIUtility.FindTexture("cs ScriptIcon");
+        selected = selectedAction;
+        blue = new Texture2D(1, 1);
+        blue.SetPixel(0, 0, Color.blue);
+        blue.Apply();
+    }
+
+    public SearchBox(Texture2D resultIcon, List<Type> searchSet, Action<Type> selectedAction, string buttonText, string labelText) {
+        searchString = string.Empty;
+        this.searchSet = searchSet;
+        this.buttonText = buttonText;
+        this.labelText = labelText;
+        results = new List<Type>();
+        resultContent = new GUIContent();
+        resultContent.image = resultIcon ?? EditorGUIUtility.FindTexture("cs ScriptIcon");
         selected = selectedAction;
         blue = new Texture2D(1, 1);
         blue.SetPixel(0, 0, Color.blue);
@@ -46,7 +60,7 @@ public class SearchBox {
 
             EditorGUILayout.BeginHorizontal();
             searchString = GUILayout.TextField(searchString);
-            if (GUILayout.Button("X", GUILayout.Width(25f))) {
+            if (GUILayout.Button("X", GUI.skin.GetStyle("minibutton"), GUILayout.Width(25f))) {
                 searching = false;
                 searchString = string.Empty;
                 results.Clear();
@@ -65,10 +79,11 @@ public class SearchBox {
             itemStyle.normal.background = null;
             itemStyle.hover.background = blue;
             itemStyle.active.background = blue;
+            itemStyle.alignment = TextAnchor.MiddleLeft;
             for (int i = 0; i < results.Count; i++) {
                 resultContent.text = results[i].Name;
                 EditorGUILayout.BeginHorizontal();
-                if (GUILayout.Button(resultContent, itemStyle)) {
+                if (GUILayout.Button(resultContent, itemStyle, GUILayout.MaxHeight(16f))) {
                     searching = false;
                     searchString = string.Empty;
                     selected(results[i]);

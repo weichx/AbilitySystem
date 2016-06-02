@@ -1,54 +1,46 @@
 ﻿
+using System;
+
 namespace Intelligence {
 
-	//only here for type queries and storing lists of actions
-	public abstract class CharacterAction {
+    ////only here for type queries and storing lists of actions.
+    /// I would much prefer to use generics exclusivly but have
+    /// trouble getting covariance to cooperate 
+    public abstract class CharacterAction {
 
-		protected Entity entity;
+        protected Entity entity;
 
-		public void Run(Context context) {
-			SetContext(context);
-			OnStart();
-		}
-			
-		public virtual void OnStart() {}
+        public abstract void Setup(Context context);
 
-		public virtual bool OnUpdate() {
-			return true;
-		}
+        public virtual void OnStart() { }
 
-		public virtual void OnInterrupt() {
+        public virtual bool OnUpdate() {
+            return true;
+        }
 
-		}
+        public virtual void OnInterrupt() {}
 
-		public virtual void OnCancel() {
+        public virtual void OnCancel() {}
 
-		}
+        public virtual void OnComplete() {}
 
-		public virtual void OnComplete() {
+        public abstract Type ContextType { get; }
 
-		}
+    }
 
-		protected abstract void SetContext(Context context);
-
-	}
-
-	public abstract class CharacterAction<T> : CharacterAction where T : Context {
+    public class CharacterAction<T> : CharacterAction where T : Context {
 		
 		protected T context;
 
-		protected override void SetContext(Context context) {
-			this.context = context as T;
-		}
+        public override void Setup(Context context) {
+            this.context = context as T;
+            entity = context.entity;
+        }
 
-	}
+        public override Type ContextType {
+            get { return typeof(T); }
+        }
 
-	[System.Serializable]
-	public class NoOpAction : CharacterAction {
-	
-		public string moarValues;
-		protected override void SetContext(Context context) {}
-
-	}
+    }
 		
 }

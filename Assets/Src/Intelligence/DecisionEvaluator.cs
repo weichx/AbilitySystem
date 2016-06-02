@@ -5,15 +5,21 @@ using UnityEngine;
 
 
 [Serializable]
-public class DecisionScoreEvaluator : EntitySystemBase {
+public class DecisionEvaluator : EntitySystemBase {
 
     public string name;
     public string description;
     public float weight;
+    public Type contextType;
     public List<Consideration> considerations;
     public List<Requirement> requirements;
 
-    public DecisionScoreEvaluator() {
+    public DecisionEvaluator(Type contextType) : this() {
+        this.contextType = contextType ?? typeof(Context);
+    }
+
+    public DecisionEvaluator() {
+        if (contextType == null) contextType = typeof(Context);
         considerations = new List<Consideration>();
         requirements = new List<Requirement>();
     }
@@ -41,16 +47,3 @@ public class DecisionScoreEvaluator : EntitySystemBase {
     }
 
 }
-
-[Serializable]
-public class NoOpDSE : DecisionScoreEvaluator {
-
-    public NoOpDSE() : base() {
-        name = " -- No Op --";
-        description = "Does nothing";
-        weight = 0;
-    }
-
-
-}
-

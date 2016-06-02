@@ -3,44 +3,73 @@ using UnityEngine;
 using UnityEditor;
 using System.Collections.Generic;
 
-public abstract class ListSection<T> : SectionBase<T> where T : EntitySystemBase {
+public abstract class ListSection<T> : SectionBase<T> where T : EntitySystemBase, new() {
 
-    public class ComponentRenderData {
+    public class RenderData {
         public bool isDisplayed;
     }
 
     protected bool shown;
     protected SearchBox searchBox;
-    protected List<ComponentRenderData> renderData;
+    protected List<RenderData> renderData;
     protected SerializedPropertyX listRoot;
 
     protected List<string> skipRenderingFields;
+    protected bool useFoldout;
 
-    public ListSection(float spacing) : base(spacing) {
+    public ListSection(float spacing = 0f, bool useFoldout = true) : base(spacing) {
+        this.useFoldout = useFoldout;
         searchBox = CreateSearchBox();
         shown = true;
         skipRenderingFields = new List<string>();
     }
 
-    protected abstract SearchBox CreateSearchBox();
-    protected abstract string FoldOutLabel { get; }
+    protected virtual string FoldOutLabel { get { return listRoot.name; } }
     protected abstract string ListRootName { get; }
 
+    protected virtual SearchBox CreateSearchBox() {
+        return null;
+    }
+
     protected virtual void RenderListItem(SerializedPropertyX item, int index) {
+        var indent = EditorGUI.indentLevel;
+        EditorGUILayout.BeginHorizontal();
+        GUILayout.Space(EditorGUI.indentLevel * 16f);
+        EditorGUI.indentLevel = 0;
+
         EditorGUILayout.BeginVertical(EntitySystemWindow.CardStyle);
 
-        ComponentRenderData data = renderData[index];
+        RenderData data = renderData[index];
         RenderHeader(item, data, index);
         if (data.isDisplayed) {
             RenderBody(item, data, index);
         }
 
         EditorGUILayout.EndVertical();
+        EditorGUILayout.EndHorizontal();
+        EditorGUI.indentLevel = indent;
+
     }
 
-    protected virtual void RenderHeader(SerializedPropertyX property, ComponentRenderData data, int index) {
+    protected virtual string GetItemFoldoutLabel(SerializedPropertyX property, RenderData data) {
+        return Util.SplitAndTitlize(property.Type.Name);
+    }
+
+    protected virtual void RenderHeader(SerializedPropertyX property, RenderData data, int index) {
+       
         EditorGUILayout.BeginHorizontal();
-        data.isDisplayed = EditorGUILayout.Foldout(data.isDisplayed, property.Type.Name);
+        GUIStyle style;
+            style = new GUIStyle(EditorStyles.foldout);
+          
+        style.normal.textColor = Color.white;
+        style.active.textColor = Color.white;
+        style.focused.textColor = Color.white;
+        style.onActive.textColor = Color.white;
+        style.onFocused.textColor = Color.white;
+        style.onNormal.textColor = Color.white;
+        style.onHover.textColor = Color.white;
+        data.isDisplayed = EditorGUILayout.Foldout(data.isDisplayed, GetItemFoldoutLabel(property, data), style);
+      
         GUILayout.FlexibleSpace();
 
         GUIStyle miniLeft = GUI.skin.GetStyle("minibuttonleft");
@@ -62,9 +91,10 @@ public abstract class ListSection<T> : SectionBase<T> where T : EntitySystemBase
 
         GUI.enabled = true;
         EditorGUILayout.EndHorizontal();
+        
     }
 
-    protected virtual void RenderBody(SerializedPropertyX property, ComponentRenderData data, int index) {
+    protected virtual void RenderBody(SerializedPropertyX property, RenderData data, int index) {
         EditorGUI.indentLevel++;
         for (int i = 0; i < property.ChildCount; i++) {
             SerializedPropertyX child = property.GetChildAt(i);
@@ -74,50 +104,64 @@ public abstract class ListSection<T> : SectionBase<T> where T : EntitySystemBase
         EditorGUI.indentLevel--;
     }
 
-    protected virtual ComponentRenderData CreateDataInstance(bool isNewTarget) {
-        ComponentRenderData data = new ComponentRenderData();
+    protected virtual RenderData CreateDataInstance(SerializedPropertyX property, bool isNewTarget) {
+        RenderData data = new RenderData();
         data.isDisplayed = !isNewTarget;
         return data;
     }
 
-    public override void SetTargetObject(AssetItem<T> targetItem) {
-        base.SetTargetObject(targetItem);
+    public override void SetTargetProperty(SerializedPropertyX rootProperty) {
+        this.rootProperty = rootProperty;
+        if (rootProperty == null) {
+            listRoot = null;
+            renderData = null;
+            return;
+        }
         listRoot = rootProperty[ListRootName];
         int count = listRoot.ChildCount;
-        renderData = new List<ComponentRenderData>(count);
+        renderData = new List<RenderData>(count);
         for (int i = 0; i < count; i++) {
-            renderData.Add(CreateDataInstance(true));
+            renderData.Add(CreateDataInstance(listRoot.GetChildAt(i), true));
         }
     }
 
-    protected void AddListItem(Type type) {
+    protected virtual void AddListItem(Type type) {
         object component = Activator.CreateInstance(type);
-        renderData.Add(CreateDataInstance(true));
         listRoot.ArraySize++;
-        listRoot.GetChildAt(listRoot.ArraySize - 1).Value = component;
+        SerializedPropertyX newChild = listRoot.GetChildAt(listRoot.ArraySize - 1);
+        newChild.Value = component;
+        renderData.Add(CreateDataInstance(newChild, true));
     }
 
     public override void Render() {
         if (rootProperty == null) return;
-
-        shown = EditorGUILayout.Foldout(shown, FoldOutLabel);
-
+        EditorGUILayout.BeginVertical();
+        if (useFoldout) {
+            shown = EditorGUILayout.Foldout(shown, FoldOutLabel);
+        }
+        else {
+            shown = true;
+        }
         if (shown) {
-            var labelWidth = EditorGUIUtility.labelWidth;
             EditorGUI.indentLevel++;
             for (int i = 0; i < listRoot.ChildCount; i++) {
                 SerializedPropertyX child = listRoot.GetChildAt(i);
                 RenderListItem(child, i);
-                GUILayout.Space(5f);
             }
             EditorGUI.indentLevel--;
-            GUILayout.Space(20f);
-            EditorGUILayout.BeginHorizontal();
-            GUILayout.FlexibleSpace();
-            searchBox.Render();
-            GUILayout.FlexibleSpace();
-            EditorGUILayout.EndHorizontal();
+
+            if (searchBox != null) {
+                GUILayout.Space(5);
+                EditorGUILayout.BeginHorizontal();
+                GUILayout.FlexibleSpace();
+                searchBox.Render();
+                GUILayout.FlexibleSpace();
+                EditorGUILayout.EndHorizontal();
+            }
+
         }
+        EditorGUILayout.EndVertical();
+
     }
 
     protected void Swap(int index, int directon) {

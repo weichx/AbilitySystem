@@ -1,13 +1,11 @@
-﻿using System;
-
+﻿
 namespace Intelligence {
 
-    [Serializable]
-    public class MyDistanceToTarget : Consideration {
+    public class MyDistanceToTarget : Consideration<SingleTargetContext> {
 
         public float maxDistance;
 
-        public override float Score(Context context) {
+        public override float Score(SingleTargetContext context) {
             return 11;
         }
 

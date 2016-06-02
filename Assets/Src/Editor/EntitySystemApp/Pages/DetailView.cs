@@ -1,7 +1,7 @@
 ﻿using  UnityEngine;
 using System.Collections.Generic;
 
-public class DetailView<T> where T : EntitySystemBase {
+public class DetailView<T> where T : EntitySystemBase, new() {
 
     protected List<SectionBase<T>> sections;
     private Vector2 scrollPosition;
@@ -18,12 +18,14 @@ public class DetailView<T> where T : EntitySystemBase {
 
     public virtual void Render() {
         scrollPosition = GUILayout.BeginScrollView(scrollPosition);
+        GUILayout.BeginVertical();
         for (int i = 0; i < sections.Count; i++) {
             GUILayout.BeginVertical();
             sections[i].Render();
             GUILayout.Space(sections[i].Space);
             GUILayout.EndVertical();
         }
+        GUILayout.EndVertical();
         GUILayout.EndScrollView();
     }
 

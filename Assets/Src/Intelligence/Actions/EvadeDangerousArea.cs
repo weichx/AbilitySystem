@@ -1,8 +1,7 @@
-﻿using System;
-
+﻿
 namespace Intelligence {
-	[Serializable]
-	public class EvadeDangerousArea : CharacterAction<PointContext> {
+
+    public class EvadeDangerousArea : CharacterAction<PointContext> {
 
 	}
 

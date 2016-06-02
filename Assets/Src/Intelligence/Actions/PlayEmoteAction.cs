@@ -1,10 +1,8 @@
-﻿using System;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace Intelligence {
 	
-	[Serializable]
-	public class PlayEmote : CharacterAction<PointContext> {
+	public class PlayEmote : CharacterAction<SingleTargetContext> {
 		public GameObject emote;
 	}
 

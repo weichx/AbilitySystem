@@ -113,6 +113,8 @@ public class SerializedPropertyX {
 
     public void ApplyModifiedProperties(SerializedPropertyX parent) {
         Type fieldType = value == null ? type : value.GetType();
+        if (value == null) value = CreateValue(type);
+        if (value == null) return;
         for (int i = 0; i < children.Count; i++) {
             SerializedPropertyX child = children[i];
             child.ApplyModifiedProperties(this);
@@ -277,6 +279,10 @@ public class SerializedPropertyX {
         }
     }
 
+    public int GetChildIndex(SerializedPropertyX child) {
+        return children.IndexOf(child);
+    }
+
     public T GetValue<T>() {
         return (T)value;
     }
@@ -284,17 +290,16 @@ public class SerializedPropertyX {
     public object Value {
         get { return value; }
         set {
+            if (value == this.value) return;
+
             if (value != null) {
                 if (!type.IsAssignableFrom(value.GetType())) {
                     throw new Exception("Unable to assign " + value.GetType().Name + " to " + type.Name);
                 }
-                Type oldValueType = this.value == null ? null : this.value.GetType();
-                this.value = value;
-                BuildProperties(true);//oldValueType != value.GetType()););
             }
-            else {
-                BuildProperties(true);
-            }
+            Type oldValueType = this.value == null ? null : this.value.GetType();
+            this.value = value;
+            BuildProperties(true);
             Changed = value != originalValue;
         }
     }

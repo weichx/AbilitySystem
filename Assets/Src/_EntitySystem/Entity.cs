@@ -11,7 +11,7 @@ using System.Collections.Generic;
 
 [SelectionBase]
 [DisallowMultipleComponent]
-public class Entity : MonoBehaviour {
+public partial class Entity : MonoBehaviour {
 
     public string factionId;
 

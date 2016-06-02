@@ -47,7 +47,7 @@ namespace Intelligence {
                 if (bonus < cutoff) {
                     continue;
                 }
-				float score = decision.dse.Score(context, bonus, cutoff);
+				float score = decision.evaluator.Score(context, bonus, cutoff);
                 if (score > cutoff) {
                     cutoff = score;
                 }

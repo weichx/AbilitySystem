@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using UnityEditor;
 
-public class EvaluatorPage_NameSection : SectionBase<DecisionScoreEvaluator> {
+public class EvaluatorPage_NameSection : SectionBase<DecisionEvaluator> {
 
     public EvaluatorPage_NameSection(float spacing) : base(spacing) {}
 
@@ -12,9 +12,7 @@ public class EvaluatorPage_NameSection : SectionBase<DecisionScoreEvaluator> {
 		GUILayout.BeginVertical();
 		GUILayout.Space(20f);
 		float labelWidth = EditorGUIUtility.labelWidth;
-		EditorGUIUtility.labelWidth = 100f;
 		EditorGUILayoutX.PropertyField(nameProp, new GUIContent("Evaluator Name"), true);
-		EditorGUIUtility.labelWidth = labelWidth;
 		GUILayout.BeginHorizontal();
 		GUILayout.FlexibleSpace();
 		if (GUILayout.Button("Restore")) {

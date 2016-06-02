@@ -27,7 +27,9 @@ public class EntitySystemWindow : EditorWindow {
         CardStyle.border.bottom = 3;
         CardStyle.padding.top = 5;
         CardStyle.padding.bottom = 5;
-        CardStyle.padding.right = 5;
+        CardStyle.padding.right = 10;
+        CardStyle.margin.right = 10;
+        CardStyle.margin.bottom = 5;
         titleContent = new GUIContent("Entity Engine");
         string typeString = EditorPrefs.GetString("ESWindow.CurrentPage");
         if (typeString != null) {
@@ -38,8 +40,8 @@ public class EntitySystemWindow : EditorWindow {
                 case "StatusPage":
                     currentPage = new StatusPage();
                     break;
-                case "DecisionSetPage":
-                    currentPage = new DecisionSetPage();
+                case "DecisionPackagePage":
+                    currentPage = new DecisionPackagePage();
                     break;
                 case "EvaluatorPage":
                     currentPage = new EvaluatorPage();
@@ -71,7 +73,9 @@ public class EntitySystemWindow : EditorWindow {
     }
 
     public void OnGUI() {
-        EditorGUIUtility.wideMode = true;
+        EditorGUIUtility.labelWidth = 0;
+        EditorGUI.indentLevel = 0;
+        EditorGUIUtility.wideMode = position.width >= 400;
         Rect window = new Rect(0, 0, position.width, position.height)
             .ShrinkTopBottom(10f)
             .ShrinkLeftRight(20f);
@@ -101,8 +105,8 @@ public class EntitySystemWindow : EditorWindow {
             currentPage = new StatusPage();
             currentPage.OnEnter();
         }
-        else if (GUI.Button(d, "Decision Sets", GetStyle(typeof(DecisionSetPage)))) {
-            currentPage = new DecisionSetPage();
+        else if (GUI.Button(d, "Decision Packages", GetStyle(typeof(DecisionPackagePage)))) {
+            currentPage = new DecisionPackagePage();
             currentPage.OnEnter();
         }
         else if (GUI.Button(d, "Decision Evaluators", GetStyle(typeof(EvaluatorPage)))) {

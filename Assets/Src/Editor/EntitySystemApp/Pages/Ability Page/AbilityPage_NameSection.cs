@@ -14,10 +14,7 @@ public class AbilityPage_NameSection : SectionBase<Ability> {
 
         GUILayout.BeginVertical();
         GUILayout.Space(20f);
-        float labelWidth = EditorGUIUtility.labelWidth;
-        EditorGUIUtility.labelWidth = 100f;
         EditorGUILayoutX.PropertyField(id, new GUIContent("Ability Name"), true);
-        EditorGUIUtility.labelWidth = labelWidth;
         GUILayout.BeginHorizontal();
         GUILayout.FlexibleSpace();
         if (GUILayout.Button("Restore")) {

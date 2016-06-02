@@ -5,7 +5,6 @@ using System.Collections.Generic;
 public enum ResponseCurveType {
     Constant,
     Polynomial,
-    InversePolynomial,
     Logistic,
     Logit,
     Threshold,
@@ -66,10 +65,6 @@ public class ResponseCurve : ICloneable {
             case ResponseCurveType.Sin: //sin(m * (x + c) ^ K + b
                 output = (Mathf.Sin((2 * Mathf.PI * slope) * Mathf.Pow(input + (hShift - 0.5f), exp)) * 0.5f) + vShift + 0.5f;
                 break;
-            case ResponseCurveType.InversePolynomial:
-                output = slope * (Mathf.Pow((input - hShift), exp)) + vShift;
-                output = slope * (Mathf.Pow((output - hShift), exp)) + vShift;
-                break;
             case ResponseCurveType.Parabolic:
                 output = Mathf.Pow(slope * (input + hShift), 2) + (exp * (input + hShift)) + vShift;
                 break;
@@ -78,6 +73,9 @@ public class ResponseCurve : ICloneable {
                 break;
             case ResponseCurveType.NormalDistribution: // y = K / sqrt(2 * PI) * 2^-(1/m * (x - c)^2) + b
                 output = (exp / (Mathf.Sqrt(2 * Mathf.PI))) * Mathf.Pow(2.0f, (-(1.0f / (Mathf.Abs(slope) * 0.01f)) * Mathf.Pow(input - (hShift + 0.5f), 2.0f))) + vShift;
+                break;
+            case ResponseCurveType.Threshold:
+                output = input > hShift ? (1.0f - vShift) : (0.0f - (1.0f - slope));
                 break;
             default:
                 throw new Exception(curveType + " curve has not been implemented yet");

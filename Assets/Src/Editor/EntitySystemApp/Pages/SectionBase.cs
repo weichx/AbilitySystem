@@ -1,22 +1,25 @@
-﻿using UnityEditor;
-
-public abstract class SectionBase<T> where T : EntitySystemBase {
+﻿
+public abstract class SectionBase<T> where T : EntitySystemBase, new() {
 
 	protected AssetItem<T> targetItem;
-	protected SerializedObjectX rootProperty;
+	protected SerializedPropertyX rootProperty;
     protected float space;
 
-    public SectionBase(float spacing) {
+    public SectionBase(float spacing = 0f) {
         space = spacing;
     }
 
-	public virtual void SetTargetObject(AssetItem<T> targetItem) {
+	public void SetTargetObject(AssetItem<T> targetItem) {
         this.targetItem = targetItem;
-        if (targetItem == null) {
-            rootProperty = null;
-            return;
+	    if (targetItem != null) {
+	        SetTargetProperty(targetItem.SerialObjectX.Root);
+	    } else {
+            SetTargetProperty(null);
         }
-	    rootProperty = targetItem.SerialObjectX;
+    }
+
+    public virtual void SetTargetProperty(SerializedPropertyX rootProperty) {
+        this.rootProperty = rootProperty;
     }
 
     public abstract void Render();

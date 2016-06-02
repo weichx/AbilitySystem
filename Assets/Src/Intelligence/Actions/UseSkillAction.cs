@@ -1,9 +1,6 @@
-﻿using System;
-using UnityEngine;
-
+﻿
 namespace Intelligence {
 
-	[Serializable]
 	public class UseSkillAction : CharacterAction<Context> {
 
 		public AbilityCreator abilityCreator;

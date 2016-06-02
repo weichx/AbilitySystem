@@ -14,10 +14,7 @@ public class StatusPage_NameSection : SectionBase<StatusEffect> {
 
         GUILayout.BeginVertical();
         GUILayout.Space(20f);
-        float labelWidth = EditorGUIUtility.labelWidth;
-        EditorGUIUtility.labelWidth = 100f;
         EditorGUILayoutX.PropertyField(id, new GUIContent("Status Effect Name"), true);
-        EditorGUIUtility.labelWidth = labelWidth;
         GUILayout.BeginHorizontal();
         GUILayout.FlexibleSpace();
         if (GUILayout.Button("Restore")) {

@@ -13,13 +13,9 @@ public abstract class Page {
     public abstract string GetActiveItemId();
 }
 
-public abstract class Page<T> : Page where T : EntitySystemBase {
+public abstract class Page<T> : Page where T : EntitySystemBase, new() {
 
     protected AssetItem<T> activeItem;
-
-    public AssetItem<T> ActiveItem {
-        get { return activeItem; }
-    }
 
     public override string GetActiveItemId() {
         if (activeItem == null) return "";
@@ -40,14 +36,14 @@ public abstract class Page<T> : Page where T : EntitySystemBase {
 
 }
 
-public abstract class MasterDetailPage<T> : Page<T> where T : EntitySystemBase {
+public abstract class MasterDetailPage<T> : Page<T> where T : EntitySystemBase, new() {
 
 
-    protected MasterView2<T> masterView;
+    protected MasterView<T> masterView;
     protected DetailView<T> detailView;
 
     public MasterDetailPage() {
-        masterView = new MasterView2<T>(SetActiveItem);
+        masterView = new MasterView<T>(SetActiveItem);
         detailView = new DetailView<T>();
     }
 

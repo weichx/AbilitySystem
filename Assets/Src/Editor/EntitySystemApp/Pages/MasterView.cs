@@ -4,28 +4,26 @@ using UnityEngine;
 using UnityEditor;
 using System.Collections.Generic;
 
-public class MasterView<T, U> where T : AssetItem<U> where U : EntitySystemBase {
+public class MasterView<T> where T : EntitySystemBase, new() {
 
     protected string searchString;
     protected string assetQuery;
     protected Vector2 scrollPosition;
-    protected List<T> itemList;
-    protected List<T> filteredList;
-    protected Action<T> SetActiveItem;
+    protected List<AssetItem<T>> itemList;
+    protected List<AssetItem<T>> filteredList;
+    protected Action<AssetItem<T>> SetActiveItem;
+    protected string NewButtonText;
 
-    public MasterView(Action<T> onItemSelected, string assetQuery = null) {
+    public MasterView(Action<AssetItem<T>> onItemSelected) {
         SetActiveItem = onItemSelected;
-        this.assetQuery = assetQuery ?? "t:" + typeof(U).Name + "Creator";
+        assetQuery = "t:" + typeof(T).Name + "Creator";
         searchString = "";
-        itemList = new List<T>();
+        itemList = new List<AssetItem<T>>();
         LoadFiles();
+        NewButtonText = "New " + Util.SplitAndTitlize(typeof(T).Name);
     }
 
-    protected virtual string NewButtonText {
-        get { return "New " + typeof(U).Name; }
-    }
-
-    public void AddItem(T item) {
+    public void AddItem(AssetItem<T> item) {
         if (itemList.Contains(item)) return;
         itemList.Add(item);
         if (!string.IsNullOrEmpty(searchString)) {
@@ -44,7 +42,7 @@ public class MasterView<T, U> where T : AssetItem<U> where U : EntitySystemBase 
         }
     }
 
-    public void RemoveItem(T item) {
+    public void RemoveItem(AssetItem<T> item) {
         itemList.Remove(item);
         if (filteredList != null) {
             filteredList.Remove(item);
@@ -64,10 +62,11 @@ public class MasterView<T, U> where T : AssetItem<U> where U : EntitySystemBase 
         GUIStyle listStyle = new GUIStyle(GUI.skin.box) {
             margin = new RectOffset() { top = 3 }
         };
+        //todo use icon or something
         scrollPosition = GUILayout.BeginScrollView(scrollPosition);
         Color original = GUI.backgroundColor;
         for (int i = 0; i < filteredList.Count; i++) {
-            T item = filteredList[i];
+            AssetItem<T> item = filteredList[i];
             GUI.backgroundColor = item.IsSelected ? Color.green : original;
             if (GUILayout.Button(filteredList[i].Name, listStyle, GUILayout.ExpandWidth(true))) {
                 if (SetActiveItem != null) {
@@ -109,13 +108,13 @@ public class MasterView<T, U> where T : AssetItem<U> where U : EntitySystemBase 
     }
 
     protected virtual void CreateNewItem() {
-        Type creatorType = typeof(EntitySystemBase).Assembly.GetType(typeof(U).Name + "Creator");
+        Type creatorType = typeof(EntitySystemBase).Assembly.GetType(typeof(T).Name + "Creator");
         if (creatorType == null) {
-            Debug.LogError("Cant find creator type: " + typeof(U).Name + "Creator");
+            Debug.LogError("Cant find creator type: " + typeof(T).Name + "Creator");
             return;
         }
 
-        string titlizedName = Util.SplitAndTitlize(typeof(U).Name);
+        string titlizedName = Util.SplitAndTitlize(typeof(T).Name);
         string assetpath = "Assets/Entity System/" + titlizedName + "/" + titlizedName + ".asset";
         if (!Directory.Exists(Application.dataPath + "/Entity System/")) {
             Directory.CreateDirectory(Application.dataPath + "/Assets/Entity System/");
@@ -124,33 +123,31 @@ public class MasterView<T, U> where T : AssetItem<U> where U : EntitySystemBase 
             Directory.CreateDirectory(Application.dataPath + "/Entity System/" + titlizedName + "/");
         }
 
-        AssetCreator asset = ScriptableObject.CreateInstance(creatorType) as AssetCreator;
+        AssetCreator<T> assetCreator = ScriptableObject.CreateInstance(creatorType) as AssetCreator<T>;
         string assetPathAndName = AssetDatabase.GenerateUniqueAssetPath(assetpath);
-        U instance = Activator.CreateInstance<U>();
+        T instance = Activator.CreateInstance<T>();
         instance.Id = Path.GetFileNameWithoutExtension(assetPathAndName);
-
-        AssetSerializer serializer = new AssetSerializer();
-        serializer.AddItem(instance);
-        asset.source = serializer.WriteToString();
-        AssetDatabase.CreateAsset(asset, assetPathAndName);
+        assetCreator.SetSourceAsset(instance);
+        AssetDatabase.CreateAsset(assetCreator, assetPathAndName);
         AssetDatabase.SaveAssets();
         AssetDatabase.Refresh();
 
-        AssetCreator creator = AssetDatabase.LoadAssetAtPath<AssetCreator>(assetPathAndName);
-        itemList.Add(Activator.CreateInstance(typeof(T), new object[] { creator }) as T);
+        string guid = AssetDatabase.AssetPathToGUID(assetPathAndName);
+        itemList.Add(new AssetItem<T>(guid));
         if (SetActiveItem != null) {
             SetActiveItem(itemList.Last());
         }
     }
 
     protected virtual void LoadFiles() {
-        Type creatorType = typeof(EntitySystemBase).Assembly.GetType(typeof(U).Name + "Creator");
+        Type creatorType = typeof(EntitySystemBase).Assembly.GetType(typeof(T).Name + "Creator");
         string[] guids = AssetDatabase.FindAssets(assetQuery);
 
         for (int i = 0; i < guids.Length; i++) {
             string assetpath = AssetDatabase.GUIDToAssetPath(guids[i]);
-            AssetCreator creator = AssetDatabase.LoadAssetAtPath(assetpath, creatorType) as AssetCreator;
-            itemList.Add(Activator.CreateInstance(typeof(T), new object[] { creator }) as T);
+            //AssetCreator creator = AssetDatabase.LoadAssetAtPath(assetpath, creatorType) as AssetCreator;
+            string guid = AssetDatabase.AssetPathToGUID(assetpath);
+            itemList.Add(new AssetItem<T>(guid));
         }
     }
 

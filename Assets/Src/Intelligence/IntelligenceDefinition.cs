@@ -8,7 +8,7 @@ namespace Intelligence {
     public class IntelligenceDefinition {
 
         public readonly Entity entity;
-        public DecisionSet skillset;
+        public DecisionPackage skillset;
        // public DecisionMaker decisionMaker;
         public string preferences; //placeholder
 
