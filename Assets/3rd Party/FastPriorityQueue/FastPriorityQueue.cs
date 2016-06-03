@@ -52,6 +52,7 @@ namespace Priority_Queue {
         public void Clear() {
             Array.Clear(_nodes, 1, _numNodes);
             _numNodes = 0;
+            _numNodesEverEnqueued = 0;
         }
 
         /// <summary>

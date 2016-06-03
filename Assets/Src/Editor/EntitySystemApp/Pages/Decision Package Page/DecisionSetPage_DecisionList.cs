@@ -18,7 +18,6 @@ public class DecisionSetPage_DecisionList : ListSection<DecisionPackage> {
         public List<DecisionEvaluatorCreator> evaluatorCreators;
         public List<Type> contextCollectorTypes;
         public int contextCollectorIndex;
-        public int evaluatorIndex;
         public EvaluatorPage_ConsiderationSection considerationSection;
         public EvaluatorPage_RequirementSection requirementSection;
 
@@ -61,6 +60,7 @@ public class DecisionSetPage_DecisionList : ListSection<DecisionPackage> {
         }
 
         public void GetContextCollectorData(CharacterAction action, ContextCollector collector) {
+            SetupCollectorTypes(action);
             contextCollectorIndex = 0;
             if (collector != null) {
                 Type collectorType = collector.GetType();
@@ -70,7 +70,10 @@ public class DecisionSetPage_DecisionList : ListSection<DecisionPackage> {
                         break;
                     }
                 }
-            }
+            }            
+        }
+
+        private void SetupCollectorTypes(CharacterAction action) {
             if (contextCollectorTypes != null) return;
             contextCollectorTypes = Reflector.FindSubClasses(typeof(ContextCollector<>));
             var genType = typeof(ContextCollector<>);

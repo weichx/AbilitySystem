@@ -28,12 +28,13 @@ public class DecisionEvaluator : EntitySystemBase {
         float finalScore = 1 + bonus;
         float modFactor = 1f - (1f / considerations.Count);
         for (int i = 0; i < requirements.Count; i++) {
-            if (!requirements[i].Check(context)) {
+            if (requirements[i] != null && !requirements[i].Check(context)) {
                 return 0;
             }
         }
+
         for (int i = 0; i < considerations.Count; i++) {
-            if (finalScore > 0 || finalScore < cutoff) {
+            if (finalScore < 0 || finalScore < cutoff) {
                 finalScore = 0;
                 break;
             }
@@ -43,6 +44,7 @@ public class DecisionEvaluator : EntitySystemBase {
             float total = response + (makeUpValue * response);
             finalScore *= Mathf.Clamp01(total);
         }
+        Debug.Log(finalScore);
         return finalScore;
     }
 

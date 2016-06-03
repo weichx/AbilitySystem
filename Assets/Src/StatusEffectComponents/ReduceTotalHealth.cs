@@ -31,7 +31,7 @@ public class ReduceTotalHealth : StatusEffectComponent {
         public override void OnEffectApplied() {
             health = target.resourceManager.GetResource("Health");
             if (health != null && reduceByPercent > 0) {
-                initialValue = health.Max;
+                initialValue = health.Max.Value;
                 reduceByPercent = Mathf.Clamp01(reduceByPercent);
                 health.AddWatcher(MaybeStopDraining);
             }

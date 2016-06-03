@@ -6,12 +6,10 @@ using System.Collections.Generic;
 
 public class AbilityPage_ContextSection : SectionBase<Ability> {
 
-	private bool shown;
 	private List<Type> contextTypeList;
 	private string[] contextTypeNames;
     
 	public AbilityPage_ContextSection(float spacing) : base(spacing) {
-		shown = true;
 		contextTypeList = Reflector.FindSubClasses<Context>(true);
 		contextTypeNames = new string[contextTypeList.Count];
 		for(int i = 0; i < contextTypeList.Count; i++) {

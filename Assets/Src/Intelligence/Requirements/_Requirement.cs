@@ -9,6 +9,8 @@ namespace Intelligence {
 
 	    internal Requirement() {}
 
+	    public virtual void Initialize() {}
+
 	    public abstract bool Check(Context context);
 
 	    public virtual Type GetContextType() {

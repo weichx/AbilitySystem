@@ -297,7 +297,6 @@ public class SerializedPropertyX {
                     throw new Exception("Unable to assign " + value.GetType().Name + " to " + type.Name);
                 }
             }
-            Type oldValueType = this.value == null ? null : this.value.GetType();
             this.value = value;
             BuildProperties(true);
             Changed = value != originalValue;

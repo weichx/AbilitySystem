@@ -140,12 +140,10 @@ public class MasterView<T> where T : EntitySystemBase, new() {
     }
 
     protected virtual void LoadFiles() {
-        Type creatorType = typeof(EntitySystemBase).Assembly.GetType(typeof(T).Name + "Creator");
         string[] guids = AssetDatabase.FindAssets(assetQuery);
 
         for (int i = 0; i < guids.Length; i++) {
             string assetpath = AssetDatabase.GUIDToAssetPath(guids[i]);
-            //AssetCreator creator = AssetDatabase.LoadAssetAtPath(assetpath, creatorType) as AssetCreator;
             string guid = AssetDatabase.AssetPathToGUID(assetpath);
             itemList.Add(new AssetItem<T>(guid));
         }

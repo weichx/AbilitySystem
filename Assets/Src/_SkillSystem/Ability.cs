@@ -17,9 +17,9 @@ public partial class Ability : EntitySystemBase {
     public Texture2D icon;
     [NonSerialized]public AbilityContextCreator contextCreator;
 
-    public FloatAttribute castTime;
-    public FloatAttribute channelTime;
-    public IntAttribute channelTicks;
+    public FloatRange castTime;
+    public FloatRange channelTime;
+    public IntRange channelTicks;
 
     public List<AbilityRequirement> requirements;
     public List<AbilityComponent> components;
@@ -43,10 +43,10 @@ public partial class Ability : EntitySystemBase {
        // attributes = new Dictionary<string, object>();
         components = new List<AbilityComponent>();
         requirements = new List<AbilityRequirement>();
-        castTime = new FloatAttribute(1f);
+        castTime = new FloatRange(1f);
         castMode = CastMode.Cast;
-        channelTicks = new IntAttribute(3);
-        channelTime = new FloatAttribute(3f);
+        channelTicks = new IntRange(3);
+        channelTime = new FloatRange(3f);
         castTimer = new Timer();
         channelTimer = new Timer();
     }

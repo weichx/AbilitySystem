@@ -12,7 +12,6 @@ public static class EditorGUILayoutX {
     public static void DrawProperties(SerializedPropertyX root) {
         for (int i = 0; i < root.ChildCount; i++) {
             SerializedPropertyX property = root.GetChildAt(i);
-            bool isExpanded = property.isExpanded;
             PropertyField(property, property.label, property.isExpanded);
         }
     }
@@ -47,7 +46,6 @@ public static class EditorGUILayoutX {
             property.isExpanded = EditorGUILayout.Foldout(property.isExpanded, label.text);
             if (property.isExpanded) {
                 EditorGUI.indentLevel++;
-                int size = property.ArraySize;
                 property.ArraySize = EditorGUILayout.IntField(new GUIContent("Size"), property.ArraySize);
                 for (int i = 0; i < property.ArraySize; i++) {
                     SerializedPropertyX child = property.GetChildAt(i);

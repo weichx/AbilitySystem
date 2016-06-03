@@ -9,7 +9,7 @@ public class StatusEffect : EntitySystemBase {
 
     public Texture2D icon;
     public StatusState state;
-    public FloatAttribute duration;
+    public FloatRange duration;
     public TagCollection tags;
     public bool IsExpirable;
     public bool IsDispellable;
@@ -22,14 +22,14 @@ public class StatusEffect : EntitySystemBase {
     protected Timer timer;
     public OldContext context;
 
-    public FloatAttribute tickRate;
-    public FloatAttribute ticks;
+    public FloatRange tickRate;
+    public FloatRange ticks;
 
     public StatusEffect() {
         state = StatusState.Invalid;
         components = new List<StatusEffectComponent>();
         tags = new TagCollection();
-        duration = new FloatAttribute();
+        duration = new FloatRange();
         timer = new Timer();//can probably get rid of timer and just duration as a variable
     }
 

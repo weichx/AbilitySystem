@@ -9,7 +9,7 @@ public class CastSpeedModifier : AbilityModifier {
     }
 
     public override void OnApply(Ability ability) {
-        ability.castTime.SetPercentBonus(id, -power);
+        ability.castTime.SetModifier(id, FloatModifier.Percent(-power));
     }
 
     public override void OnRemove(Ability ability) {

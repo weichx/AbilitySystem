@@ -3,7 +3,7 @@
     public StatusEffectComponent[] additionalComponents;
     public OldContext context;
     public string[] tags;
-    public FloatAttribute duration;
+    public FloatRange duration;
 
     public virtual StatusEffect Create(Entity target) {
         StatusEffect statusEffect = EntitySystemLoader.Instance.Create<StatusEffect>(statusEffectId);

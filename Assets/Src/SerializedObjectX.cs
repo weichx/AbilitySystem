@@ -31,7 +31,6 @@ public class SerializedObjectX {
             property.ApplyModifiedProperties(rootProperty);
             type.GetField(property.name, BindFlags).SetValue(root, property.Value);
         }
-        int z = -1;
     }
 
     public SerializedPropertyX GetChildAt(int idx) {

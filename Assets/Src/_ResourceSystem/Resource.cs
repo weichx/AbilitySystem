@@ -6,19 +6,19 @@ using System.Collections.Generic;
 ///Responsible for things like armor, essentially a pipeline of adjustments just like modifiers
 ///might have one to take double damage or half damage or negate armor or double xp rate etc.
 ///</summary>
-public class Resource : FloatAttribute {
+public class Resource : FloatRange {
     
     public string resourceId; //todo depricate this
     [NonSerialized] protected Action<float, float> watchers;
 
     protected List<ResourceAdjuster> adjusters;
     public TagCollection tags;
-	public FloatAttribute regenerationRate;
+	public FloatRange regenerationRate;
 
     public Resource() : base() {
         adjusters = new List<ResourceAdjuster>();
         watchers = delegate (float a, float b) { };
-		regenerationRate = new FloatAttribute();
+		regenerationRate = new FloatRange();
     }
 
 	public virtual void Tick() {
@@ -61,7 +61,7 @@ public class Resource : FloatAttribute {
             adjustedValue += adjusters[i].Adjust(amount, this, context);
         }
         currentValue += adjustedValue;
-        currentValue = Mathf.Clamp(currentValue, float.MinValue, baseTotal);
+        //currentValue = Mathf.Clamp(currentValue, float.MinValue, baseTotal);
     }
 
     public void Decrease(float amount, OldContext context) {
@@ -73,11 +73,11 @@ public class Resource : FloatAttribute {
     }
 
     public void IncreaseNormalized(float amount, OldContext context) {
-        Increase(Mathf.Clamp01(amount / baseTotal), context);
+        //Increase(Mathf.Clamp01(amount / baseTotal), context);
     }
 
     public void DecreaseNormalized(float amount, OldContext context) {
-        Decrease(Mathf.Clamp01(amount / baseTotal), context);
+       // Decrease(Mathf.Clamp01(amount / baseTotal), context);
     }
 
     public void AddWatcher(Action<float, float> watcher) {

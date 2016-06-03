@@ -86,6 +86,9 @@ public class EvaluatorPage_ConsiderationSection : ListSection<DecisionEvaluator>
         ResponseCurve curve = curveProperty.GetValue<ResponseCurve>();
         bool updateTexture = false;
         Texture2D graphTexture = data.graphTexture;
+        if (graphTexture == null) {
+            data.graphTexture = new Texture2D(1, 1, TextureFormat.RGBA32, true);
+        }
         EditorGUILayout.BeginHorizontal();
         data.isCurveShown = EditorGUILayout.Foldout(data.isCurveShown, "Curve(" + curve.curveType.ToString() + ")");
         if (!data.isCurveShown) {

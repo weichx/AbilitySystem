@@ -6,11 +6,11 @@ using UnityEngine;
 public class Charge {
 
     private float lastUsed;
-    public FloatAttribute cooldown;
+    public FloatRange cooldown;
     //todo this might also be responsible for cast time / channel time / tick time
 
     public Charge() {
-        cooldown = new FloatAttribute();
+        cooldown = new FloatRange();
         lastUsed = -1;
     }
 

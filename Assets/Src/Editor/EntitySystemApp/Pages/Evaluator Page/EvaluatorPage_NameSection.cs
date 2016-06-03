@@ -11,7 +11,6 @@ public class EvaluatorPage_NameSection : SectionBase<DecisionEvaluator> {
 		GUILayout.BeginHorizontal();
 		GUILayout.BeginVertical();
 		GUILayout.Space(20f);
-		float labelWidth = EditorGUIUtility.labelWidth;
 		EditorGUILayoutX.PropertyField(nameProp, new GUIContent("Evaluator Name"), true);
 		GUILayout.BeginHorizontal();
 		GUILayout.FlexibleSpace();

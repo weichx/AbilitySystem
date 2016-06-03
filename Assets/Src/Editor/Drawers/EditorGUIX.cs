@@ -29,10 +29,9 @@ public static class EditorGUIX {
 
     private static int z;
     private static void PropertyFieldExtendedValue(Rect position, SerializedPropertyX property, GUIContent label = null, GUIStyle style = null) {
-        object newValue;
         Type type = property.type;
         if (type.IsSubclassOf(typeof(UnityEngine.Object))) {
-            newValue = EditorGUI.ObjectField(position, label, (UnityEngine.Object)property.Value, type, true);
+            property.Value = EditorGUI.ObjectField(position, label, (UnityEngine.Object)property.Value, type, true);
         }
         else if (type.IsArray) {
             if (property.Value == null) {

@@ -4,7 +4,7 @@ using UnityEngine;
 [Serializable]
 public class RangeRequirement : AbilityRequirement {
 
-    public FloatAttribute range;
+    public FloatRange range;
 
     public override bool OnTest(OldContext context, RequirementType type) {
         var target = context.Get<Entity>("Target");

@@ -1,5 +1,7 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using System.Collections.Generic;
+using Intelligence;
 
 //todo -- this is a log of every action an entity has taken
 //entries are in a circular buffer. this class provies
@@ -14,6 +16,8 @@ using System.Collections.Generic;
 public partial class Entity : MonoBehaviour {
 
     public string factionId;
+    //temp
+    [NonSerialized] public List<Vector3> vectors = new List<Vector3>();
 
     [HideInInspector]
     public string id;
@@ -29,11 +33,23 @@ public partial class Entity : MonoBehaviour {
     private Vector3 lastPosition;
     private bool movedThisFrame = false;
 	protected EventEmitter emitter;
-    [SerializeField]
-    private string templatePath;
 
+    [NonSerialized] public Dictionary<string, object> blackboard = new Dictionary<string, object>();
+
+    //todo move into different file as part of parital class
+    public FloatRange attr;
+    public FloatRange attr2;
 	//handle progression of entity, attributes, and resources
     public void Awake() {
+        attr = new FloatRange(0);
+        attr.SetModifier("Mod1", FloatModifier.Value(1));
+        attr.SetModifier("Mod2", FloatModifier.Value(3));
+        attr.SetModifier("Mod3", FloatModifier.Value(6));
+        attr2 = new FloatRange(0);
+        attr2.SetModifier("Mod1", FloatModifier.Value(5));
+        attr2.SetModifier("Mod2", FloatModifier.Percent(0.2f));
+        attr2.SetModifier("Mod3", FloatModifier.Value(5));
+
         resourceManager = new ResourceManager(this);
         statusManager = new StatusEffectManager(this);
         abilityManager = new AbilityManager(this);
@@ -53,7 +69,9 @@ public partial class Entity : MonoBehaviour {
         if (resourceManager != null) {
             //resourceManager.Update();
         }
-		emitter.FlushQueue();
+        if (emitter != null) {
+            emitter.FlushQueue();
+        }
     }
 
     public void LateUpdate() {

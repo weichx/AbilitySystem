@@ -9,7 +9,6 @@ using UnityEditor;
 
 [SelectionBase]
 public class AIEntity : Entity {
-    public string behaviorPath;
     [HideInInspector] public NavMeshAgent agent;
 
     private InfluenceMapSection iMapSection;
@@ -18,21 +17,21 @@ public class AIEntity : Entity {
 
     public void Start() {
 
-        agent = GetComponent<NavMeshAgent>();
-        iMapSection = new InfluenceMapSection(9 * 9);
+        //agent = GetComponent<NavMeshAgent>();
+        //iMapSection = new InfluenceMapSection(9 * 9);
 
-        if (nameplate != null) {
-            GameObject np = Instantiate(nameplate) as GameObject;
-            np.GetComponent<Nameplate>().Initialize(this);
-            //todo handle entity being destroyed
-        }
+        //if (nameplate != null) {
+        //    GameObject np = Instantiate(nameplate) as GameObject;
+        //    np.GetComponent<Nameplate>().Initialize(this);
+        //    todo handle entity being destroyed
+        //}
     }
 
     public override void Update() {
         base.Update();
      
 
-        iMapSection = InfluenceMapManager.Instance.UpdatePhysicalInfluence(transform.position, iMapSection);
+       // iMapSection = InfluenceMapManager.Instance.UpdatePhysicalInfluence(transform.position, iMapSection);
         if (agent != null) {
             agent.speed = 5;// movementSpeed.Current;
         }

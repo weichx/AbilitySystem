@@ -22,10 +22,16 @@ public class EvaluatorPage_RequirementSection : ListSection<DecisionEvaluator> {
         if (rootProperty == null) return null;
         Type targetType = rootProperty["contextType"].GetValue<Type>();
         Type baseType = typeof(Requirement);
-        Type genType = baseType.MakeGenericType(new Type[] { targetType });
+        Type compareType = null;
+        if (targetType.IsGenericType) {
+            compareType = baseType.MakeGenericType(new Type[] { targetType });
+        } else {
+            compareType = baseType;
+        }
+        
         var searchSet = Reflector.FindSubClasses(typeof(Requirement));
         searchSet = searchSet.FindAll((requirementType) => {
-            return genType.IsAssignableFrom(requirementType);
+            return compareType.IsAssignableFrom(requirementType);
         });
         return new SearchBox(null, searchSet, AddListItem, "Add Requirement", "Requirements");
     }

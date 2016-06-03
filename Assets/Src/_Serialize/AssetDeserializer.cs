@@ -185,6 +185,7 @@ public class AssetDeserializer : IReader {
 
             TypeReadResult currentContext = context;
             object retn;
+            if (result.type == null) return null;
             if (result.type.IsArray) {
                 //todo save this object [] and just set [0] = fieldCount
                 retn = Activator.CreateInstance(result.type, new object[] { result.fields.Length });

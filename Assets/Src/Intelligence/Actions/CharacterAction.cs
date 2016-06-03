@@ -9,8 +9,12 @@ namespace Intelligence {
     public abstract class CharacterAction {
 
         protected Entity entity;
+        private Context context;
 
-        public abstract void Setup(Context context);
+        public virtual void Setup(Context context) {
+            this.context = context;
+            entity = context.entity;
+        }
 
         public virtual void OnStart() { }
 
@@ -24,7 +28,9 @@ namespace Intelligence {
 
         public virtual void OnComplete() {}
 
-        public abstract Type ContextType { get; }
+        public virtual Type ContextType {
+            get { return typeof(Context); } 
+        }
 
     }
 
@@ -35,6 +41,7 @@ namespace Intelligence {
         public override void Setup(Context context) {
             this.context = context as T;
             entity = context.entity;
+            OnStart();
         }
 
         public override Type ContextType {
