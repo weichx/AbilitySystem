@@ -1,15 +1,12 @@
 ﻿using System;
 using UnityEngine;
 using System.Collections.Generic;
-using Intelligence;
 
-//todo -- this is a log of every action an entity has taken
-//entries are in a circular buffer. this class provies
-//methods to query and log any action taken by this entity
-//public class EntityActionLog<T> where T : class {
 
-//}
-
+///<summary>
+/// Entity the root of the system, any game object that interacts with
+/// Abilities, Status Effects, or AI needs to have an entity component
+/// </summary>
 
 [SelectionBase]
 [DisallowMultipleComponent]
@@ -34,9 +31,10 @@ public partial class Entity : MonoBehaviour {
     private bool movedThisFrame = false;
 	protected EventEmitter emitter;
 
+    //temp -- move to AI
     [NonSerialized] public Dictionary<string, object> blackboard = new Dictionary<string, object>();
 
-    //todo move into different file as part of parital class
+    //temp
     public FloatRange attr;
     public FloatRange attr2;
 	//handle progression of entity, attributes, and resources
@@ -78,21 +76,6 @@ public partial class Entity : MonoBehaviour {
         movedThisFrame = lastPosition != transform.position;
     }
 
-//    #region Attributes
-//
-//    public FloatAttribute GetAttribute(string attrName) {
-//        return attributes.Get(attrName);
-//    }
-//
-//    public void SetAttribute(string attrName, FloatAttribute attr) {
-//        attributes[attrName] = attr;
-//    }
-//
-//    public bool HasAttribute(string propertyName) {
-//        return attributes.ContainsKey(propertyName);
-//    }
-//    #endregion
-
     #region Properties
 
     public bool IsMoving {
@@ -122,70 +105,3 @@ public partial class Entity : MonoBehaviour {
 	}
     #endregion
 }
-
-//figure out how to use formulas nicely, ie assign in editor (prefab reference? scriptable object? reflection? nothing?)
-
-//abilityManager.Get("BackStab").RemoveRequirement<Behind>();
-/*
-    var backstab = abilityManager.Get("BackStab");
-    var behind = backstab.RemoveRequirement<Behind>();
-    backstab.OnNextUse(() => {
-        backstab.AddRequirement(behind);
-    });
-    entity.OnAbilityUsed("AbilityId", (Ability ability) => {) {
-            if(Abilty.hasTag("tag")) {
-                //re-enable requirement
-            }
-        });
-    }
-
-    ability.GetAttribute<Damage>(out dmgAttr);
-    ability.GetAttribute("Damage")();
-
-    ability.GetAffectedTargets(); //array of all targets effected by this ability, ability implementations are expected to append to this list or mabye return it from onCompleted
-
-    entity.OnAbilityUsed((ability) => {
-        resourceRequirements = ability.GetRequirements<ResourceRequirement>();
-        resourceRequirements.ForEach((requirement) => {
-            entity.resourceManager.useResources(requirement.Type, requirement.Value);
-        });
-    });
-
-    //ability.OnCompleted() -> get snapshots here
-    //entity.AbilityUsed(); -> adjust attributes / modifiers here
-
-    entity.OnAbilityWithTagUsed(tagCollection, (usedAbility) => {
-        
-    });
-
-    //need to be able to assign different formulas to the same prototypes
-    //need to handle case where many targets are affected and all of them differently (like chain lightning)
-    //attributes can handle lots of things and are really really flexible, i can use attributes to 
-    //add `jumps` to chain lighting or all sorts of other things like # of targets to heal.
-    //an ability can be given multiple attributes that specific to it without effecting other attributes.
-    //this can be done in a type safe way too!
-
-    class Viscious : Status {
-        OnApplied() {
-            entity.OnAbilityUsedWithTag(tagCollection, () => {
-                entity.status.RemoveStack(this, 1);
-                ability.GetAttribute<Damage>().Value
-                ability.GetAttribute<Healing>().Value
-                ability.GetAttribute<ManaHeal>().Value
-                ability.SetAttribute<Damage>(new Damage() | value);
-                target.resourceManager.useResource<Health>(ability.GetAttribute<Damage>());
-            }, AbilityCallback.Once);
-        }
-
-        void Update() {
-        
-        }
-    }
-
-    resourceManager.OnResourceExpended<Health>(() => {});
-    resourceManager.OnResourceBelowThreshold<Health>(value | () => {}, () => {});
-
-    option 1: ability controls raw damage amount (before resist / armor / whatever)
-    option 2: spawned 'thing' controls damage (but I dont know always want a spawned thing if just playing animation for melee attacks)
-    option 3: add ability.GetAttributeSnapshot<Damage>() to get values at time of cast completed
-*/

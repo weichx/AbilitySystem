@@ -1,6 +1,9 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
 
+///<summary>
+///A modifiable variable that is bounded by a modifiable min and max 
+///</summary>
 public class FloatRange {
 
     [SerializeField] protected List<FloatModifier> modifiers;

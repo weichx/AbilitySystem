@@ -75,7 +75,7 @@ public static class EditorGUIX {
         }
         else if (type.IsEnum) {
             if (style == null) style = EditorStyles.popup; //todo unity default is popup field
-            property.Value = EditorGUI.EnumMaskField(position, label, (Enum)property.Value, style);
+            property.Value = EditorGUI.EnumPopup(position, label, (Enum)property.Value, style);
         }
         else if (type == typeof(Color)) {
             property.Value = EditorGUI.ColorField(position, label, (Color)property.Value);

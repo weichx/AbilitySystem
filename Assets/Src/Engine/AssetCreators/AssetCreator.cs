@@ -1,5 +1,9 @@
 ﻿using UnityEngine;
 
+///<summary>Responsible for serializing / deserializing EntitySystemBase subclasses
+/// Each subclass needs its own AssetCreator concrete non generic type so that
+/// Unity can save them as ScriptableObjects. 
+/// </summary>
 public class AssetCreator<T> : ScriptableObject where T : EntitySystemBase, new() {
 
     [HideInInspector]

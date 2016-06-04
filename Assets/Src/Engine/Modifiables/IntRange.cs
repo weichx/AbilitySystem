@@ -2,6 +2,9 @@
 using UnityEngine;
 using System.Collections.Generic;
 
+///<summary>
+///A modifiable variable that is bounded by a modifiable min and max
+///</summary>
 [Serializable]
 public class IntRange  {
     [SerializeField] protected List<IntModifier> modifiers;

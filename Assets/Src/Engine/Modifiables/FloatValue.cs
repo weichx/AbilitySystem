@@ -1,6 +1,9 @@
 ﻿using  System.Collections.Generic;
 using UnityEngine;
 
+///<summary>
+///A modifiable variable that is unbounded
+///</summary>
 public class FloatValue {
 
    [SerializeField] private float baseValue;

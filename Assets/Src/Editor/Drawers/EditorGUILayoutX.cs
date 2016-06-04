@@ -54,7 +54,7 @@ public static class EditorGUILayoutX {
             }
         }
         else if (type.IsEnum) {
-            property.Value = EditorGUILayout.EnumMaskField(label, (Enum)property.Value, options);
+            property.Value = EditorGUILayout.EnumPopup(label, (Enum)property.Value, options);
         }
         else if (type == typeof(Color)) {
             property.Value = EditorGUILayout.ColorField(label, (Color)property.Value);
