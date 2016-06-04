@@ -1,12 +1,13 @@
 ﻿using System.Collections.Generic;
+using UnityEngine;
 
 public class IntValue {
 
-    private int baseValue;
-    private int flatBonus;
-    private float percentBonus;
+    [SerializeField] private int baseValue;
+    [SerializeField] private int flatBonus;
+    [SerializeField] private float percentBonus;
 
-    private List<IntModifier> modifiers;
+    [SerializeField] private List<IntModifier> modifiers;
 
     public IntValue(int baseValue = 0) {
         this.baseValue = baseValue;

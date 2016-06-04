@@ -3,17 +3,16 @@ using UnityEngine;
 using System.Collections.Generic;
 
 [Serializable]
-[EntityDeserializerSkipConstructor]
 public class IntRange  {
-    protected List<IntModifier> modifiers;
+    [SerializeField] protected List<IntModifier> modifiers;
 
-    protected int baseValue;
-    protected int currentValue;
-    protected int flatBonus;
-    protected float percentBonus;
+    [SerializeField] protected int baseValue;
+    [SerializeField] protected int currentValue;
+    [SerializeField] protected int flatBonus;
+    [SerializeField] protected float percentBonus;
 
-    protected IntRangeBoundry min;
-    protected IntRangeBoundry max;
+    [SerializeField] protected IntRangeBoundry min;
+    [SerializeField] protected IntRangeBoundry max;
 
     public IntRange() : this(0, int.MinValue, int.MaxValue) { }
 

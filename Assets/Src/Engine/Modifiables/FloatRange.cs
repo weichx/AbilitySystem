@@ -1,20 +1,17 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
-using System;
 
-[Serializable]
-[EntityDeserializerSkipConstructor]
 public class FloatRange {
 
-    protected List<FloatModifier> modifiers;
+    [SerializeField] protected List<FloatModifier> modifiers;
 
-    protected float baseValue;
-    protected float currentValue;
-    protected float flatBonus;
-    protected float percentBonus;
+    [SerializeField] protected float baseValue;
+    [SerializeField] protected float currentValue;
+    [SerializeField] protected float flatBonus;
+    [SerializeField] protected float percentBonus;
 
-    protected FloatRangeBoundry min;
-    protected FloatRangeBoundry max;
+    [SerializeField] protected FloatRangeBoundry min;
+    [SerializeField] protected FloatRangeBoundry max;
 
     public FloatRange() : this(0, float.MinValue, float.MaxValue) { }
 
