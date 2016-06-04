@@ -12,7 +12,6 @@ public class DecisionSetPage_DecisionList : ListSection<DecisionPackage> {
     private class DecisionRenderData : RenderData {
         public bool isActionShown;
         public bool isEvaluatorShown;
-        public bool isCollectorShown;
         public string[] evaluatorOptions;
         public string[] contextCollectorNames;
         public List<DecisionEvaluatorCreator> evaluatorCreators;
