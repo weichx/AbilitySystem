@@ -39,3 +39,24 @@ public abstract class TypeSerializer<T> : TypeSerializer {
     }
 
 }
+
+/*
+
+    () {
+
+    Serialize(T instance) {
+        WriteField(id, type, instance);
+        WriteKeyValue("", "");
+        WriteField("id", instance);
+        instance.thing = SetValue(thing);
+        WriteField("values", string, "1, 1, 1");
+        WriteReference();
+    }
+
+    T Deserialize(T instance) {
+    
+    }
+}
+
+
+*/

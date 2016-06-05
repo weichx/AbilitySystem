@@ -29,7 +29,7 @@ public static class Reflector {
         }
         FindPublicStaticMethods();
 #if UNITY_EDITOR
-        BuildExtendedDrawerCache();
+        BuildExtendedDrawerTypeMap();
 #endif
     }
 
@@ -216,33 +216,48 @@ public static class Reflector {
         return customPropertyDrawerTypes;
     }
 
-    private static Dictionary<Type, ExtendedPropertyDrawer> extendedDrawerCache;
+    private static Dictionary<Type, Type> extendedDrawerTypeMap;
 
-    private static void BuildExtendedDrawerCache() {
-        if (extendedDrawerCache != null) return;
-        extendedDrawerCache = new Dictionary<Type, ExtendedPropertyDrawer>();
-        List<Type> extendedDrawerSubclasses = FindSubClasses<ExtendedPropertyDrawer>();
+    private static void BuildExtendedDrawerTypeMap() {
+        if (extendedDrawerTypeMap != null) return;
+        extendedDrawerTypeMap = new Dictionary<Type, Type>();
+        List<Type> extendedDrawerSubclasses = FindSubClasses<PropertyDrawerX>();
         for (int i = 0; i < extendedDrawerSubclasses.Count; i++) {
             Type drawerType = extendedDrawerSubclasses[i];
-            ExtendedPropertyDrawer drawer = Activator.CreateInstance(drawerType) as ExtendedPropertyDrawer;
             object[] attributes = drawerType.GetCustomAttributes(typeof(PropertyDrawerFor), false);
             for (int j = 0; j < attributes.Length; j++) {
                 PropertyDrawerFor attr = attributes[j] as PropertyDrawerFor;
-                extendedDrawerCache[attr.type] = drawer;
+                extendedDrawerTypeMap[attr.type] = drawerType;
             }
         }
     }
 
-    public static ExtendedPropertyDrawer GetExtendedPropertyDrawerFor(Type type) {
-        BuildExtendedDrawerCache();
-        ExtendedPropertyDrawer drawer = extendedDrawerCache.Get(type);
-        while (drawer == null && type.BaseType != null && type.BaseType != typeof(object)) {
+    public static Type GetExtendedDrawerTypeFor(Type type) {
+        BuildExtendedDrawerTypeMap();
+        Type drawerType = extendedDrawerTypeMap.Get(type);
+        while (drawerType == null && type.BaseType != null && type.BaseType != typeof(object)) {
             type = type.BaseType;
-            drawer = extendedDrawerCache.Get(type);
+            drawerType = extendedDrawerTypeMap.Get(type);
         }
-        return drawer;
+        return drawerType;
     }
+    
+    private static Dictionary<SerializedPropertyX, PropertyDrawerX> drawerInstanceCache = new Dictionary<SerializedPropertyX, PropertyDrawerX>();
+    public static PropertyDrawerX GetCustomPropertyDrawerFor(SerializedPropertyX property) {
+        if (drawerCache == null) {
+            drawerCache = new Dictionary<Type, UnityEditor.PropertyDrawer>();
+        }
 
+        PropertyDrawerX drawerX = drawerInstanceCache.Get(property);
+        if (drawerX == null) {
+            var drawerType = GetExtendedDrawerTypeFor(property.Type);
+            if (drawerType == null) return null;
+            drawerX = Activator.CreateInstance(drawerType) as PropertyDrawerX;
+            drawerInstanceCache[property] = drawerX;
+        }
+        return drawerX;
+    }
+    
     public static UnityEditor.PropertyDrawer GetCustomPropertyDrawerFor(Type type, params Assembly[] assemblies) {
         if (drawerCache == null) {
             drawerCache = new Dictionary<Type, UnityEditor.PropertyDrawer>();

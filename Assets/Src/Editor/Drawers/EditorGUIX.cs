@@ -1,33 +1,26 @@
 ﻿using System;
-using System.Reflection;
 using UnityEngine;
 using UnityEditor;
-using System.Collections.Generic;
 using System.Runtime.Serialization;
 
 public static class EditorGUIX {
 
-   
+   //TODO --- Deprecate EditorGUIX in favor of the EditorGUILayoutX, manual rects are dumb
 
-    public static void Draw(Rect position, SerializedObjectX obj) {
-        
-    }
+    //public static void PropertyField(Rect position, SerializedPropertyX property) {
+    //    PropertyField(position, property, property.label, true);
+    //}
 
-    public static void PropertyField(Rect position, SerializedPropertyX property) {
-        PropertyField(position, property, property.label, true);
-    }
+    //public static void PropertyField(SerializedPropertyX property, GUIContent label, bool includeChildren = true) {
+    //    var drawer = Reflector.GetCustomPropertyDrawerFor(property);
+    //    if (drawer != null) {
+    //        drawer.OnGUI(property, label);
+    //    }
+    //    else {
+    //        PropertyFieldExtendedValue(position, property, label);
+    //    }
+    //}
 
-    public static void PropertyField(Rect position, SerializedPropertyX property, GUIContent label, bool includeChildren = true) {
-        var drawer = Reflector.GetExtendedPropertyDrawerFor(property.type);
-        if (drawer != null) {
-            drawer.OnGUI(position, property, label);
-        }
-        else {
-            PropertyFieldExtendedValue(position, property, label);
-        }
-    }
-
-    private static int z;
     private static void PropertyFieldExtendedValue(Rect position, SerializedPropertyX property, GUIContent label = null, GUIStyle style = null) {
         Type type = property.type;
         if (type.IsSubclassOf(typeof(UnityEngine.Object))) {
@@ -37,7 +30,6 @@ public static class EditorGUIX {
             if (property.Value == null) {
                property.Value = Array.CreateInstance(type.GetElementType(), 1);
             }
-            //int ctrlId = GUIUtility.GetControlID(FocusType.Keyboard);
             property.isExpanded = EditorGUI.Foldout(position, property.isExpanded, label);
             if (property.isExpanded) {
                 position.y += 16f;
@@ -45,8 +37,7 @@ public static class EditorGUIX {
                 EditorGUI.indentLevel++;
                 Array array = (Array)property.Value;
                 int length = array.Length;
-                int newLength = 0;
-                z = EditorGUI.IntField(position, new GUIContent("Size"), z);
+                int newLength = EditorGUI.IntField(position, new GUIContent("Size"), length);
 
                 if (newLength < 0) newLength = 0;
                 if (length != newLength) {
@@ -144,7 +135,7 @@ public static class EditorGUIX {
                 position.height -= 16f;
                 for (int i = 0; i < property.ChildCount; i++) {
                     SerializedPropertyX child = property.GetChildAt(i);
-                    PropertyField(position, child);
+                  //  PropertyField(position, child);
                     float propHeight = EditorGUIUtilityX.GetHeight(child, child.label, child.isExpanded);
                     position.y += propHeight;
                     position.height -= propHeight;

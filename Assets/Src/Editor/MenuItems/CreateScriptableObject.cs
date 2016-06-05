@@ -7,10 +7,7 @@ public static class ScriptableObjectUtility {
     /// <summary>
     //	This makes it easy to create, name and place unique new ScriptableObject asset files.
     /// </summary>
-    [MenuItem("Assets/Scriptable Object")]
-    public static void CreateScriptableObject() {
-        CreateAsset<ScriptableObject>("Scriptable Object");
-    }
+
 
     //[MenuItem("Assets/Requirement Prototype")]
     //public static void CreateAbilityRequirement() {
@@ -21,6 +18,11 @@ public static class ScriptableObjectUtility {
     //public static void CreateAbility() {
     //    //CreateAsset<Ability>("Ability");
     //}
+
+    [MenuItem("Assets/Database")]
+    public static void CreateDatabase() {
+        CreateAsset<Persistence.Database>();
+    }
 
     public static void CreateAsset<T>(string assetName = null) where T : ScriptableObject {
         T asset = ScriptableObject.CreateInstance<T>();

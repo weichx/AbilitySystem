@@ -75,7 +75,7 @@ public class EntityManager {
     public static EntityManager Instance {
         get {
             instance = instance ?? new EntityManager();
-            instance.Register(ImplicitEntity);
+           // instance.Register(ImplicitEntity);
             return instance;
         }
     }

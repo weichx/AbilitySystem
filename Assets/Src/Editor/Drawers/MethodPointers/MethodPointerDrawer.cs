@@ -4,11 +4,11 @@ using UnityEditor;
 using System.Collections.Generic;
 
 [PropertyDrawerFor(typeof(AbstractMethodPointer))]
-public class MethodPointerDrawer : ExtendedPropertyDrawer {
+public class MethodPointerDrawerX : PropertyDrawerX {
 
     protected List<MethodPointer> pointableMethods;
 
-    public override void OnGUI(Rect position, SerializedPropertyX source, GUIContent label) {
+    public override void OnGUI(SerializedPropertyX source, GUIContent label) {
         Type sourceType = source.type;
         if (sourceType.IsGenericType) {
             Type[] genericTypes = sourceType.GetGenericArguments();
@@ -35,7 +35,7 @@ public class MethodPointerDrawer : ExtendedPropertyDrawer {
             return content.text == signature.Value as string;
         }); 
         if (idx == -1) idx = 0;
-        int newIdx = EditorGUI.Popup(position, label, idx, displayList);
+        int newIdx = EditorGUILayout.Popup(label, idx, displayList);
         signature.Value = displayList[newIdx].text;
     }
 }

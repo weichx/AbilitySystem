@@ -32,8 +32,6 @@ public class AssetSerializer : IWriter {
         }
 
         public string GetRefLine(Dictionary<Type, int> typeMap) {
-            //Type type = item.GetType();
-            //string typeName = type.Name + "." + type.Namespace;
             string[] header = new string[] {
             id.ToString(), "new", "-1", fieldCount.ToString(), version, typeMap.Get(item.GetType()).ToString()
         };
@@ -166,6 +164,9 @@ public class AssetSerializer : IWriter {
             FieldInfo fieldInfo = fields[i];
             object[] attrs = fields[i].GetCustomAttributes(typeof(SerializeField), true);
             if (!fieldInfo.IsPublic && attrs.Length == 0) continue;
+            if(fieldInfo.GetCustomAttributes(typeof(UnitySerialized), true).Length > 0) continue;
+            
+           
             if (fieldInfo.IsNotSerialized || Array.IndexOf(exceptions, fieldInfo.Name) != -1) {
                 continue;
             }

@@ -10,9 +10,9 @@ public class PropertyDrawerFor : Attribute {
     }
 }
 
-public abstract class ExtendedPropertyDrawer {
+public abstract class PropertyDrawerX {
 
-    public abstract void OnGUI(Rect position, SerializedPropertyX property, GUIContent label);
+    public abstract void OnGUI(SerializedPropertyX property, GUIContent label);
 
     public virtual float GetPropertyHeight(SerializedPropertyX property, GUIContent label) {
         return 16f;

@@ -6,12 +6,12 @@ using System.Collections.Generic;
 ///</summary>
 public class FloatRange {
 
-    [SerializeField] protected List<FloatModifier> modifiers;
+    [HideInInspector] [SerializeField] protected List<FloatModifier> modifiers;
 
-    [SerializeField] protected float baseValue;
-    [SerializeField] protected float currentValue;
-    [SerializeField] protected float flatBonus;
-    [SerializeField] protected float percentBonus;
+    [HideInInspector] [SerializeField] protected float baseValue;
+    [HideInInspector] [SerializeField] protected float currentValue;
+    [HideInInspector] [SerializeField] protected float flatBonus;
+    [HideInInspector] [SerializeField] protected float percentBonus;
 
     [SerializeField] protected FloatRangeBoundry min;
     [SerializeField] protected FloatRangeBoundry max;
@@ -72,15 +72,14 @@ public class FloatRange {
     public float BaseValue {
         get { return baseValue; }
         set {
-            baseValue = value;
-            if (max.Value == 0 && min.Value == 0) {
-                currentValue = 0;
-                return;
+            if (baseValue != value) {
+                baseValue = value;
+                float minVal = min.Value;
+                float maxVal = max.Value;
+                float flatTotal = baseValue + flatBonus;
+                float total = flatTotal + (flatTotal * percentBonus);
+                currentValue = Mathf.Clamp(total, minVal, maxVal);
             }
-            float currentPercent = (max.Value - currentValue) / (max.Value - min.Value);
-            float flatTotal = baseValue + flatBonus;
-            float total = flatTotal + (flatTotal * percentBonus);
-            currentValue = Mathf.Clamp(currentPercent * total, min.Value, max.Value);
         }
     }
 
@@ -102,7 +101,7 @@ public class FloatRange {
 
     public class FloatRangeBoundry : FloatValue {
 
-        private FloatRange parent;
+        [HideInInspector] [SerializeField] public FloatRange parent;
 
         public FloatRangeBoundry(FloatRange parent, float baseValue = 0f) : base(baseValue) {
             this.parent = parent;

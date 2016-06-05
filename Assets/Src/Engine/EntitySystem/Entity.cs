@@ -13,51 +13,34 @@ using System.Collections.Generic;
 public partial class Entity : MonoBehaviour {
 
     public string factionId;
-    //temp
-    [NonSerialized] public List<Vector3> vectors = new List<Vector3>();
 
-    [HideInInspector]
-    public string id;
-    public AbilityManager abilityManager;
-    public ResourceManager resourceManager;
-    public StatusEffectManager statusManager;
-
-    [SerializeField]
-    protected Vector3 castPoint;
-    [SerializeField]
-    protected Vector3 castTarget;
+    [HideInInspector] public string id;
+    [HideInInspector] public AbilityManager abilityManager;
+    [HideInInspector] public ResourceManager resourceManager;
+    [HideInInspector] public StatusEffectManager statusManager;
 
     private Vector3 lastPosition;
     private bool movedThisFrame = false;
 	protected EventEmitter emitter;
+    private SerializedPropertyX rootProperty;
 
-    //temp -- move to AI
-    [NonSerialized] public Dictionary<string, object> blackboard = new Dictionary<string, object>();
-
-    //temp
-    public FloatRange attr;
-    public FloatRange attr2;
 	//handle progression of entity, attributes, and resources
     public void Awake() {
-        attr = new FloatRange(0);
-        attr.SetModifier("Mod1", FloatModifier.Value(1));
-        attr.SetModifier("Mod2", FloatModifier.Value(3));
-        attr.SetModifier("Mod3", FloatModifier.Value(6));
-        attr2 = new FloatRange(0);
-        attr2.SetModifier("Mod1", FloatModifier.Value(5));
-        attr2.SetModifier("Mod2", FloatModifier.Percent(0.2f));
-        attr2.SetModifier("Mod3", FloatModifier.Value(5));
-
-        resourceManager = new ResourceManager(this);
-        statusManager = new StatusEffectManager(this);
-        abilityManager = new AbilityManager(this);
+        if (!string.IsNullOrEmpty(source)) {
+            new AssetDeserializer(source, false).DeserializeInto("__default__", this);
+        } else {
+            new SerializedObjectX(this).ApplyModifiedProperties();
+        }
+        resourceManager = resourceManager ?? new ResourceManager(this);
+        statusManager = statusManager ?? new StatusEffectManager(this);
+        abilityManager = abilityManager ?? new AbilityManager(this);
 		emitter = new EventEmitter();
         EntityManager.Instance.Register(this);
         //gameObject.layer = LayerMask.NameToLayer("Entity");
     }
 
     public virtual void Update() {
-        lastPosition = transform.position;
+                lastPosition = transform.position;
         if (abilityManager != null) {
             abilityManager.Update();
         }

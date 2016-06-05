@@ -1,16 +1,18 @@
-﻿using  System.Collections.Generic;
+﻿using  System;
+using  System.Collections.Generic;
 using UnityEngine;
 
 ///<summary>
 ///A modifiable variable that is unbounded
 ///</summary>
+
 public class FloatValue {
 
-   [SerializeField] private float baseValue;
-   [SerializeField] private float flatBonus;
-   [SerializeField] private float percentBonus;
+    [SerializeField] protected float baseValue;
+    [SerializeField] protected float flatBonus;
+    [SerializeField] protected float percentBonus;
 
-    [SerializeField] private List<FloatModifier> modifiers;
+    [SerializeField] protected List<FloatModifier> modifiers;
 
     public FloatValue(float baseValue = 0f) {
         this.baseValue = baseValue;
@@ -18,6 +20,7 @@ public class FloatValue {
     }
 
     public void SetModifier(string id, FloatModifier modifier) {
+        modifiers = modifiers ?? new List<FloatModifier>();
         modifier = new FloatModifier(id, modifier);
 
         for (int i = 0; i < modifiers.Count; i++) {
@@ -36,7 +39,21 @@ public class FloatValue {
 
     }
 
+    public void ClearModifier(string id) {
+        modifiers = modifiers ?? new List<FloatModifier>();
+        for (int i = 0; i < modifiers.Count; i++) {
+            if (modifiers[i].id == id) {
+                FloatModifier prev = modifiers[i];
+                flatBonus -= prev.flatBonus;
+                percentBonus -= prev.percentBonus;
+                modifiers.RemoveAt(i);
+                break;
+            }
+        }
+    }
+
     public FloatModifier[] GetReadOnlyModiferList() {
+        modifiers = modifiers ?? new List<FloatModifier>();
         return modifiers.ToArray();
     }
 

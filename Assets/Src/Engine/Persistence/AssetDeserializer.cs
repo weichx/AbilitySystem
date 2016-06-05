@@ -26,6 +26,8 @@ public class FieldReadResult {
     public object value;
 }
 
+
+//todo handle delegates that arent closures http://stackoverflow.com/questions/25721711/how-to-identify-a-lambda-closure-with-reflection
 public class AssetDeserializer : IReader {
 
     protected static BindingFlags FieldBindFlags = BindingFlags.Public | BindingFlags.Instance | BindingFlags.NonPublic;
@@ -41,6 +43,7 @@ public class AssetDeserializer : IReader {
     protected const char ListSymbol = '[';
 
     protected string[] lines;
+    //todo 1 dictionary should handle stuff, alias if you want to
     protected Dictionary<string, TypeReadResult> resultMap;
     protected Dictionary<string, TypeReadResult> structMap;
     protected Dictionary<string, Type> typeMap;
@@ -59,6 +62,7 @@ public class AssetDeserializer : IReader {
             lines = File.ReadAllLines(source);
         }
         else if (!fromFile) {
+            if(source == null) Debug.LogError("Null source");
             Regex regex = new Regex("(\r\n|\r|\n)");
             source = regex.Replace(source, "\n");
             lines = source.Split('\n');
@@ -66,6 +70,31 @@ public class AssetDeserializer : IReader {
         if (lines != null) {
             Deserialize();
         }
+    }
+
+    public T DeserializeInto<T>(string id, T instance) where T : class {
+        TypeReadResult init = tagMap.Get(id);
+        //temporarily swap ref id to point at instance, be sure to put it back
+        //for the next call to CreateItem or it will crash
+        if (init == null) {
+            return null;
+        }
+        init.instance = instance;
+        context = init;
+        TypeReadResult currentContext = context;
+        SerializerUtil.GetTypeSerializer(init.type).Deserialize(instance, this);
+        init.instance = instance;
+        context = currentContext;
+        toClear.Add(init);
+        for (int i = 0; i < toClear.Count; i++) {
+            IEntityDeserializable d = toClear[i].instance as IEntityDeserializable;
+            if (d != null) {
+                d.AfterDeserialize();
+            }
+            toClear[i].instance = null;
+        }
+        toClear.Clear();
+        return instance;
     }
 
     public T CreateItem<T>(string id) where T : class, new() {
@@ -127,7 +156,7 @@ public class AssetDeserializer : IReader {
     }
 
     private void CreateType(string line) {
-        typeMap[typeMap.Count.ToString()] = TypeCache.GetType(line);
+        typeMap[typeMap.Count.ToString()] = Type.GetType(line);
     }
 
     private void ReadTypeFieldLine(string line) {
@@ -171,7 +200,7 @@ public class AssetDeserializer : IReader {
             case ListSymbol:
                 return GetInstance((resultMap.Get(strVal)));
             case AssetSymbol:
-                //todo - cache
+                //todo - cache?
                 return AssetDatabase.LoadAssetAtPath(AssetDatabase.GUIDToAssetPath(strVal), result.type);
             case StringSymbol:
                 return strVal;//todo unescape
@@ -181,14 +210,14 @@ public class AssetDeserializer : IReader {
 
     private object GetInstance(TypeReadResult result) {
         if (result.instance == null) {
-            //todo - struct
 
             TypeReadResult currentContext = context;
             object retn;
             if (result.type == null) return null;
             if (result.type.IsArray) {
                 //todo save this object [] and just set [0] = fieldCount
-                retn = Activator.CreateInstance(result.type, new object[] { result.fields.Length });
+                //retn = Activator.CreateInstance(result.type, new object[] { result.fields.Length });
+                retn = Array.CreateInstance(result.type.GetElementType(), result.fields.Length);
             }
             else if (result.type.GetCustomAttributes(typeof(EntityDeserializerSkipConstructor), false).Length > 0) {
                 retn = FormatterServices.GetUninitializedObject(result.type);

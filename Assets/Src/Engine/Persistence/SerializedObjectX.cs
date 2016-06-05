@@ -17,20 +17,25 @@ public class SerializedObjectX {
         if (type.IsPrimitive || type.IsEnum || type == typeof(string)) {
             throw new Exception("Target of a SerializedObjectX cannot be null or primitive"); 
         }
-        rootProperty = new SerializedPropertyX(this, "__root__", value.GetType(), value);
+        rootProperty = new SerializedPropertyX("__root__", value.GetType(), value);
     }
 
     public void Update() {
         
     }
     
-    public void ApplyModifiedProperties() {
+    public bool ApplyModifiedProperties() {
         Type type = root.GetType();
+        bool changed = false;
         for (int i = 0; i < rootProperty.ChildCount; i++) {
             SerializedPropertyX property = rootProperty.GetChildAt(i);
-            property.ApplyModifiedProperties(rootProperty);
+            bool didChildChange = property.ApplyModifiedProperties();
+            if (!changed && didChildChange) {
+                changed = true;
+            }
             type.GetField(property.name, BindFlags).SetValue(root, property.Value);
         }
+        return changed;
     }
 
     public SerializedPropertyX GetChildAt(int idx) {
