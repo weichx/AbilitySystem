@@ -1,4 +1,4 @@
-﻿using  UnityEngine;
+﻿using UnityEngine;
 
 namespace Intelligence {
 
@@ -14,8 +14,9 @@ namespace Intelligence {
             agent.SetDestination(location);
         }
 
-        public override bool OnUpdate() {
-            return agent.hasPath && agent.remainingDistance <= 1f;
+        public override CharacterActionStatus OnUpdate() {
+            return agent.hasPath && agent.remainingDistance <= 1f ?
+                CharacterActionStatus.Completed : CharacterActionStatus.Running;
         }
 
 

@@ -1,25 +1,28 @@
 ﻿using UnityEngine;
-using AbilitySystem;
-using System;
+using System.Collections.Generic;
+using Intelligence;
 
-public class PointListTrail : MonoBehaviour {
+public class PointListTrail : MonoBehaviour, IContextAware {
 
-    protected Vector3[] pointList;
+    protected List<Vector3> pointList;
     public float speed;
     public float arrivalThreshold = 0.1f;
     public float despawnTimeout = 3f;
     protected int currentIndex = 0;
 
-    public void Initialize(Vector3[] pointList) {
-        this.pointList = pointList;
+
+    public void SetContext(Context ctx) {
+        MultiPointContext context = ctx as MultiPointContext;
+        pointList = context.points;
         RaycastHit hit;
-        if(Physics.Raycast(transform.position, Vector3.down, out hit, 100, (9 << 1))) {
+        transform.position = pointList[0];
+        if (Physics.Raycast(transform.position, Vector3.down, out hit, 100)) {
             transform.position = hit.point + (Vector3.up * 0.1f);
         }
     }
 
     public void Update() {
-        if (currentIndex == pointList.Length) {
+        if (currentIndex == pointList.Count) {
             Destroy(gameObject, despawnTimeout);
             return;
         }
@@ -28,4 +31,5 @@ public class PointListTrail : MonoBehaviour {
             currentIndex++;
         }
     }
+
 }

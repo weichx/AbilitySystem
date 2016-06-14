@@ -1,7 +1,10 @@
-﻿
-using System;
+﻿using System;
 
 namespace Intelligence {
+
+    public enum CharacterActionStatus {
+        Invalid, Running, Completed, Cancelled
+    }
 
     ////only here for type queries and storing lists of actions.
     /// I would much prefer to use generics exclusivly but have
@@ -14,29 +17,32 @@ namespace Intelligence {
         public virtual void Setup(Context context) {
             this.context = context;
             entity = context.entity;
+            OnStart();
         }
 
         public virtual void OnStart() { }
 
-        public virtual bool OnUpdate() {
-            return true;
+        public virtual CharacterActionStatus OnUpdate() {
+            return CharacterActionStatus.Completed;
         }
 
-        public virtual void OnInterrupt() {}
+        public virtual void OnInterrupt() { }
 
-        public virtual void OnCancel() {}
+        public virtual void OnCancel() { }
 
-        public virtual void OnComplete() {}
+        public virtual void OnComplete() { }
+
+        public virtual void OnCleanup() { }
 
         public virtual Type ContextType {
-            get { return typeof(Context); } 
+            get { return typeof(Context); }
         }
 
     }
 
     public class CharacterAction<T> : CharacterAction where T : Context {
-		
-		protected T context;
+
+        protected T context;
 
         public override void Setup(Context context) {
             this.context = context as T;
@@ -49,5 +55,5 @@ namespace Intelligence {
         }
 
     }
-		
+
 }

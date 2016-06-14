@@ -31,7 +31,7 @@ public class SerializedPropertyX {
         changed = false;
         displayName = Util.SplitAndTitlize(name);
         children = new List<SerializedPropertyX>();
-        isExpanded = true;
+        isExpanded = false;
         label = new GUIContent(displayName);
         IsDrawable = isDrawable;
         isRoot = true;
@@ -48,7 +48,7 @@ public class SerializedPropertyX {
         changed = false;
         displayName = Util.SplitAndTitlize(name);
         children = new List<SerializedPropertyX>();
-        isExpanded = true;
+        isExpanded = false;
         label = new GUIContent(displayName);
         IsDrawable = isDrawable;
         isRoot = true;

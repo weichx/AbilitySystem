@@ -24,6 +24,7 @@ public static class EditorGUILayoutX {
     }
 
     public static void PropertyField(SerializedPropertyX property, params GUILayoutOption[] options) {
+        if (property == null) return;
         PropertyField(property, property.label, true, options);
     }
 

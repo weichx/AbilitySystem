@@ -31,11 +31,26 @@ namespace Intelligence {
 
         public void Update() {
             currentAction = currentAction ?? GetDesiredAction();
+
             if (currentAction != null) {
-                if (currentAction.OnUpdate()) {
-                    currentAction.OnComplete();
-                    currentAction = null;
+
+                CharacterActionStatus actionStatus = currentAction.OnUpdate();
+
+                switch (actionStatus) {
+                    case CharacterActionStatus.Running:
+                        break;
+                    case CharacterActionStatus.Cancelled:
+                        currentAction.OnCancel();
+                        currentAction.OnCleanup();
+                        currentAction = null;
+                        break;
+                    case CharacterActionStatus.Completed:
+                        currentAction.OnComplete();
+                        currentAction.OnCleanup();
+                        currentAction = null;
+                        break;
                 }
+
             }
         }
 

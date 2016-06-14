@@ -44,7 +44,6 @@ public class DecisionEvaluator : EntitySystemBase {
             float total = response + (makeUpValue * response);
             finalScore *= Mathf.Clamp01(total);
         }
-        Debug.Log(finalScore);
         return finalScore;
     }
 

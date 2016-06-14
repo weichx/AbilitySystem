@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using Intelligence;
 
-public class PointToPointProjectile : MonoBehaviour {
+public class PointToPointProjectile : MonoBehaviour, IContextAware {
 
     public Vector3 targetPoint;
     public Vector3 originPoint;
@@ -12,13 +12,23 @@ public class PointToPointProjectile : MonoBehaviour {
     public float spawnHeight;
     public float originXZOffsetRadius;
 
-    public PointContext context;
+    private PointContext context;
+
+    public void SetContext(Context context) {
+        this.context = context as PointContext;
+        targetPoint = this.context.point;//.position;
+        Vector2 offset = Random.insideUnitCircle * originXZOffsetRadius;
+        originPoint = targetPoint + (Vector3.up * spawnHeight);
+        originPoint.x += offset.x;
+        originPoint.z += offset.y;
+        transform.position = originPoint;
+    }
 
     void Update() {
         speed += (accelerationRate * Time.deltaTime);
         speed = Mathf.Clamp(speed, 0, maxSpeed);
         if (transform.position.DistanceToSquared(targetPoint) < collisionRange * collisionRange) {
-            var evtManager = GetComponent<EventManager>();
+            var evtManager = GetComponent<EventEmitter>();
             if (evtManager != null) {
                 evtManager.QueueEvent(new AbilityHitPointEvent(targetPoint, context));
                 enabled = false;
@@ -26,14 +36,5 @@ public class PointToPointProjectile : MonoBehaviour {
         }
         transform.position = Vector3.MoveTowards(transform.position, targetPoint, speed * Time.deltaTime);
     }
-
-    public void SetAbilityContext(PointContext context) {
-        this.context = context;
-        targetPoint = transform.position;
-        Vector2 offset = Random.insideUnitCircle * originXZOffsetRadius;
-        originPoint = targetPoint + (Vector3.up * spawnHeight);
-        originPoint.x += offset.x;
-        originPoint.z += offset.y;
-        transform.position = originPoint;
-    }
+    
 }

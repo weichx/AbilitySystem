@@ -10,6 +10,7 @@ using System.Collections.Generic;
 
 [SelectionBase]
 [DisallowMultipleComponent]
+[RequireComponent(typeof(EventEmitter))]
 public partial class Entity : MonoBehaviour {
 
     public string factionId;
@@ -22,7 +23,6 @@ public partial class Entity : MonoBehaviour {
     private Vector3 lastPosition;
     private bool movedThisFrame = false;
 	protected EventEmitter emitter;
-    private SerializedPropertyX rootProperty;
 
 	//handle progression of entity, attributes, and resources
     public void Awake() {
@@ -34,9 +34,10 @@ public partial class Entity : MonoBehaviour {
         resourceManager = resourceManager ?? new ResourceManager(this);
         statusManager = statusManager ?? new StatusEffectManager(this);
         abilityManager = abilityManager ?? new AbilityManager(this);
-		emitter = new EventEmitter();
+        emitter = GetComponent<EventEmitter>();
         EntityManager.Instance.Register(this);
-        //gameObject.layer = LayerMask.NameToLayer("Entity");
+
+        gameObject.layer = LayerMask.NameToLayer("Entity");
     }
 
     public virtual void Update() {
@@ -49,9 +50,6 @@ public partial class Entity : MonoBehaviour {
         }
         if (resourceManager != null) {
             //resourceManager.Update();
-        }
-        if (emitter != null) {
-            emitter.FlushQueue();
         }
     }
 

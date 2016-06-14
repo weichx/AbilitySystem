@@ -14,7 +14,12 @@ public class FloatValue {
 
     [SerializeField] protected List<FloatModifier> modifiers;
 
-    public FloatValue(float baseValue = 0f) {
+    public FloatValue() {
+        baseValue = 0;
+        modifiers = new List<FloatModifier>();
+    }
+
+    public FloatValue(float baseValue) {
         this.baseValue = baseValue;
         modifiers = new List<FloatModifier>();
     }

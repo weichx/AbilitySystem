@@ -14,7 +14,7 @@ public partial class Ability : EntitySystemBase {
     [NonSerialized] protected Timer castTimer;
     [NonSerialized] protected Timer channelTimer;
 
-    public Texture2D icon;
+    public Sprite icon;
     public FloatRange castTime;
     public FloatRange channelTime;
     public IntRange channelTicks;
@@ -53,6 +53,18 @@ public partial class Ability : EntitySystemBase {
         caster = entity;
     }
 
+    public Entity Caster {
+        get { return caster; }
+    }
+
+    public Context GetContext() {
+        return context;
+    }
+
+    public T GetContext<T>() where T : Context {
+        return context as T;
+    }
+
     public AbilityComponent AddAbilityComponent<T>() where T : AbilityComponent, new() {
         AbilityComponent component = new T();
         component.ability = this;
@@ -84,7 +96,6 @@ public partial class Ability : EntitySystemBase {
         }
 
         this.context = context;
-
         SetComponentContext(context);
         OnUse();
 

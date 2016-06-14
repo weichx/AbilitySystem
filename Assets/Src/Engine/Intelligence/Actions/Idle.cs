@@ -12,9 +12,9 @@ namespace Intelligence {
             agent.ResetPath();
         }
 
-        public override bool OnUpdate() {
+        public override CharacterActionStatus OnUpdate() {
             timer += Time.deltaTime;
-            return timer > idleTime;
+            return timer > idleTime ? CharacterActionStatus.Completed : CharacterActionStatus.Running;
         }
 
     }

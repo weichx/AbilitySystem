@@ -10,6 +10,9 @@ namespace Intelligence {
 			this.target = target;
 		}
 
+	    public bool IsReady() {
+	        return entity.GetComponent<TargetManager>().currentTarget != null;
+	    }
 	}
 
 }

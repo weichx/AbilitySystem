@@ -84,7 +84,14 @@ public class FloatRange {
     }
 
     public float Value {
-        get { return currentValue; }
+        get {
+            float minVal = min.Value;
+            float maxVal = max.Value;
+            float flatTotal = baseValue + flatBonus;
+            float total = flatTotal + (flatTotal * percentBonus);
+            currentValue = Mathf.Clamp(total, minVal, maxVal);
+            return currentValue;
+        }
         set {
             currentValue = Mathf.Clamp(value, min.Value, max.Value);
         }
@@ -102,6 +109,10 @@ public class FloatRange {
     public class FloatRangeBoundry : FloatValue {
 
         [HideInInspector] [SerializeField] public FloatRange parent;
+
+        public FloatRangeBoundry() : base(0) {
+            parent = null;
+        }
 
         public FloatRangeBoundry(FloatRange parent, float baseValue = 0f) : base(baseValue) {
             this.parent = parent;

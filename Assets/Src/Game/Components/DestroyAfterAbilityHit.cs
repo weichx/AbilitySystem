@@ -6,22 +6,21 @@ public class DestroyAfterAbilityHit : MonoBehaviour {
     public GameObject toDestroy;
     private Timer timer;
     private bool destroyed = false;
+    private EventEmitter emitter;
 
     void OnEnable() {
-        EventManager evtManager = GetComponent<EventManager>();
-        if(evtManager != null) {
-            evtManager.AddListenerOnce<AbilityHitEntityEvent>(OnHit);
+        emitter = GetComponent<EventEmitter>();
+        if (emitter != null) {
+            emitter.AddListener<AbilityHit>(OnHit);
         }
     }
 
-    void OnHit(AbilityHitEntityEvent evt) {
-        if(delay > 0) {
+    void OnHit(AbilityHit evt) {
+        if (delay > 0) {
             timer = new Timer(delay);
         }
         else {
-            destroyed = true;
-            if (toDestroy == null) toDestroy = gameObject;
-            Destroy(toDestroy);
+            Destroy();
         }
     }
 
@@ -29,10 +28,18 @@ public class DestroyAfterAbilityHit : MonoBehaviour {
         if (destroyed) return;
 
         if (timer != null && timer.Ready) {
-            if (toDestroy == null) toDestroy = gameObject;
-            Destroy(toDestroy);
-            destroyed = true;
+            Destroy();
         }
 
+    }
+
+    private void Destroy() {
+        if (toDestroy == null) toDestroy = gameObject;
+        if (emitter != null) {
+            emitter.RemoveListener<AbilityHit>(OnHit);
+        }
+        emitter = null;
+        destroyed = true;
+        Destroy(toDestroy);
     }
 }
