@@ -1,15 +1,13 @@
 ﻿using UnityEngine;
 using Intelligence;
 
-public class HasTarget : AbilityRequirement {
+public class HasTarget : AbilityRequirement<SingleTargetContext> {
 
-    public override bool OnTest(Context context, RequirementType type) {
-        SingleTargetContext stc = context as SingleTargetContext;
-        if (stc == null) return false;
-        return type == RequirementType.CastStart && stc.target != null;
+    public override bool OnTest(RequirementType type) {
+        return context.target != null;
     }
 
-    public override void OnFailed(Context context, RequirementType type) {
+    public override void OnFailed(RequirementType type) {
         Debug.Log("That ability requires a target");
     }
 

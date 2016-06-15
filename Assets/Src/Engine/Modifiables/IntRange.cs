@@ -19,7 +19,7 @@ public class IntRange  {
 
     public IntRange() : this(0, int.MinValue, int.MaxValue) { }
 
-    public IntRange(int value = 0, int minBase = 0, int maxBase = 0) {
+    public IntRange(int value = 0, int minBase = int.MinValue, int maxBase = int.MaxValue) {
         modifiers = new List<IntModifier>();
         min = new IntRangeBoundry(this, minBase);
         max = new IntRangeBoundry(this, maxBase);
@@ -73,25 +73,27 @@ public class IntRange  {
     public int BaseValue {
         get { return baseValue; }
         set {
-            baseValue = value;
-            if (max.Value == 0 && min.Value == 0) {
-                currentValue = 0;
-                return;
+            if (baseValue != value) {
+                baseValue = value;
+                int minVal = min.Value;
+                int maxVal = max.Value;
+                int flatTotal = baseValue + flatBonus;
+                int total = (int)(flatTotal + (flatTotal * percentBonus));
+                currentValue = (int)Mathf.Clamp(total, minVal, maxVal);
             }
-            float currentPercent = (float)(max.Value - currentValue) / (float)(max.Value - min.Value);
-            int flatTotal = baseValue + flatBonus;
-            int total = (int)(flatTotal + (flatTotal * percentBonus));
-            currentValue = (int)Mathf.Clamp((currentPercent * total), min.Value, max.Value);
         }
     }
 
     public int Value {
-        get { return currentValue; }
+        get {
+            return currentValue;
+        }
         set {
-            currentValue = (int)Mathf.Clamp(value, min.Value, max.Value);
+            currentValue = Mathf.Clamp(value, min.Value, max.Value);
         }
     }
 
+    //todo -- get
     public float NormalizedValue {
         set {
             float val = Mathf.Clamp01(value);
@@ -103,7 +105,11 @@ public class IntRange  {
 
     public class IntRangeBoundry : IntValue {
 
-        private IntRange parent;
+        [HideInInspector] public IntRange parent;
+
+        public IntRangeBoundry() : base(0) {
+            parent = null;
+        }
 
         public IntRangeBoundry(IntRange parent, int baseValue = 0) : base(baseValue) {
             this.parent = parent;

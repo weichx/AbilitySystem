@@ -1,11 +1,18 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using Intelligence;
 
 public abstract class AbilityRequirement {
 
     protected bool supressed;
     [EnumFlag] [SerializeField]
-    public RequirementType appliesTo = RequirementType.Disabled;
+    public RequirementType appliesTo = RequirementType.All;
+
+    protected Context context;
+
+    public virtual void SetContext(Context context) {
+        this.context = context;
+    }
 
     public RequirementType RequirementType {
         get { return appliesTo; }
@@ -16,25 +23,25 @@ public abstract class AbilityRequirement {
         "Start", "Update", "Complete", "Start + Update", "Start + End", "Update + End", "All"
     };
 
-    public bool Test(Context context, RequirementType type) {
+    public bool Test(RequirementType type) {
         if (supressed || (type & RequirementType) == 0) {
             return true;
         }
 
-        bool requirementMet = OnTest(context, type);
+        bool requirementMet = OnTest(type);
 
         if (requirementMet) {
-            OnPassed(context, type);
+            OnPassed(type);
         }
         else {
-            OnFailed(context, type);
+            OnFailed( type);
         }
         return requirementMet;
     }
 
-    public virtual bool OnTest(Context context, RequirementType type) { return true; }
-    public virtual void OnPassed(Context context, RequirementType type) { }
-    public virtual void OnFailed(Context context, RequirementType type) { }
+    public virtual bool OnTest(RequirementType type) { return true; }
+    public virtual void OnPassed(RequirementType type) { }
+    public virtual void OnFailed(RequirementType type) { }
 
     public void ApplyTo(RequirementType type) {
         appliesTo |= type;
@@ -53,4 +60,20 @@ public abstract class AbilityRequirement {
         set { supressed = value; }
     }
 
+    public virtual Type GetContextType() {
+        return context.GetType();
+    }
+}
+
+public abstract class AbilityRequirement<T> : AbilityRequirement where T : Context {
+
+    protected new T context;
+
+    public override void SetContext(Context context) {
+        this.context = context as T;
+    }
+
+    public override Type GetContextType() {
+        return typeof(T);
+    }
 }

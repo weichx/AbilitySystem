@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using Intelligence;
 
-public class SpawnPrefab : AbilityComponent {
+public class SpawnPrefab : AbilityComponent<Context> {
 
     public GameObject prefab;
     public bool spawnAtPoint = true;

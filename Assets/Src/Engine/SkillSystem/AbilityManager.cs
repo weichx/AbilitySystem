@@ -33,7 +33,7 @@ public class AbilityManager {
         }
         if (idx == -1) {
             Ability ability = new Ability(abilityId);
-            ability.SetCaster(entity);
+            ability.Caster = entity;
             abilities.Add(ability);
             abilityReferences.Add(1);
             return abilityReferences.Last();

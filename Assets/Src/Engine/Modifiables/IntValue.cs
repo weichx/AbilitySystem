@@ -6,13 +6,18 @@ using UnityEngine;
 ///</summary>
 public class IntValue {
 
-    [SerializeField] private int baseValue;
-    [SerializeField] private int flatBonus;
-    [SerializeField] private float percentBonus;
+    [SerializeField] protected int baseValue;
+    [SerializeField] protected int flatBonus;
+    [SerializeField] protected float percentBonus;
 
-    [SerializeField] private List<IntModifier> modifiers;
+    [SerializeField] protected List<IntModifier> modifiers;
 
-    public IntValue(int baseValue = 0) {
+    public IntValue() {
+        baseValue = 0;
+        modifiers = new List<IntModifier>();
+    }
+
+    public IntValue(int baseValue) {
         this.baseValue = baseValue;
         modifiers = new List<IntModifier>();
     }
@@ -34,6 +39,24 @@ public class IntValue {
         flatBonus += modifier.flatBonus;
         percentBonus += modifier.percentBonus;
 
+    }
+
+    public void ClearModifier(string id) {
+        modifiers = modifiers ?? new List<IntModifier>();
+        for (int i = 0; i < modifiers.Count; i++) {
+            if (modifiers[i].id == id) {
+                IntModifier prev = modifiers[i];
+                flatBonus -= prev.flatBonus;
+                percentBonus -= prev.percentBonus;
+                modifiers.RemoveAt(i);
+                break;
+            }
+        }
+    }
+
+    public IntModifier[] GetReadOnlyModiferList() {
+        modifiers = modifiers ?? new List<IntModifier>();
+        return modifiers.ToArray();
     }
 
     public virtual int BaseValue {

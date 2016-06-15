@@ -30,7 +30,9 @@ public partial class Ability : EntitySystemBase {
 
     public bool IgnoreGCD = false;
 
-    public Ability() : this("") { }
+    public Ability() : this("") {
+        this.contextType = contextType ?? typeof(Context);
+    }
 
     public Ability(string id) {
         Id = id;
@@ -47,14 +49,13 @@ public partial class Ability : EntitySystemBase {
         channelTime = new FloatRange(3f);
         castTimer = new Timer();
         channelTimer = new Timer();
+        contextType = contextType ?? typeof(Context);
     }
 
-    public void SetCaster(Entity entity) {
-        caster = entity;
-    }
 
     public Entity Caster {
         get { return caster; }
+        set { caster = value; }
     }
 
     public Context GetContext() {
@@ -86,11 +87,16 @@ public partial class Ability : EntitySystemBase {
     }
 
     public bool Usable(Context context) {
+        if (!contextType.IsAssignableFrom(context.GetType())) {
+            Debug.LogError("Ability `" + Id + "` expects a context type assignable to " + contextType.Name + ", but was used with: " + context.GetType().Name);
+        }
         return OffCooldown && CheckRequirements(context, RequirementType.CastStart);
     }
 
     public bool Use(Context context) {
-
+        if (!contextType.IsAssignableFrom(context.GetType())) {
+            Debug.LogError("Ability `" + Id + "` expects a context type assignable to " + contextType.Name + ", but was used with: " + context.GetType().Name);
+        }
         if (!Usable(context)) {
             return false;
         }
@@ -177,13 +183,17 @@ public partial class Ability : EntitySystemBase {
 
     private void SetComponentContext(Context context) {
         for (int i = 0; i < components.Count; i++) {
-            components[i].ability = this;
+            components[i].ability = this; //can probably be moved
+            components[i].SetContext(context);
+        }
+        for (int i = 0; i < requirements.Count; i++) {
+            requirements[i].SetContext(context);
         }
     }
 
     protected bool CheckRequirements(Context context, RequirementType reqType) {
         for (int i = 0; i < requirements.Count; i++) {
-            if (!requirements[i].Test(context, reqType)) {
+            if (!requirements[i].Test(reqType)) {
                 return false;
             }
         }

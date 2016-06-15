@@ -24,7 +24,7 @@ public class SkillBookEntry : IActionbarItem {
         if (initialized) return;
         initialized = true;
         ability = abilityCreator.Create(); //ability does not have an entity right now
-        ability.SetCaster(entity);
+        ability.Caster = entity;
         action = new PlayerAction_UseSkill(ability, contextCreator);
     }
     

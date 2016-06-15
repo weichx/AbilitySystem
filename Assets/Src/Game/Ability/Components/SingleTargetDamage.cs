@@ -1,6 +1,6 @@
 ﻿using Intelligence;
 
-public class SingleTargetDamage : AbilityComponent {
+public class SingleTargetDamage : AbilityComponent<SingleTargetContext> {
 
     public float baseDamage;
     public ElementType elementType;
@@ -8,7 +8,7 @@ public class SingleTargetDamage : AbilityComponent {
 
     public override void OnCastCompleted() {
         if (damageFormula == null) return;
-        float damage = damageFormula.Invoke(baseDamage, ability.GetContext<SingleTargetContext>());
+        float damage = damageFormula.Invoke(baseDamage, context);
         //todo do something with damage, damage aggregator component perhaps?
     }
 

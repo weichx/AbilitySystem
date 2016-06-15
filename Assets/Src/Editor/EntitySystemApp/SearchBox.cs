@@ -83,7 +83,7 @@ public class SearchBox {
             for (int i = 0; i < results.Count; i++) {
                 resultContent.text = results[i].Name;
                 EditorGUILayout.BeginHorizontal();
-                if (GUILayout.Button(resultContent, itemStyle, GUILayout.MaxHeight(16f))) {
+                if (GUILayout.Button(resultContent, itemStyle, GUILayout.MaxHeight(18f))) {
                     searching = false;
                     searchString = string.Empty;
                     selected(results[i]);

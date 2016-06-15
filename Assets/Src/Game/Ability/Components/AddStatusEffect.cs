@@ -1,6 +1,6 @@
 ﻿using Intelligence;
 
-public class AddStatusEffect : AbilityComponent {
+public class AddStatusEffect : AbilityComponent<SingleTargetContext> {
 
     public StatusEffectCreator statusEffect;
 

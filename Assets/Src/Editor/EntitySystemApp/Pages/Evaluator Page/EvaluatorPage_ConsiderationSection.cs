@@ -39,7 +39,9 @@ public class EvaluatorPage_ConsiderationSection : ListSection<DecisionEvaluator>
         Type genType = baseType.MakeGenericType(new Type[] {targetType});
         var searchSet = Reflector.FindSubClasses(typeof(Consideration));
         searchSet = searchSet.FindAll((considerationType) => {
-            return genType.IsAssignableFrom(considerationType);
+            //todo cache instances
+            var dummy = Activator.CreateInstance(considerationType) as Consideration;
+            return dummy.GetContextType().IsAssignableFrom(targetType);
         });
         return new SearchBox(null, searchSet, AddListItem, "Add Consideration", "Considerations");
     }

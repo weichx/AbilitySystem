@@ -97,6 +97,7 @@ public class FloatRange {
         }
     }
 
+    //todo -- get
     public float NormalizedValue {
         set {
             float val = Mathf.Clamp01(value);
@@ -108,7 +109,7 @@ public class FloatRange {
 
     public class FloatRangeBoundry : FloatValue {
 
-        [HideInInspector] [SerializeField] public FloatRange parent;
+        [HideInInspector] public FloatRange parent;
 
         public FloatRangeBoundry() : base(0) {
             parent = null;

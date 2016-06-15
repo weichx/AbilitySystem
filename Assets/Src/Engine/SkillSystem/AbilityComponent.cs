@@ -3,7 +3,14 @@ using Intelligence;
 
 public abstract class AbilityComponent {
 
-    [NonSerialized] public Ability ability;
+    [NonSerialized]
+    public Ability ability;
+
+    protected Context context;
+
+    public virtual void SetContext(Context context) {
+        this.context = context;
+    }
 
     public virtual void OnUse() { }
     public virtual void OnChargeConsumed() { }
@@ -27,6 +34,22 @@ public abstract class AbilityComponent {
         this.ability = ability;
     }
 
-    public virtual void OnRemoved() {}
+    public virtual void OnRemoved() { }
 
+    public virtual Type GetContextType() {
+        return typeof(Context);
+    }
+}
+
+public abstract class AbilityComponent<T> : AbilityComponent where T : Context {
+
+    protected new T context;
+
+    public override void SetContext(Context context) {
+        this.context = context as T;
+    }
+
+    public override Type GetContextType() {
+        return typeof(T);
+    }
 }

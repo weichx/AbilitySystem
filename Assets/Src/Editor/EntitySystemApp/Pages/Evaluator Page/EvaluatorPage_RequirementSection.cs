@@ -18,6 +18,7 @@ public class EvaluatorPage_RequirementSection : ListSection<DecisionEvaluator> {
         searchBox = CreateSearchBox();
     }
 
+    //todo should this be the same as considerations?
     protected override SearchBox CreateSearchBox() {
         if (rootProperty == null) return null;
         Type targetType = rootProperty["contextType"].GetValue<Type>();
