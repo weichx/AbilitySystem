@@ -97,7 +97,7 @@ public class EntitySystemWindow : EditorWindow {
     }
 
     void RenderHeaderBar(Rect rect) {
-        HorizontalRectLayout d = new HorizontalRectLayout(rect, 4);
+        HorizontalRectLayout d = new HorizontalRectLayout(rect, 5);
 
         if (GUI.Button(d, "Abilities", GetStyle(typeof(AbilityPage)))) {
             currentPage = new AbilityPage();
@@ -112,9 +112,14 @@ public class EntitySystemWindow : EditorWindow {
             currentPage.OnEnter();
         }
         else if (GUI.Button(d, "Decision Evaluators", GetStyle(typeof(EvaluatorPage)))) {
-			currentPage = new EvaluatorPage();
-			currentPage.OnEnter();
+            currentPage = new EvaluatorPage();
+            currentPage.OnEnter();
         }
+        else if (GUI.Button(d, "Items", GetStyle(typeof(ItemPage)))) {
+            currentPage = new ItemPage();
+            currentPage.OnEnter();
+        }
+
     }
 
     private GUIStyle GetStyle(Type type) {
