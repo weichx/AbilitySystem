@@ -115,8 +115,8 @@ public class EntitySystemWindow : EditorWindow {
             currentPage = new EvaluatorPage();
             currentPage.OnEnter();
         }
-        else if (GUI.Button(d, "Items", GetStyle(typeof(ItemPage)))) {
-            currentPage = new ItemPage();
+        else if (GUI.Button(d, "Inventory Items", GetStyle(typeof(InventoryItemPage)))) {
+            currentPage = new InventoryItemPage();
             currentPage.OnEnter();
         }
 

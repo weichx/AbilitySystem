@@ -1,9 +1,9 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class ItemPage_NameSection : SectionBase<Item> {
+public class InventoryItemPage_NameSection : SectionBase<InventoryItem> {
 
-    public ItemPage_NameSection(float spacing) : base(spacing) {}
+    public InventoryItemPage_NameSection(float spacing) : base(spacing) {}
 
     public override void Render()
     {

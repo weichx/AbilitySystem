@@ -2,6 +2,6 @@
 using System.Collections;
 using Intelligence;
 
-public abstract class ItemComponent {
+public abstract class InventoryItemRequirement {
 
 }

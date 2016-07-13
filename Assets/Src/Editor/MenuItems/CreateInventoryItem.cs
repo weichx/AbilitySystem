@@ -2,14 +2,14 @@
 using UnityEditor;
 using System.IO;
 
-public static class ItemMenuItem {
+public static class InventoryItemMenuItem {
 
-    [MenuItem("Assets/Items")]
-    public static ItemCreator CreateScriptableObject() {
-        ItemCreator asset = ScriptableObject.CreateInstance<ItemCreator>();
-        string assetpath = "Assets/Items/Item.asset";
+    [MenuItem("Assets/InventoryItems")]
+    public static InventoryItemCreator CreateScriptableObject() {
+        InventoryItemCreator asset = ScriptableObject.CreateInstance<InventoryItemCreator>();
+        string assetpath = "Assets/InventoryItems/InventoryItem.asset";
         string assetPathAndName = AssetDatabase.GenerateUniqueAssetPath(assetpath);
-        Item item = new Item();
+        InventoryItem item = new InventoryItem();
         item.Id = Path.GetFileNameWithoutExtension(assetPathAndName);
         AssetSerializer serializer = new AssetSerializer();
         serializer.AddItem(item);
