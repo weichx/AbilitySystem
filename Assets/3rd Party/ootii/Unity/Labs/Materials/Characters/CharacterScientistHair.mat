@@ -1,0 +1,332 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!21 &2100000
+Material:
+  serializedVersion: 5
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_Name: CharacterScientistHair
+  m_Shader: {fileID: 4800000, guid: b76bb5e55880f60458545c0549390481, type: 3}
+  m_ShaderKeywords: _ALPHATEST_ON _LIGHTMAPPING_NONE _LIGHTMAPPING_STATIC_LIGHTMAPS
+    _NORMALMAP _UVSEC_UV1
+  m_LightmapFlags: 0
+  m_CustomRenderQueue: 2450
+  m_SavedProperties:
+    serializedVersion: 2
+    m_TexEnvs:
+      data:
+        first:
+          name: _MainTex
+        second:
+          m_Texture: {fileID: 2800000, guid: 2f6cf36e6c78b5540bb90c64c7e886dc, type: 3}
+          m_Scale: {x: 1, y: 1}
+          m_Offset: {x: 0, y: 0}
+      data:
+        first:
+          name: _BumpMap
+        second:
+          m_Texture: {fileID: 2800000, guid: 190b51cc1c565e24abf9930b4c5d880e, type: 3}
+          m_Scale: {x: 1, y: 1}
+          m_Offset: {x: 0, y: 0}
+      data:
+        first:
+          name: _NormalMap
+        second:
+          m_Texture: {fileID: 2800000, guid: 190b51cc1c565e24abf9930b4c5d880e, type: 3}
+          m_Scale: {x: 1, y: 1}
+          m_Offset: {x: 0, y: 0}
+      data:
+        first:
+          name: _DetailNormalMap
+        second:
+          m_Texture: {fileID: 0}
+          m_Scale: {x: 1, y: 1}
+          m_Offset: {x: 0, y: 0}
+      data:
+        first:
+          name: _SpecShiftTex
+        second:
+          m_Texture: {fileID: 2800000, guid: ea6ae831891ee304aaf6eead7d5236c3, type: 3}
+          m_Scale: {x: 1, y: 1}
+          m_Offset: {x: 0, y: 0}
+      data:
+        first:
+          name: _SpecStrandMaskTex
+        second:
+          m_Texture: {fileID: 2800000, guid: 617e23af9319a9b44b0b9c92719def64, type: 3}
+          m_Scale: {x: 1, y: 1}
+          m_Offset: {x: 0, y: 0}
+      data:
+        first:
+          name: _SpecGlossMap
+        second:
+          m_Texture: {fileID: 0}
+          m_Scale: {x: 1, y: 1}
+          m_Offset: {x: 0, y: 0}
+      data:
+        first:
+          name: _ParallaxMap
+        second:
+          m_Texture: {fileID: 0}
+          m_Scale: {x: 1, y: 1}
+          m_Offset: {x: 0, y: 0}
+      data:
+        first:
+          name: _OcclusionMap
+        second:
+          m_Texture: {fileID: 0}
+          m_Scale: {x: 1, y: 1}
+          m_Offset: {x: 0, y: 0}
+      data:
+        first:
+          name: _EmissionMap
+        second:
+          m_Texture: {fileID: 0}
+          m_Scale: {x: 1, y: 1}
+          m_Offset: {x: 0, y: 0}
+      data:
+        first:
+          name: _DetailMask
+        second:
+          m_Texture: {fileID: 0}
+          m_Scale: {x: 1, y: 1}
+          m_Offset: {x: 0, y: 0}
+      data:
+        first:
+          name: _DetailAlbedoMap
+        second:
+          m_Texture: {fileID: 0}
+          m_Scale: {x: 1, y: 1}
+          m_Offset: {x: 0, y: 0}
+      data:
+        first:
+          name: _MetallicGlossMap
+        second:
+          m_Texture: {fileID: 0}
+          m_Scale: {x: 1, y: 1}
+          m_Offset: {x: 0, y: 0}
+      data:
+        first:
+          name: _Occlusion
+        second:
+          m_Texture: {fileID: 0}
+          m_Scale: {x: 1, y: 1}
+          m_Offset: {x: 0, y: 0}
+      data:
+        first:
+          name: _KKFlowMap
+        second:
+          m_Texture: {fileID: 2800000, guid: bfc0aca536f8dc74c81bb546268c82c2, type: 3}
+          m_Scale: {x: 1, y: 1}
+          m_Offset: {x: 0, y: 0}
+    m_Floats:
+      data:
+        first:
+          name: _Cutoff
+        second: .349999994
+      data:
+        first:
+          name: _Shininess
+        second: .078125
+      data:
+        first:
+          name: _AlphaTestRef
+        second: .266000003
+      data:
+        first:
+          name: _SpecPower1
+        second: 102.5
+      data:
+        first:
+          name: _SpecPower2
+        second: 3.5
+      data:
+        first:
+          name: _SpecShift1
+        second: .0799999982
+      data:
+        first:
+          name: _SpecShift2
+        second: .349999994
+      data:
+        first:
+          name: _SpecAmount1
+        second: 3.5
+      data:
+        first:
+          name: _SpecAmount2
+        second: 2.79999995
+      data:
+        first:
+          name: _Brightness
+        second: 1
+      data:
+        first:
+          name: _MaskingPower
+        second: 1
+      data:
+        first:
+          name: _HorizontalTiling
+        second: 1.25
+      data:
+        first:
+          name: _LOD
+        second: 4.25
+      data:
+        first:
+          name: _NormalScale
+        second: .300000012
+      data:
+        first:
+          name: _ambientDiffuseMultiplier
+        second: 2
+      data:
+        first:
+          name: _ambientSpecularMultiplier
+        second: 1
+      data:
+        first:
+          name: _SrcBlend
+        second: 1
+      data:
+        first:
+          name: _DstBlend
+        second: 0
+      data:
+        first:
+          name: _ZWrite
+        second: 1
+      data:
+        first:
+          name: _Glossiness
+        second: 0
+      data:
+        first:
+          name: _BumpScale
+        second: -14.29
+      data:
+        first:
+          name: _Parallax
+        second: .00499999989
+      data:
+        first:
+          name: _OcclusionStrength
+        second: 1
+      data:
+        first:
+          name: _DetailNormalMapScale
+        second: 1
+      data:
+        first:
+          name: _UVSec
+        second: 0
+      data:
+        first:
+          name: _EmissionScaleUI
+        second: 0
+      data:
+        first:
+          name: _Mode
+        second: 1
+      data:
+        first:
+          name: _Metallic
+        second: 0
+      data:
+        first:
+          name: _Lightmapping
+        second: 0
+      data:
+        first:
+          name: _ZTest
+        second: 4
+      data:
+        first:
+          name: _Cull
+        second: 0
+      data:
+        first:
+          name: _KKReflectionSmoothness
+        second: .856999993
+      data:
+        first:
+          name: _KKReflectionGrayScale
+        second: 12.6899996
+      data:
+        first:
+          name: _KKPrimarySpecularExponent
+        second: 176.600006
+      data:
+        first:
+          name: _KKPrimaryRootShift
+        second: -.0170000009
+      data:
+        first:
+          name: _KKSecondarySpecularExponent
+        second: 192
+      data:
+        first:
+          name: _KKSecondaryRootShift
+        second: -.750999987
+      data:
+        first:
+          name: _HelmetHairStrength
+        second: 0
+      data:
+        first:
+          name: _HelmetHairScale
+        second: -1
+    m_Colors:
+      data:
+        first:
+          name: _EmissionColor
+        second: {r: 0, g: 0, b: 0, a: 0}
+      data:
+        first:
+          name: _Color
+        second: {r: 1, g: 1, b: 1, a: 1}
+      data:
+        first:
+          name: _SpecColor
+        second: {r: .0808823705, g: .0785034746, b: .0749351382, a: 1}
+      data:
+        first:
+          name: _HairColour
+        second: {r: .0784313753, g: .0392156877, b: .00392156886, a: 1}
+      data:
+        first:
+          name: _SpecColour1
+        second: {r: .176470593, g: .117647059, b: .0392156877, a: 1}
+      data:
+        first:
+          name: _SpecColour2
+        second: {r: .294117659, g: .196078435, b: .0980392173, a: 1}
+      data:
+        first:
+          name: _EmissionColorUI
+        second: {r: 0, g: 0, b: 0, a: 1}
+      data:
+        first:
+          name: _EmissionColorWithMapUI
+        second: {r: 1, g: 1, b: 1, a: 1}
+      data:
+        first:
+          name: _SpecularColor
+        second: {r: 0, g: 0, b: 0, a: 1}
+      data:
+        first:
+          name: _KKPrimarySpecularColor
+        second: {r: .308823526, g: .211117223, b: .0363321789, a: 1}
+      data:
+        first:
+          name: _KKSecondarySpecularColor
+        second: {r: .448529422, g: .257492512, b: .0527681634, a: 1}
+      data:
+        first:
+          name: _KKSpecularMixDirectFactors
+        second: {r: .150000006, g: .100000001, b: .0500000007, a: 0}
+      data:
+        first:
+          name: _KKSpecularMixIndirectFactors
+        second: {r: .75, g: .600000024, b: .150000006, a: 0}

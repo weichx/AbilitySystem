@@ -8,7 +8,7 @@ public class SingleTargetDamage : AbilityComponent<SingleTargetContext> {
 
     public override void OnCastCompleted() {
         if (damageFormula == null) return;
-        float damage = damageFormula.Invoke(baseDamage, context);
+       // float damage = damageFormula.Invoke(baseDamage, context);
         //todo do something with damage, damage aggregator component perhaps?
     }
 

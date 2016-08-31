@@ -37,11 +37,11 @@ public partial class Entity : MonoBehaviour {
         emitter = GetComponent<EventEmitter>();
         EntityManager.Instance.Register(this);
 
-        gameObject.layer = LayerMask.NameToLayer("Entity");
+       // gameObject.layer = LayerMask.NameToLayer("Entity");
     }
 
     public virtual void Update() {
-                lastPosition = transform.position;
+        lastPosition = transform.position;
         if (abilityManager != null) {
             abilityManager.Update();
         }

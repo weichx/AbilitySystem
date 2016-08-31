@@ -1,0 +1,349 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!21 &2100000
+Material:
+  serializedVersion: 5
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_Name: CharacterScientistSkin
+  m_Shader: {fileID: 4800000, guid: e0d998a9394d87b40af5b6fd5477ffde, type: 3}
+  m_ShaderKeywords: _DETAIL_MULX2 _ENABLEALBEDO_ON _LIGHTMAPPING_STATIC_LIGHTMAPS
+    _NORMALMAP _UVSEC_UV1
+  m_LightmapFlags: 0
+  m_CustomRenderQueue: -1
+  m_SavedProperties:
+    serializedVersion: 2
+    m_TexEnvs:
+      data:
+        first:
+          name: _MainTex
+        second:
+          m_Texture: {fileID: 2800000, guid: 2a7c7051b6e70e14b8959c3a3c42e7e9, type: 3}
+          m_Scale: {x: 1, y: 1}
+          m_Offset: {x: 0, y: 0}
+      data:
+        first:
+          name: _BumpMap
+        second:
+          m_Texture: {fileID: 2800000, guid: 9c104a3db3066864193d0dfd1e2e4f63, type: 3}
+          m_Scale: {x: 1, y: 1}
+          m_Offset: {x: 0, y: 0}
+      data:
+        first:
+          name: _DetailNormalMap
+        second:
+          m_Texture: {fileID: 0}
+          m_Scale: {x: 1, y: 1}
+          m_Offset: {x: 0, y: 0}
+      data:
+        first:
+          name: _NormalTex
+        second:
+          m_Texture: {fileID: 2800000, guid: 9c104a3db3066864193d0dfd1e2e4f63, type: 3}
+          m_Scale: {x: 1, y: 1}
+          m_Offset: {x: 0, y: 0}
+      data:
+        first:
+          name: _NormalDetailTex
+        second:
+          m_Texture: {fileID: 2800000, guid: 0ae55daa586d89745b276d9e4bd13c63, type: 3}
+          m_Scale: {x: 50, y: 50}
+          m_Offset: {x: 0, y: 0}
+      data:
+        first:
+          name: _SpecularAOTex
+        second:
+          m_Texture: {fileID: 2800000, guid: 6e94a63d7a8cd0a4091ed7aa4cb81d0e, type: 3}
+          m_Scale: {x: 1, y: 1}
+          m_Offset: {x: 0, y: 0}
+      data:
+        first:
+          name: _BeckmannTex
+        second:
+          m_Texture: {fileID: 2800000, guid: 67a2b822442ed4f47bbb1f0aabcef611, type: 3}
+          m_Scale: {x: 1, y: 1}
+          m_Offset: {x: 0, y: 0}
+      data:
+        first:
+          name: _BRDFTex
+        second:
+          m_Texture: {fileID: 2800000, guid: 74322c6059997824fb902670671a40d9, type: 3}
+          m_Scale: {x: 1, y: 1}
+          m_Offset: {x: 0, y: 0}
+      data:
+        first:
+          name: _SpecGlossMap
+        second:
+          m_Texture: {fileID: 0}
+          m_Scale: {x: 1, y: 1}
+          m_Offset: {x: 0, y: 0}
+      data:
+        first:
+          name: _ParallaxMap
+        second:
+          m_Texture: {fileID: 0}
+          m_Scale: {x: 1, y: 1}
+          m_Offset: {x: 0, y: 0}
+      data:
+        first:
+          name: _OcclusionMap
+        second:
+          m_Texture: {fileID: 2800000, guid: c81ff398d1adcd94dbf489cc6d7cafde, type: 3}
+          m_Scale: {x: 1, y: 1}
+          m_Offset: {x: 0, y: 0}
+      data:
+        first:
+          name: _EmissionMap
+        second:
+          m_Texture: {fileID: 0}
+          m_Scale: {x: 1, y: 1}
+          m_Offset: {x: 0, y: 0}
+      data:
+        first:
+          name: _DetailMask
+        second:
+          m_Texture: {fileID: 0}
+          m_Scale: {x: 1, y: 1}
+          m_Offset: {x: 0, y: 0}
+      data:
+        first:
+          name: _DetailAlbedoMap
+        second:
+          m_Texture: {fileID: 0}
+          m_Scale: {x: 1, y: 1}
+          m_Offset: {x: 0, y: 0}
+      data:
+        first:
+          name: _MetallicGlossMap
+        second:
+          m_Texture: {fileID: 0}
+          m_Scale: {x: 1, y: 1}
+          m_Offset: {x: 0, y: 0}
+      data:
+        first:
+          name: _Occlusion
+        second:
+          m_Texture: {fileID: 2800000, guid: c81ff398d1adcd94dbf489cc6d7cafde, type: 3}
+          m_Scale: {x: 1, y: 1}
+          m_Offset: {x: 0, y: 0}
+      data:
+        first:
+          name: _NoiseTex
+        second:
+          m_Texture: {fileID: 0}
+          m_Scale: {x: 1, y: 1}
+          m_Offset: {x: 0, y: 0}
+      data:
+        first:
+          name: _IrradianceTex
+        second:
+          m_Texture: {fileID: 8900000, guid: 9670ea06a09b37346b89e95be8adec96, type: 3}
+          m_Scale: {x: 1, y: 1}
+          m_Offset: {x: 0, y: 0}
+    m_Floats:
+      data:
+        first:
+          name: _Cutoff
+        second: .5
+      data:
+        first:
+          name: _AlphaTestRef
+        second: .5
+      data:
+        first:
+          name: _EnableAlbedo
+        second: 1
+      data:
+        first:
+          name: _EnableNormal
+        second: 1
+      data:
+        first:
+          name: _bumpiness
+        second: 2
+      data:
+        first:
+          name: _EnableNormalDetail
+        second: 1
+      data:
+        first:
+          name: _normalDetailLevel
+        second: 1.96000004
+      data:
+        first:
+          name: _EnableSpecular
+        second: 1
+      data:
+        first:
+          name: _specularIntensity
+        second: 3.13000011
+      data:
+        first:
+          name: _specularRoughness
+        second: .469999999
+      data:
+        first:
+          name: _specularFresnel
+        second: 1.08000004
+      data:
+        first:
+          name: _EnableSSS
+        second: 1
+      data:
+        first:
+          name: _EnableSecondSpec
+        second: 1
+      data:
+        first:
+          name: _normalLOD
+        second: 3
+      data:
+        first:
+          name: _sssCurve
+        second: .99000001
+      data:
+        first:
+          name: _sssPower
+        second: 2.46000004
+      data:
+        first:
+          name: _sssDistortion
+        second: 4.5
+      data:
+        first:
+          name: _sssScale
+        second: .649999976
+      data:
+        first:
+          name: _sssAmount
+        second: 1
+      data:
+        first:
+          name: _ambientContribution
+        second: 1
+      data:
+        first:
+          name: _SrcBlend
+        second: 1
+      data:
+        first:
+          name: _DstBlend
+        second: 0
+      data:
+        first:
+          name: _ZWrite
+        second: 1
+      data:
+        first:
+          name: _Glossiness
+        second: .00999999978
+      data:
+        first:
+          name: _BumpScale
+        second: .5
+      data:
+        first:
+          name: _Parallax
+        second: .0199999996
+      data:
+        first:
+          name: _OcclusionStrength
+        second: .536000013
+      data:
+        first:
+          name: _DetailNormalMapScale
+        second: 1
+      data:
+        first:
+          name: _UVSec
+        second: 0
+      data:
+        first:
+          name: _EmissionScaleUI
+        second: 1
+      data:
+        first:
+          name: _Mode
+        second: 0
+      data:
+        first:
+          name: _Metallic
+        second: 0
+      data:
+        first:
+          name: _Lightmapping
+        second: 0
+      data:
+        first:
+          name: sssWidth
+        second: 1
+      data:
+        first:
+          name: ssssFOVY
+        second: 20
+      data:
+        first:
+          name: ssssStrengthSource
+        second: 1
+      data:
+        first:
+          name: _EnableIrradiance
+        second: 0
+      data:
+        first:
+          name: _normalBias
+        second: 1
+      data:
+        first:
+          name: _translucency
+        second: .790000021
+      data:
+        first:
+          name: _sssWidth
+        second: 1.25
+      data:
+        first:
+          name: noiseIntensity
+        second: 1
+      data:
+        first:
+          name: exposure
+        second: 1
+    m_Colors:
+      data:
+        first:
+          name: _EmissionColor
+        second: {r: 0, g: 0, b: 0, a: 1}
+      data:
+        first:
+          name: _Color
+        second: {r: .411764681, g: .411764681, b: .411764681, a: 1}
+      data:
+        first:
+          name: _SpecColor
+        second: {r: .0735294223, g: .0735294223, b: .0735294223, a: 1}
+      data:
+        first:
+          name: _sssSubColor
+        second: {r: 1, g: 0, b: 0, a: 1}
+      data:
+        first:
+          name: _EmissionColorUI
+        second: {r: 0, g: 0, b: 0, a: 1}
+      data:
+        first:
+          name: _EmissionColorWithMapUI
+        second: {r: 1, g: 1, b: 1, a: 1}
+      data:
+        first:
+          name: _SpecularColor
+        second: {r: .117647059, g: .117647059, b: .117647059, a: 1}
+      data:
+        first:
+          name: dir
+        second: {r: 0, g: 0, b: 0, a: 0}
+      data:
+        first:
+          name: pixelSize
+        second: {r: 0, g: 0, b: 0, a: 0}
