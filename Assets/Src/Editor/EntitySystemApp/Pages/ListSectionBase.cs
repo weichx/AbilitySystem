@@ -1,6 +1,7 @@
 ﻿using System;
 using UnityEngine;
 using UnityEditor;
+using EntitySystem;
 using System.Collections.Generic;
 
 public abstract class ListSection<T> : SectionBase<T> where T : EntitySystemBase, new() {

@@ -1,4 +1,5 @@
-﻿
+﻿using EntitySystem;
+
 public class StatusPage : MasterDetailPage<StatusEffect> {
 
     public StatusPage() : base() {

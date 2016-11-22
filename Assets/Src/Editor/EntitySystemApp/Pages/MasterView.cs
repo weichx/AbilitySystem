@@ -2,6 +2,7 @@
 using System.IO;
 using UnityEngine;
 using UnityEditor;
+using EntitySystem;
 using System.Collections.Generic;
 
 public class MasterView<T> where T : EntitySystemBase, new() {

@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using UnityEditor;
-using System.Reflection;
 using System;
+using System.Reflection;
 
 public static class EditorGUILayoutX {
 
@@ -12,7 +12,9 @@ public static class EditorGUILayoutX {
     public static void DrawProperties(SerializedPropertyX root) {
         for (int i = 0; i < root.ChildCount; i++) {
             SerializedPropertyX property = root.GetChildAt(i);
-            PropertyField(property, property.label, property.isExpanded);
+            if (property.IsDrawable) {
+                PropertyField(property, property.label, property.isExpanded);
+            }
         }
     }
 
@@ -22,6 +24,7 @@ public static class EditorGUILayoutX {
     }
 
     public static void PropertyField(SerializedPropertyX property, params GUILayoutOption[] options) {
+        if (property == null) return;
         PropertyField(property, property.label, true, options);
     }
 
@@ -31,9 +34,10 @@ public static class EditorGUILayoutX {
 
     public static void PropertyField(SerializedPropertyX property, GUIContent label, bool includeChildren, params GUILayoutOption[] options) {
         Type type = property.type;
-        ExtendedPropertyDrawer drawer = Reflector.GetExtendedPropertyDrawerFor(property.type);
-        if (drawer != null) {
-            drawer.OnGUI(GetControlRect(property), property, label);
+        if (!property.IsDrawable) return;
+        PropertyDrawerX drawerX = Reflector.GetCustomPropertyDrawerFor(property);
+        if (drawerX != null) {
+            drawerX.OnGUI(property, label);
             return;
         }
         if (type.IsSubclassOf(typeof(UnityEngine.Object))) {
@@ -55,7 +59,7 @@ public static class EditorGUILayoutX {
             }
         }
         else if (type.IsEnum) {
-            property.Value = EditorGUILayout.EnumMaskField(label, (Enum)property.Value, options);
+            property.Value = EditorGUILayout.EnumPopup(label, (Enum)property.Value, options);
         }
         else if (type == typeof(Color)) {
             property.Value = EditorGUILayout.ColorField(label, (Color)property.Value);
@@ -104,7 +108,9 @@ public static class EditorGUILayoutX {
                 EditorGUI.indentLevel++;
                 for (int i = 0; i < property.ChildCount; i++) {
                     SerializedPropertyX child = property.GetChildAt(i);
-                    PropertyField(child, child.label, child.isExpanded, options);
+                    if (child.IsDrawable) {
+                        PropertyField(child, child.label, child.isExpanded, options);
+                    }
                 }
                 EditorGUI.indentLevel--;
             }

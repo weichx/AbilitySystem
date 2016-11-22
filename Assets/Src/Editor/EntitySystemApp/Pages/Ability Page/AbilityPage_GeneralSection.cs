@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using UnityEditor;
+using EntitySystem;
 
 public class AbilityPage_GeneralSection : SectionBase<Ability> {
 
@@ -10,9 +11,9 @@ public class AbilityPage_GeneralSection : SectionBase<Ability> {
         if (targetItem == null) return;
         SerializedPropertyX castMode = rootProperty.FindProperty("castMode");
         SerializedPropertyX ignoreGCD = rootProperty.FindProperty("IgnoreGCD");
-        SerializedPropertyX castTime = rootProperty.FindProperty("castTime").FindProperty("baseValue");
-        SerializedPropertyX channelTime = rootProperty.FindProperty("channelTime").FindProperty("baseValue");
-        SerializedPropertyX channelTicks = rootProperty.FindProperty("channelTicks").FindProperty("baseValue");
+        SerializedPropertyX castTime = rootProperty.FindProperty("castTime");//.FindProperty("baseValue");
+        SerializedPropertyX channelTime = rootProperty.FindProperty("channelTime");//.FindProperty("baseValue");
+        SerializedPropertyX channelTicks = rootProperty.FindProperty("channelTicks");//.FindProperty("baseValue");
         SerializedPropertyX charges = rootProperty.FindProperty("charges");
 
         GUILayout.BeginHorizontal();
@@ -23,11 +24,19 @@ public class AbilityPage_GeneralSection : SectionBase<Ability> {
         int castVal = (int) castMode.Value;
         if (castVal != (int)CastMode.Instant) {
             if (castVal != (int)CastMode.Channel) {
-                castTime.Value = EditorGUILayout.FloatField(new GUIContent("Cast Time"), (float) castTime.Value);
+                EditorGUI.indentLevel++;
+                EditorGUILayoutX.PropertyField(castTime);
+                EditorGUI.indentLevel--;
             }
             if (castVal != (int)CastMode.Cast) {
-                channelTime.Value = EditorGUILayout.FloatField(new GUIContent("Channel Time"), (float)channelTime.Value);
-                channelTicks.Value = EditorGUILayout.IntField(new GUIContent("Channel Ticks"), (int)channelTicks.Value);
+                EditorGUI.indentLevel++;
+                EditorGUILayoutX.PropertyField(channelTime);
+                EditorGUI.indentLevel--;
+                EditorGUI.indentLevel++;
+                EditorGUILayoutX.PropertyField(channelTicks);
+                EditorGUI.indentLevel--;
+                //channelTime.Value = EditorGUILayout.FloatField(new GUIContent("Channel Time"), (float)channelTime.Value);
+                //channelTicks.Value = EditorGUILayout.IntField(new GUIContent("Channel Ticks"), (int)channelTicks.Value);
             }
         }
         EditorGUILayout.BeginHorizontal();

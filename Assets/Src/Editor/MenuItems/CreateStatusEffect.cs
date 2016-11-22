@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using UnityEditor;
+using EntitySystem;
 using System.IO;
 
 public static class StatusEffectMenuItem {

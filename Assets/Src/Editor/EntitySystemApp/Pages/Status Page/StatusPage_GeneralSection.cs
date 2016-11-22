@@ -1,7 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEditor;
+using EntitySystem;
 
 public class StatusPage_GeneralSection : SectionBase<StatusEffect> {
 
@@ -28,17 +27,17 @@ public class StatusPage_GeneralSection : SectionBase<StatusEffect> {
 
         GUILayout.Space(10f);
 
-        using (var h = new EditorGUILayout.HorizontalScope()) {
-            duration.Value = EditorGUILayout.FloatField("Duration", duration.GetValue<float>());
-        }
+        //using (var h = new EditorGUILayout.HorizontalScope()) {
+        //    duration.Value = EditorGUILayout.FloatField("Duration", duration.GetValue<float>());
+        //}
 
-        using (var h = new EditorGUILayout.HorizontalScope()) {
-            ticks.Value = EditorGUILayout.FloatField("Ticks", ticks.GetValue<float>());
-        }
+        //using (var h = new EditorGUILayout.HorizontalScope()) {
+        //    ticks.Value = EditorGUILayout.FloatField("Ticks", ticks.GetValue<float>());
+        //}
 
-        using (var h = new EditorGUILayout.HorizontalScope()) {
-            tickRate.Value = EditorGUILayout.FloatField("Tick Rate", tickRate.GetValue<float>());
-        }
+        //using (var h = new EditorGUILayout.HorizontalScope()) {
+        //    tickRate.Value = EditorGUILayout.FloatField("Tick Rate", tickRate.GetValue<float>());
+        //}
     }
 
 }

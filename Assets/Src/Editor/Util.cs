@@ -9,4 +9,5 @@ public static class AssetDatabaseExtensions {
         string path = AssetDatabase.GUIDToAssetPath(guids[0]);
         return AssetDatabase.LoadAssetAtPath<T>(path);
     }
+
 }

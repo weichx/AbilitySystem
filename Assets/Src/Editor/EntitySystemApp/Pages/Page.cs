@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using EntitySystem;
 
 public interface IRectDrawable {
     void Render(Rect rect);

@@ -35,9 +35,9 @@ public static class EditorGUIUtilityX {
 
     //todo account for decorators eventually
     public static float GetHeight(SerializedPropertyX property, GUIContent label, bool includeChildren) {
-        ExtendedPropertyDrawer drawer = Reflector.GetExtendedPropertyDrawerFor(property.type);
-        if (drawer != null) {
-            return drawer.GetPropertyHeight(property, label);
+        PropertyDrawerX drawerX = Reflector.GetCustomPropertyDrawerFor(property);
+        if (drawerX != null) {
+            return drawerX.GetPropertyHeight(property, label);
         }
         else if (!includeChildren || property.type.IsPrimitive || property.type.IsEnum || property.type == typeof(string) || Array.IndexOf(BuildInTypes, property.type) != -1) {
             return GetSinglePropertyHeight(property.type, label);

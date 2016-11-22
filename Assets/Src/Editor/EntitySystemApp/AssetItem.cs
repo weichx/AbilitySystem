@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using UnityEditor;
+using EntitySystem;
 using System;
 
 public class AssetItem<T> where T : EntitySystemBase, new() {

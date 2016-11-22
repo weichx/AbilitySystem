@@ -1,4 +1,5 @@
-﻿
+﻿using EntitySystem;
+
 public class StatusPage_ComponentSection : ListSection<StatusEffect> {
 
     public StatusPage_ComponentSection(float spacing) : base(spacing) { }

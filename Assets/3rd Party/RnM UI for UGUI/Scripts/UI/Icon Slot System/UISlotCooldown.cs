@@ -1,0 +1,266 @@
+﻿using UnityEngine;
+using UnityEngine.UI;
+using System.Collections;
+using System.Collections.Generic;
+
+namespace UnityEngine.UI
+{
+	[AddComponentMenu("UI/Icon Slots/Slot Cooldown", 28)]
+	public class UISlotCooldown : MonoBehaviour {
+		
+		public class CooldownInfo
+		{
+			public float duration;
+			public float startTime;
+			public float endTime;
+			
+			public CooldownInfo(float duration, float startTime, float endTime)
+			{
+				this.duration = duration;
+				this.startTime = startTime;
+				this.endTime = endTime;
+			}
+		}
+		
+		private static Dictionary<int, CooldownInfo> spellCooldowns = new Dictionary<int, CooldownInfo>();
+		
+		[SerializeField] private UISlotBase m_TargetSlot;
+		[SerializeField] private Image m_TargetGraphic;
+		[SerializeField] private Text m_TargetText;
+		private bool m_IsOnCooldown = false;
+		private int m_CurrentSpellId = 0;
+		
+		protected void Start()
+		{
+			// Disable the image and text if they are shown by any chance
+			if (this.m_TargetGraphic != null) this.m_TargetGraphic.enabled = false;
+			if (this.m_TargetText != null) this.m_TargetText.enabled = false;
+			
+			// Hook the assign and unassign events
+			if (this.m_TargetSlot != null)
+			{
+				// Check if the slot is a spell slot
+				if (this.m_TargetSlot is UISpellSlot)
+				{
+					UISpellSlot slot = (this.m_TargetSlot as UISpellSlot);
+					
+					// Hook the events
+					slot.onAssign.AddListener(OnAssignSpell);
+					slot.onUnassign.AddListener(OnUnassignSpell);
+					slot.AssignCooldownComponent(this);
+				}
+			}
+			else
+			{
+				Debug.LogWarning("The slot cooldown script cannot operate without a target slot, disabling script.");
+				this.enabled = false;
+				return;
+			}
+		}
+		
+		protected void OnDisable()
+		{
+			// Disable any current cooldown display
+			this.InterruptCooldown();
+		}
+		
+		/// <summary>
+		/// Gets a value indicating whether the cooldown is active.
+		/// </summary>
+		/// <value><c>true</c> if this instance is on cooldown; otherwise, <c>false</c>.</value>
+		public bool IsOnCooldown
+		{
+			get { return this.m_IsOnCooldown; }
+		}
+		
+		/// <summary>
+		/// Raises the assign spell event.
+		/// </summary>
+		/// <param name="spellSlot">The spell slot.</param>
+		public void OnAssignSpell(UISpellSlot spellSlot)
+		{
+			// Return if the slot is not valid
+			if (spellSlot == null || spellSlot.GetSpellInfo() == null)
+				return;
+
+			// Get the spell info
+			UISpellInfo spellInfo = spellSlot.GetSpellInfo();
+
+			// Check if this spell still has cooldown
+			if (spellCooldowns.ContainsKey(spellInfo.ID))
+			{
+				float cooldownTill = spellCooldowns[spellInfo.ID].endTime;
+				
+				// Check if the cooldown isnt expired
+				if (cooldownTill > Time.time)
+				{
+					// Resume the cooldown
+					this.ResumeCooldown(spellInfo.ID);
+				}
+				else
+				{
+					// Cooldown already expired, remove the record
+					spellCooldowns.Remove(spellInfo.ID);
+				}
+			}
+		}
+		
+		/// <summary>
+		/// Raises the unassign event.
+		/// </summary>
+		public void OnUnassignSpell(UISpellSlot spellSlot)
+		{
+			this.InterruptCooldown();
+		}
+		
+		/// <summary>
+		/// Starts a cooldown.
+		/// </summary>
+		/// <param name="spellId">Spell identifier.</param>
+		/// <param name="duration">Duration.</param>
+		public void StartCooldown(int spellId, float duration)
+		{
+			if (!this.enabled || !this.gameObject.activeInHierarchy || this.m_TargetGraphic == null)
+				return;
+			
+			// Save the spell id
+			this.m_CurrentSpellId = spellId;
+			
+			// Enable the image if it's disabled
+			if (!this.m_TargetGraphic.enabled)
+				this.m_TargetGraphic.enabled = true;
+			
+			// Reset the fill amount
+			this.m_TargetGraphic.fillAmount = 1f;
+			
+			// Enable the text if it's disabled
+			if (this.m_TargetText != null)
+			{
+				if (!this.m_TargetText.enabled)
+					this.m_TargetText.enabled = true;
+				
+				this.m_TargetText.text = duration.ToString("0");
+			}
+			
+			// Set the slot on cooldown
+			this.m_IsOnCooldown = true;
+			
+			// Create new cooldown info
+			CooldownInfo cooldownInfo = new CooldownInfo(duration, Time.time, (Time.time + duration));
+			
+			// Save that this spell is on cooldown
+			if (!spellCooldowns.ContainsKey(spellId))
+				spellCooldowns.Add(spellId, cooldownInfo);
+			
+			// Start the coroutine
+			this.StartCoroutine("_StartCooldown", cooldownInfo);
+		}
+		
+		/// <summary>
+		/// Resumes a cooldown.
+		/// </summary>
+		/// <param name="spellId">Spell identifier.</param>
+		public void ResumeCooldown(int spellId)
+		{
+			if (!this.enabled || !this.gameObject.activeInHierarchy || this.m_TargetGraphic == null)
+				return;
+			
+			// Check if we have the cooldown info for that spell
+			if (!spellCooldowns.ContainsKey(spellId))
+				return;
+				
+			// Get the cooldown info
+			CooldownInfo cooldownInfo = spellCooldowns[spellId];
+			
+			// Get the remaining time
+			float remainingTime = (cooldownInfo.endTime - Time.time);
+			
+			// Save the spell id
+			this.m_CurrentSpellId = spellId;
+			
+			// Enable the image if it's disabled
+			if (!this.m_TargetGraphic.enabled)
+				this.m_TargetGraphic.enabled = true;
+			
+			// Set the fill amount to the remaing percents
+			this.m_TargetGraphic.fillAmount = (remainingTime / cooldownInfo.duration);
+			
+			// Enable the text if it's disabled
+			if (this.m_TargetText != null)
+			{
+				if (!this.m_TargetText.enabled)
+					this.m_TargetText.enabled = true;
+				
+				this.m_TargetText.text = remainingTime.ToString("0");
+			}
+			
+			// Start the coroutine
+			this.StartCoroutine("_StartCooldown", cooldownInfo);
+		}
+		
+		/// <summary>
+		/// Interrupts the current cooldown.
+		/// </summary>
+		public void InterruptCooldown()
+		{
+			// Cancel the coroutine
+			this.StopCoroutine("_StartCooldown");
+			
+			// Call the finish
+			this.OnCooldownFinished();
+		}
+		
+		IEnumerator _StartCooldown(CooldownInfo cooldownInfo)
+		{
+			while (Time.time < (cooldownInfo.startTime + cooldownInfo.duration))
+			{
+				float RemainingTime = (cooldownInfo.startTime + cooldownInfo.duration) - Time.time;
+				float RemainingTimePct = RemainingTime / cooldownInfo.duration;
+				
+				// Update the cooldown image
+				if (this.m_TargetGraphic != null)
+					this.m_TargetGraphic.fillAmount = RemainingTimePct;
+				
+				// Update the text
+				if (this.m_TargetText != null)
+					this.m_TargetText.text = RemainingTime.ToString("0");
+				
+				yield return 0;
+			}
+			
+			// Call the on finish
+			this.OnCooldownCompleted();
+		}
+		
+		/// <summary>
+		/// Raised when the cooldown completes it's full duration.
+		/// </summary>
+		private void OnCooldownCompleted()
+		{
+			// Remove from the cooldowns list
+			if (spellCooldowns.ContainsKey(this.m_CurrentSpellId))
+				spellCooldowns.Remove(this.m_CurrentSpellId);
+			
+			// Fire up the cooldown finished
+			this.OnCooldownFinished();
+		}
+		
+		/// <summary>
+		/// Raised when the cooldown finishes or has been interrupted.
+		/// </summary>
+		private void OnCooldownFinished()
+		{
+			// No longer on cooldown
+			this.m_IsOnCooldown = false;
+			this.m_CurrentSpellId = 0;
+			
+			// Disable the image
+			if (this.m_TargetGraphic != null)
+				this.m_TargetGraphic.enabled = false;
+			
+			// Disable the text
+			if (this.m_TargetText != null)
+				this.m_TargetText.enabled = false;
+		}
+	}
+}

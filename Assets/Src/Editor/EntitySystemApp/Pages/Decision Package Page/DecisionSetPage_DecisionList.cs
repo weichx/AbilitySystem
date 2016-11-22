@@ -1,6 +1,7 @@
 ﻿using System;
 using UnityEngine;
 using UnityEditor;
+using EntitySystem;
 using Intelligence;
 using System.Collections.Generic;
 using System.Reflection;
@@ -12,7 +13,6 @@ public class DecisionSetPage_DecisionList : ListSection<DecisionPackage> {
     private class DecisionRenderData : RenderData {
         public bool isActionShown;
         public bool isEvaluatorShown;
-        public bool isCollectorShown;
         public string[] evaluatorOptions;
         public string[] contextCollectorNames;
         public List<DecisionEvaluatorCreator> evaluatorCreators;

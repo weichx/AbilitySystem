@@ -1,4 +1,5 @@
-﻿using  UnityEngine;
+﻿using UnityEngine;
+using EntitySystem;
 using System.Collections.Generic;
 
 public class DetailView<T> where T : EntitySystemBase, new() {

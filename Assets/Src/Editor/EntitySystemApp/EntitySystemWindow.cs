@@ -56,8 +56,10 @@ public class EntitySystemWindow : EditorWindow {
     }
 
     void OnDisable() {
-        EditorPrefs.SetString("ESWindow.CurrentPage", currentPage.GetType().Name);
-        EditorPrefs.SetString("ESWindow.CurrentPage.SelectedItem", currentPage.GetActiveItemId());
+        if (currentPage != null) {
+            EditorPrefs.SetString("ESWindow.CurrentPage", currentPage.GetType().Name);
+            EditorPrefs.SetString("ESWindow.CurrentPage.SelectedItem", currentPage.GetActiveItemId());
+        }
     }
 
     void OnDestroy() {
