@@ -1,5 +1,6 @@
 ﻿using Intelligence;
 using UnityEngine;
+using EntitySystem;
 
 public class NotMoving : AbilityRequirement<Context> {
 

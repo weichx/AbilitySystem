@@ -1,4 +1,5 @@
-﻿
+﻿using EntitySystem;
+
 namespace Intelligence {
 
 	public class UseSkillAction : CharacterAction<Context> {

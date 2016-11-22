@@ -48,83 +48,72 @@ public class NavMeshDriverEditor : Editor
 
         GUILayout.Space(5);
 
-        bool lNewIsEnabled = EditorGUILayout.Toggle(new GUIContent("Is Enabled", "Determines if the driver is actively controlling the actor."), mTarget.IsEnabled);
-        if (lNewIsEnabled != mTarget.IsEnabled)
+        if (EditorHelper.BoolField("Is Enabled", "Determines if the driver is actively controlling the actor.", mTarget.IsEnabled, mTarget))
         {
             mIsDirty = true;
-            mTarget.IsEnabled = lNewIsEnabled;
+            mTarget.IsEnabled = EditorHelper.FieldBoolValue;
         }
 
-        bool lNewUseNavMeshPosition = EditorGUILayout.Toggle(new GUIContent("Use Nav Position", "Determines if we'll use the nav mesh position directly or calculate our own."), mTarget.UseNavMeshPosition);
-        if (lNewUseNavMeshPosition != mTarget.UseNavMeshPosition)
+        if (EditorHelper.BoolField("Use Nav Position", "Determines if we'll use the nav mesh position directly or calculate our own.", mTarget.UseNavMeshPosition, mTarget))
         {
             mIsDirty = true;
-            mTarget.UseNavMeshPosition = lNewUseNavMeshPosition;
+            mTarget.UseNavMeshPosition = EditorHelper.FieldBoolValue;
         }
 
-        float lNewMovementSpeed = EditorGUILayout.FloatField(new GUIContent("Movement Speed", "Meters per second the actor moves."), mTarget.MovementSpeed);
-        if (lNewMovementSpeed != mTarget.MovementSpeed)
+        if (EditorHelper.FloatField("Movement Speed", "Meters per second the actor moves.", mTarget.MovementSpeed, mTarget))
         {
             mIsDirty = true;
-            mTarget.MovementSpeed = lNewMovementSpeed;
+            mTarget.MovementSpeed = EditorHelper.FieldFloatValue;
         }
 
-        float lNewRotationSpeed = EditorGUILayout.FloatField(new GUIContent("Rotation Speed", "Degrees per second the actor rotates."), mTarget.RotationSpeed);
-        if (lNewRotationSpeed != mTarget.RotationSpeed)
+        if (EditorHelper.FloatField("Rotation Speed", "Degrees per second the actor rotates.", mTarget.RotationSpeed, mTarget))
         {
             mIsDirty = true;
-            mTarget.RotationSpeed = lNewRotationSpeed;
+            mTarget.RotationSpeed = EditorHelper.FieldFloatValue;
         }
 
         GUILayout.Space(5);
 
-        Transform lNewTarget = EditorGUILayout.ObjectField(new GUIContent("Target", "Transform that we'll use the Nav Mesh Agent to follow."), mTarget.Target, typeof(Transform), true) as Transform;
-        if (lNewTarget != mTarget.Target)
+        if (EditorHelper.ObjectField<Transform>("Target", "Transform that we'll use the Nav Mesh Agent to follow.", mTarget.Target, mTarget))
         {
             mIsDirty = true;
-            mTarget.Target = lNewTarget;
+            mTarget.Target = EditorHelper.FieldObjectValue as Transform;
         }
 
-        Vector3 lNewTargetPosition = EditorGUILayout.Vector3Field(new GUIContent("Target Position", "Specific position the Nav Mesh Agent will head to."), mTarget.TargetPosition);
-        if (lNewTargetPosition != mTarget.TargetPosition)
+        if (EditorHelper.Vector3Field("Target Position", "Specific position the Nav Mesh Agent will head to.", mTarget.TargetPosition, mTarget))
         {
             mIsDirty = true;
-            mTarget.TargetPosition = lNewTargetPosition;
+            mTarget.TargetPosition = EditorHelper.FieldVector3Value;
         }
 
-        bool lNewClearTargetOnStop = EditorGUILayout.Toggle(new GUIContent("Clear Target On Stop", "Determine if we clear the target once it's reached."), mTarget.ClearTargetOnStop);
-        if (lNewClearTargetOnStop != mTarget.ClearTargetOnStop)
+        if (EditorHelper.BoolField("Clear Target On Stop", "Determine if we clear the target once it's reached.", mTarget.ClearTargetOnStop, mTarget))
         {
             mIsDirty = true;
-            mTarget.ClearTargetOnStop = lNewClearTargetOnStop;
+            mTarget.ClearTargetOnStop = EditorHelper.FieldBoolValue;
         }
 
         GUILayout.Space(5);
 
-        float lNewStopDistance = EditorGUILayout.FloatField(new GUIContent("Stop Distance", "Range in which we consider ourselves as arriving."), mTarget.StopDistance);
-        if (lNewStopDistance != mTarget.StopDistance)
+        if (EditorHelper.FloatField("Stop Distance", "Range in which we consider ourselves as arriving.", mTarget.StopDistance, mTarget))
         {
             mIsDirty = true;
-            mTarget.StopDistance = lNewStopDistance;
+            mTarget.StopDistance = EditorHelper.FieldFloatValue;
         }
 
         EditorGUILayout.BeginHorizontal();
 
-        float lNewSlowDistance = EditorGUILayout.FloatField(new GUIContent("Slow Distance", "Range in which start slowing down."), mTarget.SlowDistance);
-        if (lNewSlowDistance != mTarget.SlowDistance)
+        if (EditorHelper.FloatField("Slow Distance", "Range in which start slowing down.", mTarget.SlowDistance, mTarget))
         {
             mIsDirty = true;
-            mTarget.SlowDistance = lNewSlowDistance;
+            mTarget.SlowDistance = EditorHelper.FieldFloatValue;
         }
 
         GUILayout.Space(5);
 
-        EditorGUILayout.LabelField(new GUIContent("Slow Speed", "Speed we'll drop to between the Slow Distance and Stop Distance"), GUILayout.Width(50));
-        float lNewSlowFactor = EditorGUILayout.FloatField(mTarget.SlowFactor, GUILayout.Width(45));
-        if (lNewSlowFactor != mTarget.SlowFactor)
+        if (EditorHelper.FloatField(mTarget.SlowFactor, "Slow Speed", mTarget, 45))
         {
             mIsDirty = true;
-            mTarget.SlowFactor = lNewSlowFactor;
+            mTarget.SlowFactor = EditorHelper.FieldFloatValue;
         }
 
         GUILayout.FlexibleSpace();
@@ -133,11 +122,10 @@ public class NavMeshDriverEditor : Editor
 
         GUILayout.Space(5);
 
-        float lNewPathHeight = EditorGUILayout.FloatField(new GUIContent("Path Height", "Nav Mesh height that is added by Unity. This allows us to fix our height."), mTarget.PathHeight);
-        if (lNewPathHeight != mTarget.PathHeight)
+        if (EditorHelper.FloatField("Path Height", "Nav Mesh height that is added by Unity. This allows us to fix our height.", mTarget.PathHeight, mTarget))
         {
             mIsDirty = true;
-            mTarget.PathHeight = lNewPathHeight;
+            mTarget.PathHeight = EditorHelper.FieldFloatValue;
         }
 
         GUILayout.Space(5);

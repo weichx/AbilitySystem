@@ -1,4 +1,5 @@
 ﻿using Intelligence;
+using EntitySystem;
 
 public class SingleTargetDamage : AbilityComponent<SingleTargetContext> {
 

@@ -112,7 +112,7 @@ namespace com.ootii.Actors.AnimationControllers
         /// the 'prev' and 'current' will actually share the same array when
         /// the assignment of 'prev = current' occurs. This is exactly what we want.
         /// </summary>
-        public Geometry.FloatValue InputMagnitudeTrend;
+        public FloatValue InputMagnitudeTrend;
 
         /// <summary>
         /// The forward normal of the controller

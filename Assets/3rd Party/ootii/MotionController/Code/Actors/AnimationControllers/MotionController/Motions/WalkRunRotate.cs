@@ -12,9 +12,9 @@ namespace com.ootii.Actors.AnimationControllers
     /// Idle motion for when the character is just standing and waiting
     /// for input or some interaction.
     /// </summary>
-    [MotionName("Walk Run Rotate")]
+    [MotionName("Walk Run Rotate (old)")]
     [MotionDescription("Simple walking motion that keeps the character facing forward, but rotates with the 'a' and 'd' keys.")]
-    public class WalkRunRotate : MotionControllerMotion
+    public class WalkRunRotate : MotionControllerMotion, IWalkRunMotion
     {
         /// <summary>
         /// Trigger values for th emotion
@@ -144,6 +144,16 @@ namespace com.ootii.Actors.AnimationControllers
         {
             get { return _RemoveLateralMovement; }
             set { _RemoveLateralMovement = value; }
+        }
+
+        /// <summary>
+        /// Determines if we shortcut the motion and start in the loop
+        /// </summary>
+        private bool mStartInMove = false;
+        public bool StartInMove
+        {
+            get { return mStartInMove; }
+            set { mStartInMove = value; }
         }
 
         /// <summary>

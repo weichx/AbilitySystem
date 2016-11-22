@@ -234,6 +234,11 @@ namespace com.ootii.Actors
         protected bool mFirstPathValid = false;
 
         /// <summary>
+        /// Determines if the current path is valid
+        /// </summary>
+        protected bool mIsPathValid = true;
+
+        /// <summary>
         /// Used for initialization before any Start or Updates are called
         /// </summary>
         protected override void Awake()
@@ -285,6 +290,7 @@ namespace com.ootii.Actors
             mNavMeshAgent.Stop();
 
             mHasArrived = false;
+            mIsPathValid = true;
             mFirstPathSet = false;
             mFirstPathValid = false;
             mIsInSlowDistance = false;
@@ -352,6 +358,8 @@ namespace com.ootii.Actors
                 // Hold on to our next position before we change it
                 if (mNavMeshAgent.hasPath && !mNavMeshAgent.pathPending)
                 {
+                    mIsPathValid = true;
+
                     mWaypoint = mNavMeshAgent.steeringTarget;
                     if (mTargetDistance > _SlowDistance) { mIsInSlowDistance = false; }
                 }
@@ -425,7 +433,7 @@ namespace com.ootii.Actors
             else
             {
                 // Grab the base movement speed
-                float lMoveSpeed = mRootMotionMovement.magnitude;
+                float lMoveSpeed = mRootMotionMovement.magnitude / lDeltaTime;
                 if (lMoveSpeed == 0f) { lMoveSpeed = _MovementSpeed; }
 
                 // Calculate our own slowing
@@ -464,8 +472,10 @@ namespace com.ootii.Actors
             mAgentDestination = rDestination;
 
             // Recalculate the path
-            if (!mNavMeshAgent.pathPending)
+            if (mIsPathValid && !mNavMeshAgent.pathPending)
             {
+                mIsPathValid = false;
+
                 mNavMeshAgent.updatePosition = false;
                 mNavMeshAgent.updateRotation = false;
                 mNavMeshAgent.stoppingDistance = _StopDistance;

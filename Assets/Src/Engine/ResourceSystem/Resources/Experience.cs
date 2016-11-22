@@ -1,7 +1,11 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class Experience : Resource {
+namespace EntitySystem.Resources {
 	
+	public class Experience : Resource {
+		
+	}
+
 }
 

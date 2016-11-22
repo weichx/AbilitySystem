@@ -1,4 +1,5 @@
-﻿
+﻿using EntitySystem;
+
 public abstract class SectionBase<T> where T : EntitySystemBase, new() {
 
 	protected AssetItem<T> targetItem;

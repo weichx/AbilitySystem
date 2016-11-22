@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using Intelligence;
 using UnityEngine;
-
+using EntitySystem;
 
 [Serializable]
 public class DecisionEvaluator : EntitySystemBase {

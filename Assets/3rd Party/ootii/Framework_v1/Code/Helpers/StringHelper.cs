@@ -174,6 +174,16 @@ namespace com.ootii.Helpers
         }
 
         /// <summary>
+        /// Adds a space between camel cased text
+        /// </summary>
+        /// <param name="rInput"></param>
+        /// <returns></returns>
+        public static string CleanString(string rInput)
+        {
+            return rInput.Replace(" ", String.Empty).Replace("_", String.Empty).ToLower();
+        }
+
+        /// <summary>
         /// Splits a string, but respecting qualifiers around the whole delimited segments so
         /// we can use the delimiter (say a comma) in the segment.
         /// </summary>

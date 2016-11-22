@@ -1,3 +1,5 @@
+// Upgrade NOTE: replaced '_Object2World' with 'unity_ObjectToWorld'
+
 
 // Upgrade NOTE: commented out 'sampler2D unity_Lightmap', a built-in variable
 // Upgrade NOTE: replaced tex2D unity_Lightmap with UNITY_SAMPLE_TEX2D
@@ -116,12 +118,12 @@ Shader "Custom/Skin" {
 			output.uv_MainTex = v.texcoord.xy;
 			output.uv_NormalDetailTex = v.texcoord2.xy;
 			
-			float3 worldPosition = mul(v.vertex, _Object2World).xyz;
+			float3 worldPosition = mul(v.vertex, unity_ObjectToWorld).xyz;
 
 			//world position is stcoked in w of viewspace, normal & tangent output (save one output)
 			output.view = float4(WorldSpaceViewDir(v.vertex).xyz, worldPosition.x);
 			output.normal = float4(v.normal.xyz, worldPosition.y); 
-			output.tangent = float4(mul((float3x3)_Object2World, v.tangent.xyz), worldPosition.z);
+			output.tangent = float4(mul((float3x3)unity_ObjectToWorld, v.tangent.xyz), worldPosition.z);
 		}
 		
 		void RenderPS( Input IN, inout SurfaceOutputSkinStandard o ) {

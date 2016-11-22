@@ -1,5 +1,5 @@
 ﻿using UnityEngine;
-using AbilitySystem;
+using EntitySystem;
 using System;
 
 public class PointToPointBeam : MonoBehaviour {

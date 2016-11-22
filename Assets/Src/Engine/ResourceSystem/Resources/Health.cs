@@ -1,5 +1,8 @@
 ﻿
-public class Health : Resource {
+namespace EntitySystem.Resources {
+	
+	public class Health : Resource {
+
+	}
 
 }
-

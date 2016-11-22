@@ -25,9 +25,25 @@ namespace com.ootii.Actors
     public interface ICharacterController
     {
         /// <summary>
-        /// Sets and absolute rotation to rotate the actor to
+        /// Yaw of the character
+        /// </summary>
+        Quaternion Yaw { get; set; }
+
+        /// <summary>
+        /// Tilt of the character
+        /// </summary>
+        Quaternion Tilt { get; set; }
+
+        /// <summary>
+        /// Sets and absolute yaw to rotate the actor to
         /// </summary>
         void SetRotation(Quaternion rRotation);
+
+        /// <summary>
+        /// Sets an absolute rotation of the actor using the yaw and tilt values.
+        /// </summary>
+        /// <param name="rRotation"></param>
+        void SetRotation(Quaternion rYaw, Quaternion rTilt);
 
         /// <summary>
         /// Sets and absolute position to move the actor to

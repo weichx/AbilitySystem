@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using EntitySystem;
 
 public class PlayerSkillBook : MonoBehaviour {
     [UnitySerialized] [HideInInspector] public string source;

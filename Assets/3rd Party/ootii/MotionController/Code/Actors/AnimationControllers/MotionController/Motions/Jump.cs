@@ -155,9 +155,13 @@ namespace com.ootii.Actors.AnimationControllers
         /// <summary>
         /// Connect to the move motion if we can
         /// </summary>
-        protected WalkRunPivot mWalkRunPivot = null;
-        protected WalkRunStrafe mWalkRunStrafe = null;
-        protected WalkRunRotate mWalkRunRotate = null;
+        protected IWalkRunMotion mWalkRunMotion = null;
+        //protected WalkRunPivot mWalkRunPivot = null;
+        //protected WalkRunPivot_v2 mWalkRunPivot_v2 = null;
+        //protected WalkRunStrafe mWalkRunStrafe = null;
+        //protected WalkRunStrafe_v2 mWalkRunStrafe_v2 = null;
+        //protected WalkRunRotate mWalkRunRotate = null;
+        //protected WalkRunRotate_v2 mWalkRunRotate_v2 = null;
 
         /// <summary>
         /// Default constructor
@@ -198,9 +202,13 @@ namespace com.ootii.Actors.AnimationControllers
         {
             if (mMotionController != null)
             {
-                if (mWalkRunPivot == null) { mWalkRunPivot = mMotionController.GetMotion<WalkRunPivot>(); }
-                if (mWalkRunStrafe == null) { mWalkRunStrafe = mMotionController.GetMotion<WalkRunStrafe>(); }
-                if (mWalkRunRotate == null) { mWalkRunRotate = mMotionController.GetMotion<WalkRunRotate>(); }
+                if (mWalkRunMotion == null) { mWalkRunMotion = mMotionController.GetMotionInterface<IWalkRunMotion>(); }
+                //if (mWalkRunPivot == null) { mWalkRunPivot = mMotionController.GetMotion<WalkRunPivot>(); }
+                //if (mWalkRunPivot_v2 == null) { mWalkRunPivot_v2 = mMotionController.GetMotion<WalkRunPivot_v2>(); }
+                //if (mWalkRunStrafe == null) { mWalkRunStrafe = mMotionController.GetMotion<WalkRunStrafe>(); }
+                //if (mWalkRunStrafe_v2 == null) { mWalkRunStrafe_v2 = mMotionController.GetMotion<WalkRunStrafe_v2>(); }
+                //if (mWalkRunRotate == null) { mWalkRunRotate = mMotionController.GetMotion<WalkRunRotate>(); }
+                //if (mWalkRunRotate_v2 == null) { mWalkRunRotate_v2 = mMotionController.GetMotion<WalkRunRotate_v2>(); }
             }
         }
 
@@ -317,7 +325,8 @@ namespace com.ootii.Actors.AnimationControllers
             // Force the camera to the default mode
             if (mMotionController.CameraRig != null)
             {
-                mMotionController.CameraRig.Mode = 0;
+                // TRT 10/13/16: Removed as not needed with CC
+                //mMotionController.CameraRig.Mode = 0;
             }
 
             // Attempt to find the hip bone if we have a name
@@ -555,9 +564,13 @@ namespace com.ootii.Actors.AnimationControllers
                     // what to transition to
                     else
                     {
-                        if ((mWalkRunPivot != null && mWalkRunPivot.IsEnabled && mWalkRunPivot.IsRunActive) ||
-                            (mWalkRunStrafe != null && mWalkRunStrafe.IsEnabled && mWalkRunStrafe.IsRunActive) ||
-                            (mWalkRunRotate != null && mWalkRunRotate.IsEnabled && mWalkRunRotate.IsRunActive))
+                        //if ((mWalkRunPivot != null && mWalkRunPivot.IsEnabled && mWalkRunPivot.IsRunActive) ||
+                        //    (mWalkRunPivot_v2 != null && mWalkRunPivot_v2.IsEnabled && mWalkRunPivot_v2.IsRunActive) ||
+                        //    (mWalkRunStrafe != null && mWalkRunStrafe.IsEnabled && mWalkRunStrafe.IsRunActive) ||
+                        //    (mWalkRunStrafe_v2 != null && mWalkRunStrafe_v2.IsEnabled && mWalkRunStrafe_v2.IsRunActive) ||
+                        //    (mWalkRunRotate != null && mWalkRunRotate.IsEnabled && mWalkRunRotate.IsRunActive) ||
+                        //    (mWalkRunRotate_v2 != null && mWalkRunRotate_v2.IsEnabled && mWalkRunRotate_v2.IsRunActive))
+                        if (mWalkRunMotion != null && mWalkRunMotion.IsEnabled && mWalkRunMotion.IsRunActive)
                         {
                             if (Mathf.Abs(lState.InputFromAvatarAngle) > 140) { mLaunchVelocity = Vector3.zero; }
                             mMotionController.SetAnimatorMotionPhase(mMotionLayer._AnimatorLayerIndex, PHASE_RECOVER_TO_MOVE);
@@ -587,24 +600,49 @@ namespace com.ootii.Actors.AnimationControllers
                     // It may be time to move into the walk/run
                     if (lStateTime > 0.3f)
                     {
-                        if (mWalkRunPivot != null && mWalkRunPivot.IsEnabled)
+                        if (mWalkRunMotion != null && mWalkRunMotion.IsEnabled)
                         {
-                            mWalkRunPivot.StartInRun = mWalkRunPivot.IsRunActive;
-                            mWalkRunPivot.StartInWalk = !mWalkRunPivot.StartInRun;
-                            mMotionController.ActivateMotion(mWalkRunPivot);
+                            mWalkRunMotion.StartInRun = mWalkRunMotion.IsRunActive;
+                            mWalkRunMotion.StartInWalk = !mWalkRunMotion.StartInRun;
+                            mMotionController.ActivateMotion(mWalkRunMotion as MotionControllerMotion);
                         }
-                        else if (mWalkRunStrafe != null && mWalkRunStrafe.IsEnabled)
-                        {
-                            mWalkRunStrafe.StartInRun = mWalkRunStrafe.IsRunActive;
-                            mWalkRunStrafe.StartInWalk = !mWalkRunStrafe.StartInRun;
-                            mMotionController.ActivateMotion(mWalkRunStrafe);
-                        }
-                        else if (mWalkRunRotate != null && mWalkRunRotate.IsEnabled)
-                        {
-                            mWalkRunRotate.StartInRun = mWalkRunRotate.IsRunActive;
-                            mWalkRunRotate.StartInWalk = !mWalkRunRotate.StartInRun;
-                            mMotionController.ActivateMotion(mWalkRunRotate);
-                        }
+
+                        //if (mWalkRunPivot != null && mWalkRunPivot.IsEnabled)
+                        //{
+                        //    mWalkRunPivot.StartInRun = mWalkRunPivot.IsRunActive;
+                        //    mWalkRunPivot.StartInWalk = !mWalkRunPivot.StartInRun;
+                        //    mMotionController.ActivateMotion(mWalkRunPivot);
+                        //}
+                        //else if (mWalkRunPivot_v2 != null && mWalkRunPivot_v2.IsEnabled)
+                        //{
+                        //    mWalkRunPivot_v2.StartInRun = mWalkRunPivot_v2.IsRunActive;
+                        //    mWalkRunPivot_v2.StartInWalk = !mWalkRunPivot_v2.StartInRun;
+                        //    mMotionController.ActivateMotion(mWalkRunPivot_v2);
+                        //}
+                        //else if (mWalkRunStrafe != null && mWalkRunStrafe.IsEnabled)
+                        //{
+                        //    mWalkRunStrafe.StartInRun = mWalkRunStrafe.IsRunActive;
+                        //    mWalkRunStrafe.StartInWalk = !mWalkRunStrafe.StartInRun;
+                        //    mMotionController.ActivateMotion(mWalkRunStrafe);
+                        //}
+                        //else if (mWalkRunStrafe_v2 != null && mWalkRunStrafe_v2.IsEnabled)
+                        //{
+                        //    mWalkRunStrafe_v2.StartInRun = mWalkRunStrafe_v2.IsRunActive;
+                        //    mWalkRunStrafe_v2.StartInWalk = !mWalkRunStrafe_v2.StartInRun;
+                        //    mMotionController.ActivateMotion(mWalkRunStrafe_v2);
+                        //}
+                        //else if (mWalkRunRotate != null && mWalkRunRotate.IsEnabled)
+                        //{
+                        //    mWalkRunRotate.StartInRun = mWalkRunRotate.IsRunActive;
+                        //    mWalkRunRotate.StartInWalk = !mWalkRunRotate.StartInRun;
+                        //    mMotionController.ActivateMotion(mWalkRunRotate);
+                        //}
+                        //else if (mWalkRunRotate_v2 != null && mWalkRunRotate_v2.IsEnabled)
+                        //{
+                        //    mWalkRunRotate_v2.StartInRun = mWalkRunRotate_v2.IsRunActive;
+                        //    mWalkRunRotate_v2.StartInWalk = !mWalkRunRotate_v2.StartInRun;
+                        //    mMotionController.ActivateMotion(mWalkRunRotate_v2);
+                        //}
                     }
                 }
             }
@@ -614,43 +652,91 @@ namespace com.ootii.Actors.AnimationControllers
                 // Allow the animation to control movement again
                 mLaunchVelocity = Vector3.zero;
 
-                // It may be time to move into the walk/run
-                if (mWalkRunPivot != null && mWalkRunPivot.IsEnabled)
+                if (mWalkRunMotion != null && mWalkRunMotion.IsEnabled)
                 {
                     // Allow us to keep moving so we blend into the run
                     lAllowSlide = true;
 
                     if (lStateTime > 0.2f)
                     {
-                        mWalkRunPivot.StartInRun = mWalkRunPivot.IsRunActive;
-                        mWalkRunPivot.StartInWalk = !mWalkRunPivot.StartInRun;
-                        mMotionController.ActivateMotion(mWalkRunPivot);
+                        mWalkRunMotion.StartInRun = mWalkRunMotion.IsRunActive;
+                        mWalkRunMotion.StartInWalk = !mWalkRunMotion.StartInRun;
+                        mMotionController.ActivateMotion(mWalkRunMotion as MotionControllerMotion);
                     }
                 }
-                else if (mWalkRunStrafe != null && mWalkRunStrafe.IsEnabled)
-                {
-                    // Allow us to keep moving so we blend into the run
-                    lAllowSlide = true;
+                //// It may be time to move into the walk/run
+                //if (mWalkRunPivot != null && mWalkRunPivot.IsEnabled)
+                //{
+                //    // Allow us to keep moving so we blend into the run
+                //    lAllowSlide = true;
 
-                    if (lStateTime > 0.2f)
-                    {
-                        mWalkRunStrafe.StartInRun = mWalkRunStrafe.IsRunActive;
-                        mWalkRunStrafe.StartInWalk = !mWalkRunStrafe.StartInRun;
-                        mMotionController.ActivateMotion(mWalkRunStrafe);
-                    }
-                }
-                else if (mWalkRunRotate != null && mWalkRunRotate.IsEnabled)
-                {
-                    // Allow us to keep moving so we blend into the run
-                    lAllowSlide = true;
+                //    if (lStateTime > 0.2f)
+                //    {
+                //        mWalkRunPivot.StartInRun = mWalkRunPivot.IsRunActive;
+                //        mWalkRunPivot.StartInWalk = !mWalkRunPivot.StartInRun;
+                //        mMotionController.ActivateMotion(mWalkRunPivot);
+                //    }
+                //}
+                //else if (mWalkRunPivot_v2 != null && mWalkRunPivot_v2.IsEnabled)
+                //{
+                //    // Allow us to keep moving so we blend into the run
+                //    lAllowSlide = true;
 
-                    if (lStateTime > 0.2f)
-                    {
-                        mWalkRunRotate.StartInRun = mWalkRunRotate.IsRunActive;
-                        mWalkRunRotate.StartInWalk = !mWalkRunRotate.StartInRun;
-                        mMotionController.ActivateMotion(mWalkRunRotate);
-                    }
-                }
+                //    if (lStateTime > 0.2f)
+                //    {
+                //        mWalkRunPivot_v2.StartInRun = mWalkRunPivot_v2.IsRunActive;
+                //        mWalkRunPivot_v2.StartInWalk = !mWalkRunPivot_v2.StartInRun;
+                //        mMotionController.ActivateMotion(mWalkRunPivot_v2);
+                //    }
+                //}
+                //else if (mWalkRunStrafe != null && mWalkRunStrafe.IsEnabled)
+                //{
+                //    // Allow us to keep moving so we blend into the run
+                //    lAllowSlide = true;
+
+                //    if (lStateTime > 0.2f)
+                //    {
+                //        mWalkRunStrafe.StartInRun = mWalkRunStrafe.IsRunActive;
+                //        mWalkRunStrafe.StartInWalk = !mWalkRunStrafe.StartInRun;
+                //        mMotionController.ActivateMotion(mWalkRunStrafe);
+                //    }
+                //}
+                //else if (mWalkRunStrafe_v2 != null && mWalkRunStrafe_v2.IsEnabled)
+                //{
+                //    // Allow us to keep moving so we blend into the run
+                //    lAllowSlide = true;
+
+                //    if (lStateTime > 0.2f)
+                //    {
+                //        mWalkRunStrafe_v2.StartInRun = mWalkRunStrafe_v2.IsRunActive;
+                //        mWalkRunStrafe_v2.StartInWalk = !mWalkRunStrafe_v2.StartInRun;
+                //        mMotionController.ActivateMotion(mWalkRunStrafe_v2);
+                //    }
+                //}
+                //else if (mWalkRunRotate != null && mWalkRunRotate.IsEnabled)
+                //{
+                //    // Allow us to keep moving so we blend into the run
+                //    lAllowSlide = true;
+
+                //    if (lStateTime > 0.2f)
+                //    {
+                //        mWalkRunRotate.StartInRun = mWalkRunRotate.IsRunActive;
+                //        mWalkRunRotate.StartInWalk = !mWalkRunRotate.StartInRun;
+                //        mMotionController.ActivateMotion(mWalkRunRotate);
+                //    }
+                //}
+                //else if (mWalkRunRotate_v2 != null && mWalkRunRotate_v2.IsEnabled)
+                //{
+                //    // Allow us to keep moving so we blend into the run
+                //    lAllowSlide = true;
+
+                //    if (lStateTime > 0.2f)
+                //    {
+                //        mWalkRunRotate_v2.StartInRun = mWalkRunRotate_v2.IsRunActive;
+                //        mWalkRunRotate_v2.StartInWalk = !mWalkRunRotate_v2.StartInRun;
+                //        mMotionController.ActivateMotion(mWalkRunRotate_v2);
+                //    }
+                //}
                 else
                 {
                     Deactivate();

@@ -1,8 +1,6 @@
-﻿using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using com.ootii.Geometry;
 using com.ootii.Helpers;
-using com.ootii.Utilities.Debug;
 
 #if UNITY_EDITOR
 using UnityEditor;

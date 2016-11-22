@@ -1,5 +1,7 @@
 ﻿using UnityEngine;
 using UnityEditor;
+using EntitySystem;
+
 using System;
 
 [PropertyDrawerFor(typeof(FloatRange))]

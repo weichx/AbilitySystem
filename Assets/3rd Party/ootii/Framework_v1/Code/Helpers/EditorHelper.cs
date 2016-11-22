@@ -69,6 +69,361 @@ namespace com.ootii.Helpers
 
         public static string LastPath = "";
 
+        public static string FieldStringValue = "";
+
+        public static bool FieldBoolValue = false;
+
+        public static float FieldFloatValue = 0f;
+
+        public static int FieldIntValue = 0;
+
+        public static Vector2 FieldVector2Value = Vector2.zero;
+
+        public static Vector3 FieldVector3Value = Vector3.zero;
+
+        public static Quaternion FieldQuaternionValue = Quaternion.identity;
+
+        public static UnityEngine.Object FieldObjectValue = null;
+
+        /// <summary>
+        /// Simplified way to create a text field
+        /// </summary>
+        /// <returns></returns>
+        public static void LabelField(string rTitle, string rTip, float rMinWidth = 0)
+        {
+            if (rMinWidth <= 0)
+            {
+                EditorGUILayout.LabelField(new GUIContent(rTitle, rTip));
+            }
+            else
+            {
+                EditorGUILayout.LabelField(new GUIContent(rTitle, rTip), GUILayout.Width(rMinWidth));
+            }
+        }
+
+        /// <summary>
+        /// Simplified way to create a text field
+        /// </summary>
+        /// <returns></returns>
+        public static bool TextField(string rTitle, string rTip, string rValue, UnityEngine.Object rRecorder = null, float rMinWidth = 0)
+        {
+            EditorGUI.BeginChangeCheck();
+
+            if (rMinWidth <= 0)
+            {
+                FieldStringValue = EditorGUILayout.TextField(new GUIContent(rTitle, rTip), rValue);
+            }
+            else
+            {
+                FieldStringValue = EditorGUILayout.TextField(new GUIContent(rTitle, rTip), rValue, GUILayout.MinWidth(rMinWidth));
+            }
+
+            if (EditorGUI.EndChangeCheck())
+            {
+                if (rRecorder != null) { Undo.RecordObject(rRecorder, "Set " + rTitle); }
+                return true;
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Simplified way to create a text field
+        /// </summary>
+        /// <returns></returns>
+        public static bool BoolField(bool rValue, string rTitle = "", UnityEngine.Object rRecorder = null, float rWidth = 0)
+        {
+            EditorGUI.BeginChangeCheck();
+
+            if (rWidth <= 0)
+            {
+                FieldBoolValue = EditorGUILayout.Toggle(rValue);
+            }
+            else
+            {
+                FieldBoolValue = EditorGUILayout.Toggle(rValue, GUILayout.Width(rWidth));
+            }
+
+            if (EditorGUI.EndChangeCheck())
+            {
+                if (rTitle.Length > 0 && rRecorder != null) { Undo.RecordObject(rRecorder, "Set " + rTitle); }
+                return true;
+            }
+
+            return false;
+        }
+        
+        /// <summary>
+        /// Simplified way to create a text field
+        /// </summary>
+        /// <returns></returns>
+        public static bool BoolField(string rTitle, string rTip, bool rValue, UnityEngine.Object rRecorder = null, float rMinWidth = 0)
+        {
+            EditorGUI.BeginChangeCheck();
+
+            if (rMinWidth <= 0)
+            {
+                FieldBoolValue = EditorGUILayout.Toggle(new GUIContent(rTitle, rTip), rValue);
+            }
+            else
+            {
+                FieldBoolValue = EditorGUILayout.Toggle(new GUIContent(rTitle, rTip), rValue, GUILayout.MinWidth(rMinWidth));
+            }
+
+            if (EditorGUI.EndChangeCheck())
+            {
+                if (rRecorder != null) { Undo.RecordObject(rRecorder, "Set " + rTitle); }
+                return true;
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Simplified way to create a text field
+        /// </summary>
+        /// <returns></returns>
+        public static bool FloatField(string rTitle, string rTip, float rValue, UnityEngine.Object rRecorder = null, float rMinWidth = 0)
+        {
+            EditorGUI.BeginChangeCheck();
+
+            if (rMinWidth <= 0)
+            {
+                FieldFloatValue = EditorGUILayout.FloatField(new GUIContent(rTitle, rTip), rValue);
+            }
+            else
+            {
+                FieldFloatValue = EditorGUILayout.FloatField(new GUIContent(rTitle, rTip), rValue, GUILayout.MinWidth(rMinWidth));
+            }
+
+            if (EditorGUI.EndChangeCheck())
+            {
+                if (rRecorder != null) { Undo.RecordObject(rRecorder, "Set " + rTitle); }
+                return true;
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Simplified way to create a text field
+        /// </summary>
+        /// <returns></returns>
+        public static bool FloatField(float rValue, string rTitle = "", UnityEngine.Object rRecorder = null, float rWidth = 0, float rMinWidth = 0)
+        {
+            EditorGUI.BeginChangeCheck();
+
+            if (rWidth <= 0)
+            {
+                if (rMinWidth <= 0)
+                {
+                    FieldFloatValue = EditorGUILayout.FloatField(rValue);
+                }
+                else
+                {
+                    FieldFloatValue = EditorGUILayout.FloatField(rValue, GUILayout.MinWidth(rMinWidth));
+                }
+            }
+            else
+            {
+                FieldFloatValue = EditorGUILayout.FloatField(rValue, GUILayout.Width(rWidth));
+            }
+
+            if (EditorGUI.EndChangeCheck())
+            {
+                if (rTitle.Length > 0 && rRecorder != null) { Undo.RecordObject(rRecorder, "Set " + rTitle); }
+                return true;
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Simplified way to create a text field
+        /// </summary>
+        /// <returns></returns>
+        public static bool IntField(string rTitle, string rTip, int rValue, UnityEngine.Object rRecorder = null, float rMinWidth = 0)
+        {
+            EditorGUI.BeginChangeCheck();
+
+            if (rMinWidth <= 0)
+            {
+                FieldIntValue = EditorGUILayout.IntField(new GUIContent(rTitle, rTip), rValue);
+            }
+            else
+            {
+                FieldIntValue = EditorGUILayout.IntField(new GUIContent(rTitle, rTip), rValue, GUILayout.MinWidth(rMinWidth));
+            }
+
+            if (EditorGUI.EndChangeCheck())
+            {
+                if (rRecorder != null) { Undo.RecordObject(rRecorder, "Set " + rTitle); }
+                return true;
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Simplified way to create a text field
+        /// </summary>
+        /// <returns></returns>
+        public static bool IntField(int rValue, string rTitle = "", UnityEngine.Object rRecorder = null, float rWidth = 0)
+        {
+            EditorGUI.BeginChangeCheck();
+
+            if (rWidth <= 0)
+            {
+                FieldIntValue = EditorGUILayout.IntField(rValue);
+            }
+            else
+            {
+                FieldIntValue = EditorGUILayout.IntField(rValue, GUILayout.Width(rWidth));
+            }
+
+            if (EditorGUI.EndChangeCheck())
+            {
+                if (rTitle.Length > 0 && rRecorder != null) { Undo.RecordObject(rRecorder, "Set " + rTitle); }
+                return true;
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Simplified way to create a text field
+        /// </summary>
+        /// <returns></returns>
+        public static bool PopUpField(string rTitle, string rTip, int rValue, string[] rValues, UnityEngine.Object rRecorder = null, float rMinWidth = 0)
+        {
+            EditorGUI.BeginChangeCheck();
+
+            if (rMinWidth <= 0)
+            {
+                FieldIntValue = EditorGUILayout.Popup(rTitle, rValue, rValues);
+            }
+            else
+            {
+                FieldIntValue = EditorGUILayout.Popup(rTitle, rValue, rValues, GUILayout.MinWidth(rMinWidth));
+            }
+
+            if (EditorGUI.EndChangeCheck())
+            {
+                if (rRecorder != null) { Undo.RecordObject(rRecorder, "Set " + rTitle); }
+                return true;
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Simplified way to create a text field
+        /// </summary>
+        /// <returns></returns>
+        public static bool Vector2Field(string rTitle, string rTip, Vector2 rValue, UnityEngine.Object rRecorder = null, float rMinWidth = 0)
+        {
+            EditorGUI.BeginChangeCheck();
+
+            if (rMinWidth <= 0)
+            {
+                FieldVector2Value = EditorGUILayout.Vector2Field(new GUIContent(rTitle, rTip), rValue);
+            }
+            else
+            {
+                FieldVector2Value = EditorGUILayout.Vector2Field(new GUIContent(rTitle, rTip), rValue, GUILayout.MinWidth(rMinWidth));
+            }
+
+            if (EditorGUI.EndChangeCheck())
+            {
+                if (rRecorder != null) { Undo.RecordObject(rRecorder, "Set " + rTitle); }
+                return true;
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Simplified way to create a text field
+        /// </summary>
+        /// <returns></returns>
+        public static bool Vector3Field(string rTitle, string rTip, Vector3 rValue, UnityEngine.Object rRecorder = null, float rMinWidth = 0)
+        {
+            EditorGUI.BeginChangeCheck();
+
+            if (rMinWidth <= 0)
+            {
+                FieldVector3Value = EditorGUILayout.Vector3Field(new GUIContent(rTitle, rTip), rValue);
+            }
+            else
+            {
+                FieldVector3Value = EditorGUILayout.Vector3Field(new GUIContent(rTitle, rTip), rValue, GUILayout.MinWidth(rMinWidth));
+            }
+
+            if (EditorGUI.EndChangeCheck())
+            {
+                if (rRecorder != null) { Undo.RecordObject(rRecorder, "Set " + rTitle); }
+                return true;
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Simplified way to create a text field
+        /// </summary>
+        /// <returns></returns>
+        public static bool QuaternionField(string rTitle, string rTip, Quaternion rValue, UnityEngine.Object rRecorder = null, float rMinWidth = 0)
+        {
+            EditorGUI.BeginChangeCheck();
+
+            Vector3 lValue = rValue.eulerAngles;
+
+            if (rMinWidth <= 0)
+            {
+                Vector3 lEuler = EditorGUILayout.Vector3Field(new GUIContent(rTitle, rTip), lValue);
+                FieldQuaternionValue = Quaternion.Euler(lEuler);
+            }
+            else
+            {
+                Vector3 lEuler = EditorGUILayout.Vector3Field(new GUIContent(rTitle, rTip), lValue, GUILayout.MinWidth(rMinWidth));
+                FieldQuaternionValue = Quaternion.Euler(lEuler);
+            }
+
+            if (EditorGUI.EndChangeCheck())
+            {
+                if (rRecorder != null) { Undo.RecordObject(rRecorder, "Set " + rTitle); }
+                return true;
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Simplified way to create a text field
+        /// </summary>
+        /// <returns></returns>
+        public static bool ObjectField<T>(string rTitle, string rTip, T rValue, UnityEngine.Object rRecorder = null, float rMinWidth = 0) where T : UnityEngine.Object
+        {
+            EditorGUI.BeginChangeCheck();
+
+            if (rMinWidth <= 0)
+            {
+                FieldObjectValue = EditorGUILayout.ObjectField(new GUIContent(rTitle, rTip), rValue, typeof(T), true);
+            }
+            else
+            {
+                FieldObjectValue = EditorGUILayout.ObjectField(new GUIContent(rTitle, rTip), rValue, typeof(T), true, GUILayout.MinWidth(rMinWidth));
+            }
+
+            if (EditorGUI.EndChangeCheck())
+            {
+                if (rRecorder != null) { Undo.RecordObject(rRecorder, "Set " + rTitle); }
+                return true;
+            }
+
+            return false;
+        }
+
         /// <summary>
         /// Shows a file selection field and button
         /// </summary>
@@ -355,6 +710,21 @@ namespace com.ootii.Helpers
         }
 
         /// <summary>
+        /// Renders the link in our inspector
+        /// </summary>
+        public static void DrawLink(string rTitle, string rURL)
+        {
+            Color lGUIColor = GUI.color;
+
+            if (GUILayout.Button(rTitle, LinkLabel))
+            {
+                Application.OpenURL(rURL);
+            }
+
+            GUI.color = lGUIColor;
+        }
+
+        /// <summary>
         /// Renders a simple line to the inspector
         /// </summary>
         public static void DrawLine()
@@ -437,7 +807,7 @@ namespace com.ootii.Helpers
                     mBox = new GUIStyle(GUI.skin.box);
                     mBox.normal.background = lTexture;
                     mBox.padding = new RectOffset(2, 2, 4, 4);
-                    mBox.margin = new RectOffset(0, 0, 0, 0);
+                    //mBox.margin = new RectOffset(0, 0, 0, 0);
                 }
 
                 return mBox;
@@ -801,6 +1171,25 @@ namespace com.ootii.Helpers
         /// <summary>
         /// Gray select target button
         /// </summary>
+        private static GUIStyle mOrangeGearButton = null;
+        public static GUIStyle OrangeGearButton
+        {
+            get
+            {
+                if (mOrangeGearButton == null)
+                {
+                    mOrangeGearButton = new GUIStyle();
+                    mOrangeGearButton.normal.background = Resources.Load<Texture2D>(EditorGUIUtility.isProSkin ? "Editor/GearButtonOrange_pro" : "Editor/GearButtonOrange");
+                    mOrangeGearButton.margin = new RectOffset(0, 0, 2, 0);
+                }
+
+                return mOrangeGearButton;
+            }
+        }
+
+        /// <summary>
+        /// Gray select target button
+        /// </summary>
         private static GUIStyle mBlueGearButton = null;
         public static GUIStyle BlueGearButton
         {
@@ -951,6 +1340,25 @@ namespace com.ootii.Helpers
         }
 
         /// <summary>
+        /// Blue select target button
+        /// </summary>
+        private static GUIStyle mLongButtonGreen = null;
+        public static GUIStyle LongButtonGreen
+        {
+            get
+            {
+                if (mLongButtonGreen == null)
+                {
+                    mLongButtonGreen = new GUIStyle();
+                    mLongButtonGreen.normal.background = Resources.Load<Texture2D>(EditorGUIUtility.isProSkin ? "Editor/LongButtonGreen" : "Editor/LongButtonGreen");
+                    mLongButtonGreen.border = new RectOffset(3, 3, 3, 3);
+                }
+
+                return mLongButtonGreen;
+            }
+        }
+
+        /// <summary>
         /// Label
         /// </summary>
         public static GUIStyle mLabel = null;
@@ -1021,6 +1429,81 @@ namespace com.ootii.Helpers
                 }
 
                 return mDisabledLabel;
+            }
+        }
+
+        /// <summary>
+        /// Label
+        /// </summary>
+        public static GUIStyle mSmallLabel = null;
+        public static GUIStyle SmallLabel
+        {
+            get
+            {
+                if (mSmallLabel == null)
+                {
+                    mSmallLabel = new GUIStyle(GUI.skin.label);
+                    mSmallLabel.fontSize = 9;
+                }
+
+                return mSmallLabel;
+            }
+        }
+
+        /// <summary>
+        /// Label
+        /// </summary>
+        public static GUIStyle mSmallBoldLabel = null;
+        public static GUIStyle SmallBoldLabel
+        {
+            get
+            {
+                //if (mSmallBoldLabel == null)
+                {
+                    mSmallBoldLabel = new GUIStyle(GUI.skin.label);
+                    mSmallBoldLabel.fontSize = 10;
+                    mSmallBoldLabel.fontStyle = FontStyle.Bold;
+                }
+
+                return mSmallBoldLabel;
+            }
+        }
+
+        /// <summary>
+        /// Label
+        /// </summary>
+        public static GUIStyle mLinkLabel = null;
+        public static GUIStyle LinkLabel
+        {
+            get
+            {
+                if (mLinkLabel == null)
+                {
+                    mLinkLabel = new GUIStyle(GUI.skin.label);
+                    mLinkLabel.normal.textColor = Color.blue;
+                    mLinkLabel.fontSize = 9;
+                }
+
+                return mLinkLabel;
+            }
+        }
+
+        /// <summary>
+        /// Label
+        /// </summary>
+        private static GUIStyle mOptionLabel = null;
+        public static GUIStyle OptionLabel
+        {
+            get
+            {
+                if (mOptionLabel == null)
+                {
+                    mOptionLabel = new GUIStyle(GUI.skin.label);
+                    mOptionLabel.wordWrap = true;
+                    mOptionLabel.padding.top = 11;
+                }
+
+                return mOptionLabel;
             }
         }
 

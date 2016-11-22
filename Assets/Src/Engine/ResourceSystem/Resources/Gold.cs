@@ -1,6 +1,10 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class Gold : Resource {
+namespace EntitySystem.Resources {
+	
+	public class Gold : Resource {
+	}
+
 }
 

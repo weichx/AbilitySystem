@@ -66,6 +66,16 @@ namespace com.ootii.Actors.AnimationControllers
         }
 
         /// <summary>
+        /// Determine if the running vault is used
+        /// </summary>
+        public bool _AllowRunningVault = false;
+        public bool AllowRunningVault
+        {
+            get { return _AllowRunningVault; }
+            set { _AllowRunningVault = value; }
+        }
+
+        /// <summary>
         /// User layer id set for objects that are climbable.
         /// </summary>
         public int _ClimbableLayers = 1;
@@ -105,9 +115,13 @@ namespace com.ootii.Actors.AnimationControllers
         /// <summary>
         /// Connect to the move motion if we can
         /// </summary>
-        protected WalkRunPivot mWalkRunPivot = null;
-        protected WalkRunStrafe mWalkRunStrafe = null;
-        protected WalkRunRotate mWalkRunRotate = null;
+        protected IWalkRunMotion mWalkRunMotion = null;
+        //protected WalkRunPivot mWalkRunPivot = null;
+        //protected WalkRunPivot_v2 mWalkRunPivot_v2 = null;
+        //protected WalkRunStrafe mWalkRunStrafe = null;
+        //protected WalkRunStrafe_v2 mWalkRunStrafe_v2 = null;
+        //protected WalkRunRotate mWalkRunRotate = null;
+        //protected WalkRunRotate_v2 mWalkRunRotate_v2 = null;
 
         /// <summary>
         /// Determines if we've already triggered the exit animation
@@ -165,9 +179,13 @@ namespace com.ootii.Actors.AnimationControllers
         {
             if (mMotionController != null)
             {
-                if (mWalkRunPivot == null) { mWalkRunPivot = mMotionController.GetMotion<WalkRunPivot>(); }
-                if (mWalkRunStrafe == null) { mWalkRunStrafe = mMotionController.GetMotion<WalkRunStrafe>(); }
-                if (mWalkRunRotate == null) { mWalkRunRotate = mMotionController.GetMotion<WalkRunRotate>(); }
+                if (mWalkRunMotion == null) { mWalkRunMotion = mMotionController.GetMotionInterface<IWalkRunMotion>(); }
+                //if (mWalkRunPivot == null) { mWalkRunPivot = mMotionController.GetMotion<WalkRunPivot>(); }
+                //if (mWalkRunPivot_v2 == null) { mWalkRunPivot_v2 = mMotionController.GetMotion<WalkRunPivot_v2>(); }
+                //if (mWalkRunStrafe == null) { mWalkRunStrafe = mMotionController.GetMotion<WalkRunStrafe>(); }
+                //if (mWalkRunStrafe_v2 == null) { mWalkRunStrafe_v2 = mMotionController.GetMotion<WalkRunStrafe_v2>(); }
+                //if (mWalkRunRotate == null) { mWalkRunRotate = mMotionController.GetMotion<WalkRunRotate>(); }
+                //if (mWalkRunRotate_v2 == null) { mWalkRunRotate_v2 = mMotionController.GetMotion<WalkRunRotate_v2>(); }
             }
         }
 
@@ -236,18 +254,23 @@ namespace com.ootii.Actors.AnimationControllers
             mActorController.SetGround(mClimbable.transform);
 
             // Set the animator in motion
-            if (rPrevMotion is WalkRunPivot)
+            mDefaultToRun = false;
+            if (_AllowRunningVault && rPrevMotion is IWalkRunMotion)
             {
-                mDefaultToRun = ((WalkRunPivot)rPrevMotion).IsRunActive;
+                mDefaultToRun = ((IWalkRunMotion)rPrevMotion).IsRunActive;
             }
-            else if (rPrevMotion is WalkRunStrafe)
-            {
-                mDefaultToRun = ((WalkRunStrafe)rPrevMotion).IsRunActive;
-            }
-            else if (rPrevMotion is WalkRunRotate)
-            {
-                mDefaultToRun = ((WalkRunRotate)rPrevMotion).IsRunActive;
-            }
+            //else if (rPrevMotion is WalkRunPivot)
+            //{
+            //    mDefaultToRun = ((WalkRunPivot)rPrevMotion).IsRunActive;
+            //}
+            //else if (rPrevMotion is WalkRunStrafe)
+            //{
+            //    mDefaultToRun = ((WalkRunStrafe)rPrevMotion).IsRunActive;
+            //}
+            //else if (rPrevMotion is WalkRunRotate)
+            //{
+            //    mDefaultToRun = ((WalkRunRotate)rPrevMotion).IsRunActive;
+            //}
 
             // Setup the reach data and clear any current values
             ClearReachData();
@@ -258,15 +281,15 @@ namespace com.ootii.Actors.AnimationControllers
                 Quaternion lWallHitRotation = mActorController._Transform.rotation;
 
                 MotionReachData lReachData = MotionReachData.Allocate();
-                lReachData.StateID = STATE_WalkVault_1m;
+                lReachData.StateID = STATE_RunVault_1m;
                 lReachData.StartTime = 0.0f;
                 lReachData.EndTime = 0.25f;
                 lReachData.Power = 3;
-                lReachData.ReachTarget = mRaycastHitInfo.point + (mActorController._Transform.rotation * _ReachOffset1) + (lWallHitRotation * _ReachOffset2);
+                lReachData.ReachTarget = mRaycastHitInfo.point + (mActorController._Transform.rotation * (_ReachOffset1 + new Vector3(0f, 0.3f, -0.5f))) + (lWallHitRotation * _ReachOffset2);
                 lReachData.ReachTargetGround = mActorController.State.Ground;
                 mReachData.Add(lReachData);
 
-                mMotionController.SetAnimatorMotionPhase(mMotionLayer._AnimatorLayerIndex, PHASE_START, true);
+                mMotionController.SetAnimatorMotionPhase(mMotionLayer._AnimatorLayerIndex, PHASE_START_RUN, true);
             }
             else
             {
@@ -345,7 +368,7 @@ namespace com.ootii.Actors.AnimationControllers
             // Get any movement from the reach data
             mMovement = GetReachMovement();
 
-            if (lStateID == STATE_WalkVault_1m)
+            if (lStateID == STATE_WalkVault_1m || lStateID == STATE_RunVault_1m)
             {
                 if (lStateTime > 0.65f)
                 {
@@ -369,23 +392,52 @@ namespace com.ootii.Actors.AnimationControllers
                 {
                     mIsExitTriggered = true;
 
-                    if (mWalkRunPivot != null && mWalkRunPivot.IsEnabled)
+                    // It may be time to move into the walk/run
+                    if (mWalkRunMotion != null && mWalkRunMotion.IsEnabled)
                     {
-                        mWalkRunPivot.StartInRun = mWalkRunPivot.IsRunActive;
-                        mWalkRunPivot.StartInWalk = !mWalkRunPivot.StartInRun;
-                        mMotionController.ActivateMotion(mWalkRunPivot);
+                        mWalkRunMotion.StartInRun = mWalkRunMotion.IsRunActive;
+                        mWalkRunMotion.StartInWalk = !mWalkRunMotion.StartInRun;
+                        mMotionController.ActivateMotion(mWalkRunMotion as MotionControllerMotion);
                     }
-                    else if (mWalkRunStrafe != null && mWalkRunStrafe.IsEnabled)
+                    //if (mWalkRunPivot != null && mWalkRunPivot.IsEnabled)
+                    //{
+                    //    mWalkRunPivot.StartInRun = mWalkRunPivot.IsRunActive;
+                    //    mWalkRunPivot.StartInWalk = !mWalkRunPivot.StartInRun;
+                    //    mMotionController.ActivateMotion(mWalkRunPivot);
+                    //}
+                    //else if (mWalkRunPivot_v2 != null && mWalkRunPivot_v2.IsEnabled)
+                    //{
+                    //    mWalkRunPivot_v2.StartInRun = mWalkRunPivot_v2.IsRunActive;
+                    //    mWalkRunPivot_v2.StartInWalk = !mWalkRunPivot_v2.StartInRun;
+                    //    mMotionController.ActivateMotion(mWalkRunPivot_v2);
+                    //}
+                    //else if (mWalkRunStrafe != null && mWalkRunStrafe.IsEnabled)
+                    //{
+                    //    mWalkRunStrafe.StartInRun = mWalkRunStrafe.IsRunActive;
+                    //    mWalkRunStrafe.StartInWalk = !mWalkRunStrafe.StartInRun;
+                    //    mMotionController.ActivateMotion(mWalkRunStrafe);
+                    //}
+                    //else if (mWalkRunStrafe_v2 != null && mWalkRunStrafe_v2.IsEnabled)
+                    //{
+                    //    mWalkRunStrafe_v2.StartInRun = mWalkRunStrafe_v2.IsRunActive;
+                    //    mWalkRunStrafe_v2.StartInWalk = !mWalkRunStrafe_v2.StartInRun;
+                    //    mMotionController.ActivateMotion(mWalkRunStrafe_v2);
+                    //}
+                    //else if (mWalkRunRotate != null && mWalkRunRotate.IsEnabled)
+                    //{
+                    //    mWalkRunRotate.StartInRun = mWalkRunRotate.IsRunActive;
+                    //    mWalkRunRotate.StartInWalk = !mWalkRunRotate.StartInRun;
+                    //    mMotionController.ActivateMotion(mWalkRunRotate);
+                    //}
+                    //else if (mWalkRunRotate_v2 != null && mWalkRunRotate_v2.IsEnabled)
+                    //{
+                    //    mWalkRunRotate_v2.StartInRun = mWalkRunRotate_v2.IsRunActive;
+                    //    mWalkRunRotate_v2.StartInWalk = !mWalkRunRotate_v2.StartInRun;
+                    //    mMotionController.ActivateMotion(mWalkRunRotate_v2);
+                    //}
+                    else
                     {
-                        mWalkRunStrafe.StartInRun = mWalkRunStrafe.IsRunActive;
-                        mWalkRunStrafe.StartInWalk = !mWalkRunStrafe.StartInRun;
-                        mMotionController.ActivateMotion(mWalkRunStrafe);
-                    }
-                    else if (mWalkRunRotate != null && mWalkRunRotate.IsEnabled)
-                    {
-                        mWalkRunRotate.StartInRun = mWalkRunRotate.IsRunActive;
-                        mWalkRunRotate.StartInWalk = !mWalkRunRotate.StartInRun;
-                        mMotionController.ActivateMotion(mWalkRunRotate);
+                        Deactivate();
                     }
                 }
             }
@@ -530,6 +582,12 @@ namespace com.ootii.Actors.AnimationControllers
             {
                 lIsDirty = true;
                 MaxHeight = lNewMaxHeight;
+            }
+
+            if (EditorHelper.BoolField("Allow Running Vault", "Determines if the running version of the vault is enabled", AllowRunningVault, mMotionController))
+            {
+                lIsDirty = true;
+                AllowRunningVault = EditorHelper.FieldBoolValue;
             }
 
             // Balance layer

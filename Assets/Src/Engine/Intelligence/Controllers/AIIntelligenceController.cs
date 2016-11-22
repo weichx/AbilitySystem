@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using Priority_Queue;
 using UnityEngine;
+using EntitySystem;
 
 namespace Intelligence {
 

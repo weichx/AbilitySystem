@@ -140,6 +140,17 @@ namespace com.ootii.Input
         }
 
         /// <summary>
+        /// Determines if button presses and action aliaces will be returned
+        /// through this input source
+        /// </summary>
+        public bool _AllowUserInput = false;
+        public bool AllowUserInput
+        {
+            get { return _AllowUserInput; }
+            set { _AllowUserInput = value; }
+        }
+
+        /// <summary>
         /// Height of the path from the actual navmesh surface. This is
         /// This height is added to the path by unity
         /// </summary>
@@ -357,6 +368,11 @@ namespace com.ootii.Input
         protected bool mFirstPathValid = false;
 
         /// <summary>
+        /// Determines if the current path is valid
+        /// </summary>
+        protected bool mIsPathValid = true;
+
+        /// <summary>
         /// Used for initialization before any Start or Updates are called
         /// </summary>
         protected void Awake()
@@ -445,6 +461,7 @@ namespace com.ootii.Input
             mNavMeshAgent.Stop();
 
             mHasArrived = false;
+            mIsPathValid = true;
             mFirstPathSet = false;
             mFirstPathValid = false;
             mIsInSlowDistance = false;
@@ -459,10 +476,65 @@ namespace com.ootii.Input
         }
 
         /// <summary>
-        /// We're going to hijack the function and ensure certain actions return values we want
+        /// Test if a specific key is pressed this frame.
         /// </summary>
-        /// <param name="rAction"></param>
+        /// <param name="rKey"></param>
         /// <returns></returns>
+        public override bool IsJustPressed(KeyCode rKey)
+        {
+            if (_AllowUserInput) { return base.IsJustPressed(rKey); }
+            return false;
+        }
+
+        /// <summary>
+        /// Test if a specific key is pressed this frame.
+        /// </summary>
+        /// <param name="rEnumInput">Input Manager enumerated key to test</param>
+        /// <returns>Boolean that determines if the action just took place</returns>
+        public override bool IsJustPressed(int rKey)
+        {
+            if (_AllowUserInput) { return base.IsJustPressed(rKey); }
+            return false;
+        }
+
+        /// <summary>
+        /// Test if a specific action is pressed this frame.
+        /// </summary>
+        /// <param name="rAction">Action to test for</param>
+        /// <returns>Boolean that determines if the action just took place</returns>
+        public override bool IsJustPressed(string rAction)
+        {
+            if (_AllowUserInput) { return base.IsJustPressed(rAction); }
+            return false;
+        }
+
+        /// <summary>
+        /// Test if a specific key is pressed. This is used for continuous checking.
+        /// </summary>
+        /// <param name="rKey"></param>
+        /// <returns></returns>
+        public override bool IsPressed(KeyCode rKey)
+        {
+            if (_AllowUserInput) { return base.IsPressed(rKey); }
+            return false;
+        }
+
+        /// <summary>
+        /// Test if a specific key is pressed. This is used for continuous checking.
+        /// </summary>
+        /// <param name="rEnumInput">Input Manager enumerated key to test</param>
+        /// <returns>Boolean that determines if the action is taking place</returns>
+        public override bool IsPressed(int rKey)
+        {
+            if (_AllowUserInput) { return base.IsPressed(rKey); }
+            return false;
+        }
+
+        /// <summary>
+        /// Test if a specific action is pressed. This is used for continuous checking.
+        /// </summary>
+        /// <param name="rAction">Action to test for</param>
+        /// <returns>Boolean that determines if the action is taking place</returns>
         public override bool IsPressed(string rAction)
         {
             if (rAction == "ActivateRotation")
@@ -470,7 +542,96 @@ namespace com.ootii.Input
                 return (mViewX != 0f);
             }
 
-            return base.IsPressed(rAction);
+            if (_AllowUserInput) { return base.IsPressed(rAction); }
+            return false;
+        }
+
+        /// <summary>
+        /// Test if a specific key is released this frame.
+        /// </summary>
+        /// <param name="rKey"></param>
+        /// <returns></returns>
+        public override bool IsJustReleased(KeyCode rKey)
+        {
+            if (_AllowUserInput) { return base.IsJustReleased(rKey); }
+            return false;
+        }
+
+        /// <summary>
+        /// Test if a specific key is released this frame.
+        /// </summary>
+        /// <param name="rKey">Input Manager enumerated key to test</param>
+        /// <returns>Boolean that determines if the action just took place</returns>
+        public override bool IsJustReleased(int rKey)
+        {
+            if (_AllowUserInput) { return base.IsJustReleased(rKey); }
+            return false;
+        }
+
+        /// <summary>
+        /// Test if a specific action is released this frame.
+        /// </summary>
+        /// <param name="rAction">Action to test for</param>
+        /// <returns>Boolean that determines if the action just took place</returns>
+        public override bool IsJustReleased(string rAction)
+        {
+            if (_AllowUserInput) { return base.IsJustReleased(rAction); }
+            return false;
+        }
+
+        /// <summary>
+        /// Test if a specific key is not pressed. This is used for continuous checking.
+        /// </summary>
+        /// <param name="rKey"></param>
+        /// <returns></returns>
+        public override bool IsReleased(KeyCode rKey)
+        {
+            if (_AllowUserInput) { return base.IsReleased(rKey); }
+            return true;
+        }
+
+        /// <summary>
+        /// Test if a specific key is not pressed. This is used for continuous checking.
+        /// </summary>
+        /// <param name="rEnumInput">Input Manager enumerated key to test</param>
+        /// <returns>Boolean that determines if the action is taking place</returns>
+        public override bool IsReleased(int rKey)
+        {
+            if (_AllowUserInput) { return base.IsReleased(rKey); }
+            return true;
+        }
+
+        /// <summary>
+        /// Test if a specific action is not pressed. This is used for continuous checking.
+        /// </summary>
+        /// <param name="rAction">Action to test for</param>
+        /// <returns>Boolean that determines if the action is taking place</returns>
+        public override bool IsReleased(string rAction)
+        {
+            if (_AllowUserInput) { return base.IsReleased(rAction); }
+            return true;
+        }
+
+        /// <summary>
+        /// Test for a specific action value.
+        /// </summary>
+        /// <param name="rKey">Input Manager enumerated key to test</param>
+        /// <returns>Float value as determined by the key</returns>
+        public override float GetValue(int rKey)
+        {
+            if (_AllowUserInput) { return base.GetValue(rKey); }
+            return 0f;
+        }
+
+        /// <summary>
+        /// Test for a specific action value.
+        /// </summary>
+        /// <param name="rAction">Action to test for</param>
+        /// <returns>Float value as determined by the action</returns>
+        public override float GetValue(string rAction)
+        {
+            if (_AllowUserInput) { return base.GetValue(rAction); }
+            return 0;
         }
 
         /// <summary>
@@ -524,9 +685,13 @@ namespace com.ootii.Input
                 // If we've reset the path, we may not be ready for a new steering target yet
                 if (mNavMeshAgent.hasPath && !mNavMeshAgent.pathPending)
                 {
+                    mIsPathValid = true;
+
                     mWaypoint = mNavMeshAgent.steeringTarget;
                     mWaypointVector = mWaypoint - _Transform.position;
                     mWaypointDistance = mWaypointVector.magnitude;
+
+                    if (mTargetDistance > _SlowDistance) { mIsInSlowDistance = false; }
                 }
 
                 // Determine if we're within the slow distance. We only want to fire the event once
@@ -631,8 +796,10 @@ namespace com.ootii.Input
             mAgentDestination = rDestination;
 
             // Recalculate the path
-            if (!mNavMeshAgent.pathPending)
+            if (mIsPathValid && !mNavMeshAgent.pathPending)
             {
+                mIsPathValid = false;
+
                 mNavMeshAgent.updatePosition = false;
                 mNavMeshAgent.updateRotation = false;
                 mNavMeshAgent.stoppingDistance = _StopDistance;

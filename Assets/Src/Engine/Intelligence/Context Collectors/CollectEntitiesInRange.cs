@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using EntitySystem;
+using System.Collections.Generic;
 
 namespace Intelligence {
 

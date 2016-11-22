@@ -35,7 +35,7 @@ namespace com.ootii.Actors.AnimationControllers
         public Fall()
             : base()
         {
-            _Priority = 14;
+            _Priority = 20;
             _IsControlEnabled = false;
             _ConvertToHipBase = false;
 
@@ -50,7 +50,7 @@ namespace com.ootii.Actors.AnimationControllers
         public Fall(MotionController rController)
             : base(rController)
         {
-            _Priority = 14;
+            _Priority = 20;
             _IsControlEnabled = false;
             _ConvertToHipBase = false;
 
@@ -62,14 +62,14 @@ namespace com.ootii.Actors.AnimationControllers
         /// Initialize is called after all the motions have been initialized. This allow us time to
         /// create references before the motions start working
         /// </summary>
-        public override void Initialize()
-        {
-            if (mMotionController != null)
-            {
-                if (mWalkRunPivot == null) { mWalkRunPivot = mMotionController.GetMotion<WalkRunPivot>(); }
-                if (mWalkRunStrafe == null) { mWalkRunStrafe = mMotionController.GetMotion<WalkRunStrafe>(); }
-            }
-        }
+        //public override void Initialize()
+        //{
+        //    if (mMotionController != null)
+        //    {
+        //        if (mWalkRunPivot == null) { mWalkRunPivot = mMotionController.GetMotion<WalkRunPivot>(); }
+        //        if (mWalkRunStrafe == null) { mWalkRunStrafe = mMotionController.GetMotion<WalkRunStrafe>(); }
+        //    }
+        //}
 
         /// <summary>
         /// Tests if this motion should be started. However, the motion
@@ -103,7 +103,8 @@ namespace com.ootii.Actors.AnimationControllers
             // Force the camera to the default mode
             if (mMotionController.CameraRig != null)
             {
-                mMotionController.CameraRig.Mode = 0;
+                // TRT 10/13/16: Removed as not needed with CC
+                //mMotionController.CameraRig.Mode = 0;
             }
 
             // Attempt to find the hip bone if we have a name
@@ -168,7 +169,7 @@ namespace com.ootii.Actors.AnimationControllers
             if (lNewFallHeight != MinFallHeight)
             {
                 lIsDirty = true;
-                MinFallHeight = MinFallHeight;
+                MinFallHeight = lNewFallHeight;
             }
 
             return lIsDirty;

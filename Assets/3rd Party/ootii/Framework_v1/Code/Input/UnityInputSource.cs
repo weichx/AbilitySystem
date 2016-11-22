@@ -63,7 +63,25 @@ namespace com.ootii.Input
             get
             {
                 if (!_IsEnabled) { return 0f; }
-                return UnityEngine.Input.GetAxis("Horizontal");
+
+                float lValue = 0f;
+                if (UnityEngine.Input.GetKey(KeyCode.D) || UnityEngine.Input.GetKey(KeyCode.RightArrow)) { lValue++; }
+                if (UnityEngine.Input.GetKey(KeyCode.A) || UnityEngine.Input.GetKey(KeyCode.LeftArrow)) { lValue--; }
+
+                if (_IsXboxControllerEnabled && lValue == 0f)
+                {
+                    try
+                    {
+#if UNITY_EDITOR_OSX || UNITY_STANDALONE_OSX
+                        lValue = UnityEngine.Input.GetAxis("MXLeftStickX");
+#else
+                        lValue = UnityEngine.Input.GetAxis("WXLeftStickX");
+#endif
+                    }
+                    catch { }
+                }
+
+                return lValue;
             }
         }
 
@@ -75,7 +93,25 @@ namespace com.ootii.Input
             get
             {
                 if (!_IsEnabled) { return 0f; }
-                return UnityEngine.Input.GetAxis("Vertical");
+
+                float lValue = 0f;
+                if (UnityEngine.Input.GetKey(KeyCode.W) || UnityEngine.Input.GetKey(KeyCode.UpArrow)) { lValue++; }
+                if (UnityEngine.Input.GetKey(KeyCode.S) || UnityEngine.Input.GetKey(KeyCode.DownArrow)) { lValue--; }
+
+                if (_IsXboxControllerEnabled && lValue == 0f)
+                {
+                    try
+                    {
+#if UNITY_EDITOR_OSX || UNITY_STANDALONE_OSX
+                        lValue = UnityEngine.Input.GetAxis("MXLeftStickY"); 
+#else
+                        lValue = UnityEngine.Input.GetAxis("WXLeftStickY");
+#endif
+                    }
+                    catch { }
+                }
+
+                return lValue;
             }
         }
 

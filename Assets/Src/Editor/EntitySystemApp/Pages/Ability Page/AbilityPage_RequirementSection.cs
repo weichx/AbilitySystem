@@ -1,4 +1,5 @@
 ﻿using System;
+using EntitySystem;
 using Intelligence;
 
 public class AbilityPage_RequirementSection : ListSection<Ability> {

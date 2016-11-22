@@ -193,7 +193,22 @@ namespace com.ootii.Cameras
             if (_Camera == null)
             {
                 _Camera = gameObject.GetComponent<Camera>();
-                if (_Camera == null) { _Camera = gameObject.GetComponentInChildren<Camera>(); }
+
+                if (_Camera == null)
+                {
+                    Camera[] lCameras = gameObject.GetComponentsInChildren<Camera>();
+                    if (lCameras != null && lCameras.Length > 0)
+                    {
+                        for (int i = 0; i < lCameras.Length; i++)
+                        {
+                            if (lCameras[i].enabled)
+                            {
+                                _Camera = lCameras[i];
+                                break;
+                            }
+                        }
+                    }
+                }
             }
         }
 
@@ -201,6 +216,52 @@ namespace com.ootii.Cameras
         /// Use this for initialization
         /// </summary>
         protected virtual void Start()
+        {
+        }
+
+        /// <summary>
+        /// Determines if the specified mode can be activated. This does not activate
+        /// the mode, but determines if it can be
+        /// </summary>
+        /// <param name="rMode"></param>
+        /// <param name="rEnable"></param>
+        public virtual void EnableMode(int rMode, bool rEnable)
+        {
+
+        }
+
+        /// <summary>
+        /// Clears out any target we're moving to
+        /// </summary>
+        public virtual void ClearTargetYawPitch()
+        {
+        }
+
+        /// <summary>
+        /// Causes us to ignore user input and force the camera to the specified localangles
+        /// </summary>
+        /// <param name="rYaw">Target local yaw</param>
+        /// <param name="rPitch">Target local pitch</param>
+        /// <param name="rSpeed">Degrees per second we'll rotate. A value of -1 uses the current yaw speed.</param>
+        /// <param name="rAutoClearTarget">Determines if we'll clear the target once we reach it.</param>
+        public virtual void SetTargetYawPitch(float rYaw, float rPitch, float rSpeed = -1f, bool rAutoClearTarget = true)
+        {
+        }
+
+        /// <summary>
+        /// Clears the forward direction target we're trying to reach
+        /// </summary>
+        public virtual void ClearTargetForward()
+        {
+        }
+
+        /// <summary>
+        /// Causes us to ignore user input and force the camera to a specific direction.
+        /// </summary>
+        /// <param name="rForward">Forward direction the camera should look.</param>
+        /// <param name="rSpeed">Speed at which we get there. A value of -1 uses the current yaw speed.</param>
+        /// <param name="rAutoClearTarget">Determines if we'll clear the target once we reach it.</param>
+        public virtual void SetTargetForward(Vector3 rForward, float rSpeed = -1f, bool rAutoClearTarget = true)
         {
         }
 

@@ -4,7 +4,6 @@
 
 using System;
 using System.Collections;
-using System.Collections.Generic;
 
 #if USE_FILE_IO
 using System.IO;
@@ -20,8 +19,6 @@ namespace com.ootii.Utilities.Debug
     /// </summary>
     public class Log : MonoBehaviour
     {
-        private const int LOG_TEXT_COUNT = 50;
-
         /// <summary>
         /// Inspector property
         /// Prefixes each line with the game time
@@ -41,6 +38,11 @@ namespace com.ootii.Utilities.Debug
         public bool _IsScreenEnabled = true;
 
         /// <summary>
+        /// Number of lines to write to on the screen
+        /// </summary>
+        public int _LineCount = 30;
+
+        /// <summary>
         /// Sets the size of the font when written to the screen.
         /// </summary>
         public int _ScreenFontSize = 12;
@@ -49,6 +51,11 @@ namespace com.ootii.Utilities.Debug
         /// Sets the color of the font in the screen
         /// </summary>
         public Color _ScreenForeColor = Color.black;
+
+        /// <summary>
+        /// Determines if we clear the screen each frame
+        /// </summary>
+        public bool _ClearScreenEachFrame = true;
 
         /// <summary>
         /// Inspector property
@@ -78,7 +85,9 @@ namespace com.ootii.Utilities.Debug
             Log.FilePath = _FilePath;
             Log.FontSize = _ScreenFontSize;
             Log.ForeColor = _ScreenForeColor;
+            Log.LineCount = _LineCount;
             Log.LineHeight = _ScreenFontSize + 6;
+            Log.ClearScreenEachFrame = _ClearScreenEachFrame;
             Log.PrefixTime = _PrefixTime;
             Log.IsFileEnabled = _IsFileEnabled;
             Log.IsScreenEnabled = _IsScreenEnabled;
@@ -96,7 +105,17 @@ namespace com.ootii.Utilities.Debug
                 //
                 // MEMORY: This causes 9/17 bytes of GC (runtime/editor)
                 yield return lWaitForEndOfFrame;
-                Log.Clear();
+
+                if (mClearScreenEachFrame)
+                {
+                    Clear();
+                }
+                else
+                {
+                    #if USE_FILE_IO
+                    if (mWriter != null) { mWriter.Flush(); }
+                    #endif
+                }
             }
         }
 
@@ -152,6 +171,16 @@ namespace com.ootii.Utilities.Debug
         }
 
         /// <summary>
+        /// Determines if we clear screen writing each frame
+        /// </summary>
+        private static bool mClearScreenEachFrame = true;
+        public static bool ClearScreenEachFrame
+        {
+            get { return mClearScreenEachFrame; }
+            set { mClearScreenEachFrame = value; }
+        }
+
+        /// <summary>
         /// Global enable flag that effects all logging
         /// </summary>
         private static bool mIsEnabled = true;
@@ -203,6 +232,34 @@ namespace com.ootii.Utilities.Debug
         }
 
         /// <summary>
+        /// Number of lines to write to on the screen
+        /// </summary>
+        private static int mLineCount = 30;
+        public static int LineCount
+        {
+            get { return mLineCount; }
+
+            set
+            {
+                if (mLineCount != value)
+                {
+                    mLineCount = value;
+
+                    mLines = new LogText[mLineCount];
+                    for (int i = 0; i < mLines.Length; i++)
+                    {
+                        LogText lLine = new LogText();
+                        lLine.X = 10;
+                        lLine.Y = i * mLineHeight;
+                        lLine.Text = "";
+
+                        mLines[i] = lLine;
+                    }
+                }
+            }
+        }
+
+        /// <summary>
         /// Sets the size of the font in the screen
         /// </summary>
         private static int mFontSize = 12;
@@ -225,7 +282,7 @@ namespace com.ootii.Utilities.Debug
         /// <summary>
         /// Lines of text to store and render
         /// </summary>
-        private static LogText[] mLines = new LogText[LOG_TEXT_COUNT];
+        private static LogText[] mLines = null;
 
         /// <summary>
         /// Index of the line to add
@@ -243,6 +300,23 @@ namespace com.ootii.Utilities.Debug
 #if USE_FILE_IO
     private static StreamWriter mWriter = null;
 #endif
+
+        /// <summary>
+        /// Static constructor
+        /// </summary>
+        static Log()
+        {
+            if (mLines == null) { mLines = new LogText[mLineCount]; }
+            for (int i = 0; i < mLines.Length; i++)
+            {
+                LogText lLine = new LogText();
+                lLine.X = 10;
+                lLine.Y = i * mLineHeight;
+                lLine.Text = "";
+
+                mLines[i] = lLine;
+            }
+        }
 
         /// <summary>
         /// Write to the logs that have been enabled
@@ -436,11 +510,62 @@ namespace com.ootii.Utilities.Debug
 
             if (mPrefixTime) { rText = String.Format("[{0:f4}] {1}", Time.realtimeSinceStartup, rText); }
 
-            LogText lLine = LogText.Allocate(rText, rX, rY);
-            mLines[mLineIndex % Log.LOG_TEXT_COUNT] = lLine;
+            int lLineIndex = rY / mLineHeight;
+            if (lLineIndex < mLines.Length)
+            {
+                if (mLines[lLineIndex] == null)
+                {
+                    LogText lLine = new LogText();
+                    lLine.X = rX;
+                    lLine.Y = lLineIndex * mLineHeight;
+                    lLine.Text = rText;
+
+                    mLines[lLineIndex] = lLine; 
+                }
+                else
+                {
+                    mLines[lLineIndex].Text = rText;
+                }
+            }
 
             mLineIndex++;
-            if (mLineIndex >= Log.LOG_TEXT_COUNT) { mLineIndex = Log.LOG_TEXT_COUNT - 1; }
+            if (mLineIndex >= mLineCount) { mLineIndex = mLineCount - 1; }
+        }
+
+        /// <summary>
+        /// Pushes the current content down and writes to the top of the stack
+        /// </summary>
+        /// <param name="rText"></param>
+        public static void ScreenWriteTop(string rText)
+        {
+            if (!mIsEnabled) { return; }
+
+            if (mPrefixTime) { rText = String.Format("[{0:f4}] {1}", Time.realtimeSinceStartup, rText); }
+
+            for (int i = mLines.Length - 1; i > 0; i--)
+            {
+                mLines[i].Text = mLines[i - 1].Text;
+            }
+
+            mLines[0].Text = rText;
+        }
+
+        /// <summary>
+        /// Pushes the current content up and writes to the bottom of the stack
+        /// </summary>
+        /// <param name="rText"></param>
+        public static void ScreenWriteBottom(string rText)
+        {
+            if (!mIsEnabled) { return; }
+
+            if (mPrefixTime) { rText = String.Format("[{0:f4}] {1}", Time.realtimeSinceStartup, rText); }
+
+            for (int i = 0; i < mLines.Length - 1; i++)
+            {
+                mLines[i].Text = mLines[i + 1].Text;
+            }
+
+            mLines[mLines.Length - 1].Text = rText;
         }
 
         /// <summary>
@@ -450,7 +575,7 @@ namespace com.ootii.Utilities.Debug
         public static void Render()
         {
             if (!mIsEnabled) { return; }
-            if (mLineIndex <= 0) { return; }
+            if (mLines.Length == 0) { return; }
 
             GUIStyle lStyle = new GUIStyle();
             lStyle.alignment = TextAnchor.UpperLeft;
@@ -462,9 +587,10 @@ namespace com.ootii.Utilities.Debug
             GUI.backgroundColor = Color.green;
 
             // Write out the lines of text
-            for (int i = 0; i < mLineIndex; i++)
+            for (int i = 0; i < mLines.Length; i++)
             {
                 LogText lLine = mLines[i];
+                if (lLine.Text.Length == 0) { continue; }
 
                 mLineRect.x = lLine.X;
                 mLineRect.y = lLine.Y;
@@ -481,9 +607,9 @@ namespace com.ootii.Utilities.Debug
         /// </summary>
         public static void Clear()
         {
-            for (int i = 0; i < mLineIndex; i++)
+            for (int i = 0; i < mLines.Length; i++)
             {
-                LogText.Release(mLines[i]);
+                mLines[i].Text = "";
             }
 
             mLineIndex = 0;

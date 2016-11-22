@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using com.ootii.Data.Serializers;
 using com.ootii.Geometry;
+using com.ootii.Helpers;
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -95,8 +96,10 @@ namespace com.ootii.Actors
 
             Vector3 lBodyShapePos1 = rPositionDelta + (_Transform == null ? _Parent.position + ((_Parent.rotation * rRotationDelta) * _Offset) : _Transform.position + ((_Transform.rotation * rRotationDelta) * _Offset));
 
+            GeometryExt.Ignore = _Parent;
+
             Collider[] lColliders = null;
-            int lColliderHits = RaycastExt.SafeOverlapSphere(lBodyShapePos1, _Radius, out lColliders, -1, _Parent);
+            int lColliderHits = RaycastExt.SafeOverlapSphere(lBodyShapePos1, _Radius, out lColliders, rLayerMask, _Parent);
 
             for (int i = 0; i < lColliderHits; i++)
             {
@@ -105,7 +108,7 @@ namespace com.ootii.Actors
 
                 // Once we get here, we have a valid collider
                 Vector3 lLinePoint = lBodyShapePos1;
-                Vector3 lColliderPoint = GeometryExt.ClosestPoint(lBodyShapePos1, _Radius, lColliders[i]);
+                Vector3 lColliderPoint = GeometryExt.ClosestPoint(lBodyShapePos1, _Radius, lColliders[i], rLayerMask);
 
                 float lDistance = Vector3.Distance(lLinePoint, lColliderPoint);
                 if (lDistance < _Radius + 0.001f)
@@ -120,6 +123,9 @@ namespace com.ootii.Actors
                     lHits.Add(lHit);
                 }
             }
+
+            GeometryExt.Ignore = null;
+            GeometryExt.IgnoreArray = null;
 
             return lHits;
         }
@@ -199,14 +205,14 @@ namespace com.ootii.Actors
                 {
                     Vector3 lColliderPoint = Vector3.zero;
 
-                    if (lBodyShapeHit.HitCollider is TerrainCollider)
-                    {
-                        lColliderPoint = GeometryExt.ClosestPoint(lBodyShapePos1, rDirection * rDistance, _Radius, (TerrainCollider)lBodyShapeHit.HitCollider);
-                    }
-                    else
-                    {
-                        lColliderPoint = GeometryExt.ClosestPoint(lBodyShapePos1, _Radius, lBodyShapeHit.HitCollider);
-                    }
+                    //if (lBodyShapeHit.HitCollider is TerrainCollider)
+                    //{
+                    //    lColliderPoint = GeometryExt.ClosestPoint(lBodyShapePos1, rDirection * rDistance, _Radius, (TerrainCollider)lBodyShapeHit.HitCollider, rLayerMask);
+                    //}
+                    //else
+                    //{
+                        lColliderPoint = GeometryExt.ClosestPoint(lBodyShapePos1, _Radius, lBodyShapeHit.HitCollider, rLayerMask);
+                    //}
 
                     // If we don't have a valid point, we will skip
                     if (lColliderPoint == Vector3.zero)
@@ -293,14 +299,14 @@ namespace com.ootii.Actors
             rContactPoint = Vector3.zero;
 
             // Test the collider for the closest contact point
-            if (rProcessTerrain && rCollider is TerrainCollider)
-            {
-                rContactPoint = GeometryExt.ClosestPoint(rShapePoint, rMovement.normalized, _Radius, (TerrainCollider)rCollider);
-            }
-            else
-            {
+            //if (rProcessTerrain && rCollider is TerrainCollider)
+            //{
+            //    rContactPoint = GeometryExt.ClosestPoint(rShapePoint, rMovement.normalized, _Radius, (TerrainCollider)rCollider);
+            //}
+            //else
+            //{
                 rContactPoint = GeometryExt.ClosestPoint(rShapePoint, _Radius, rCollider);
-            }
+            //}
 
             // Report back if we have a valid contact point
             return (rContactPoint.sqrMagnitude > 0f);
@@ -368,7 +374,7 @@ namespace com.ootii.Actors
         {
             bool lIsDirty = false;
 
-            EditorGUILayout.LabelField("Body Sphere", EditorStyles.boldLabel);
+            EditorHelper.DrawSmallTitle("Body Sphere");
 
             if (_Parent != null)
             {

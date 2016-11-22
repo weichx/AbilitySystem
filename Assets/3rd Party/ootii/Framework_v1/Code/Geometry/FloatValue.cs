@@ -23,9 +23,9 @@ namespace com.ootii.Geometry
             
             set 
             {
-                if (value > 0)
+                mSampleCount = (value > 0 ? value : 1);
+                if (mSamples == null || mSamples.Length != mSampleCount)
                 {
-                    mSampleCount = value;
                     Resize(mSampleCount, mDefault);
                 }
             }
@@ -39,6 +39,15 @@ namespace com.ootii.Geometry
         {
             get { return mValue; }
             set { Add(value); }
+        }
+
+        /// <summary>
+        /// Returns the previous value that was added (one before the last)
+        /// </summary>
+        private float mPrevValue;
+        public float PrevValue
+        {
+            get { return mPrevValue; }
         }
 
         /// <summary>
@@ -99,6 +108,7 @@ namespace com.ootii.Geometry
         {
             mSampleCount = 10;
             mValue = 0f;
+            mPrevValue = 0f;
             mSum = 0f;
             mAverage = 0f;
             mDefault = 0f;
@@ -118,6 +128,7 @@ namespace com.ootii.Geometry
         {
             mSampleCount = rSampleCount;
             mValue = 0f;
+            mPrevValue = 0f;
             mSum = 0f;
             mAverage = 0f;
             mDefault = 0f;
@@ -139,6 +150,22 @@ namespace com.ootii.Geometry
         //    mSampleCount = rSampleCount;
         //    Resize(mSampleCount, mDefault);
         //}
+
+        public void Clear(float rValue = 0f)
+        {
+            for (int i = 0; i < mSampleCount; i++)
+            {
+                mSamples[i] = rValue;
+            }
+
+            mValue = rValue;
+            mPrevValue = rValue;
+            mAverage = rValue;
+            mTrendDirection = FloatValue.TREND_CONSTANT;
+            mTrendValue = rValue;
+
+            mIndex = -1;
+        }
 
         /// <summary>
         /// Replaces the value that was last added with this new value
@@ -165,21 +192,21 @@ namespace com.ootii.Geometry
             if (mSampleCount == 0) { Resize(10, mDefault); }
 
             // Set the value
-            float lOldValue = mValue;
+            mPrevValue = mValue;
             mValue = rValue;
 
             // Determine the trend
-            if (mValue == lOldValue)
+            if (mValue == mPrevValue)
             {
                 if (mTrendDirection != FloatValue.TREND_CONSTANT) { mTrendValue = mValue; }
                 mTrendDirection = FloatValue.TREND_CONSTANT;
             }
-            else if (mValue < lOldValue)
+            else if (mValue < mPrevValue)
             {
                 if (mTrendDirection != FloatValue.TREND_DECREASING) { mTrendValue = mValue; }
                 mTrendDirection = FloatValue.TREND_DECREASING;
             }
-            else if (mTrendDirection > lOldValue)
+            else if (mTrendDirection > mPrevValue)
             {
                 if (mTrendDirection != FloatValue.TREND_INCREASING) { mTrendValue = mValue; }
                 mTrendDirection = FloatValue.TREND_INCREASING;

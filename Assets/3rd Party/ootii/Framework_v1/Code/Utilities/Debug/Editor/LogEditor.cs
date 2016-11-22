@@ -51,6 +51,17 @@ public class LogEditor : Editor
 
         GUILayout.Space(5);
 
+        int lNewLineCount = EditorGUILayout.IntField(new GUIContent("Line Count", "Number of lines to write to on the screen (edit-time only)."), mTarget._LineCount);
+        if (lNewLineCount != mTarget._LineCount)
+        {
+            if (!Application.isPlaying)
+            {
+                mIsDirty = true;
+                mTarget._LineCount = lNewLineCount;
+                Log.LineCount = lNewLineCount;
+            }
+        }
+
         int lNewFontSize = EditorGUILayout.IntField(new GUIContent("Font Size", "Font size when writing to the screen."), mTarget._ScreenFontSize);
         if (lNewFontSize != mTarget._ScreenFontSize)
         {
@@ -65,6 +76,14 @@ public class LogEditor : Editor
             mIsDirty = true;
             mTarget._ScreenForeColor = lNewFontColor;
             Log.ForeColor = lNewFontColor;
+        }
+
+        bool lNewClearScreenEachFrame = EditorGUILayout.Toggle(new GUIContent("Clear Each Frame", "Determines if we clear the screen each frame."), mTarget._ClearScreenEachFrame);
+        if (lNewPrefixTime != mTarget._ClearScreenEachFrame)
+        {
+            mIsDirty = true;
+            mTarget._ClearScreenEachFrame = lNewClearScreenEachFrame;
+            Log.ClearScreenEachFrame = mTarget._ClearScreenEachFrame;
         }
 
         GUILayout.Space(5);

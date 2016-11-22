@@ -1,4 +1,6 @@
-﻿#ifndef UNITY_PBS_LIGHTING_INCLUDED
+﻿// Upgrade NOTE: replaced '_Object2World' with 'unity_ObjectToWorld'
+
+#ifndef UNITY_PBS_LIGHTING_INCLUDED
 #define UNITY_PBS_LIGHTING_INCLUDED
 
 #include "UnityShaderVariables.cginc"
@@ -60,7 +62,7 @@ inline half4 LightingHairStandard (SurfaceOutputHairStandard s, half3 viewDir, U
 	s.Albedo = PreMultiplyAlpha (s.Albedo, s.Alpha, oneMinusReflectivity, /*out*/ outputAlpha);
 	
 	float3 binormal = cross(s.Normal, s.Tangent.xyz) * s.Tangent.w;
-	float3 ansio = normalize(mul(_Object2World, float4(binormal,0)).xyz); 
+	float3 ansio = normalize(mul(unity_ObjectToWorld, float4(binormal,0)).xyz); 
 	
 	float shiftTex = s.SpecShift.r;
 	float3 t1 = ShiftTangent(ansio, s.Normal, _SpecShift1 + shiftTex);

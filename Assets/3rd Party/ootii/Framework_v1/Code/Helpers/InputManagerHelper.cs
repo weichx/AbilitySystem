@@ -49,6 +49,34 @@ namespace com.ootii.Helpers
     /// </summary>
     public class InputManagerHelper
     {
+        /// <summary>
+        /// The keyboard provides linear x,y input while the Xbox controller
+        /// provides radial x,y input. This function convers from linear to radial.
+        /// 
+        /// 1.0, 1.0 (mag 1.4) becomes 0.7, 0.7 (mag 1.0)
+        /// 1.0, 0.0 (mag 1.0) stays   1.0, 0.0 (mag 1.0)
+        /// </summary>
+        /// <param name="rInputX"></param>
+        /// <param name="rInputY"></param>
+        /// <param name="rMagnitude"></param>
+        public static void ConvertToRadialInput(ref float rInputX, ref float rInputY, ref float rMagnitude, float rMultiplier = 1f)
+        {
+            if (rMagnitude > 1f) { rMagnitude = 1f; }
+
+            float lAngle = Mathf.Atan2(rInputX, rInputY) - 1.5708f;
+
+            rInputX = rMagnitude * Mathf.Cos(lAngle);
+            rInputY = rMagnitude * -Mathf.Sin(lAngle);
+            rMagnitude = Mathf.Sqrt((rInputX * rInputX) + (rInputY * rInputY));
+
+            if (rMultiplier != 1f)
+            {
+                rInputX = rInputX * rMultiplier;
+                rInputY = rInputY * rMultiplier;
+                rMagnitude = rMagnitude * rMultiplier;
+            }
+        }
+
 #if UNITY_EDITOR
 
         /// <summary>

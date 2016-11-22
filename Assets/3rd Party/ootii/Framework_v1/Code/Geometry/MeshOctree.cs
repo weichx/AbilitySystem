@@ -95,7 +95,7 @@ namespace com.ootii.Geometry
             if (rPoint.z < lMin.z) { rPoint.z = lMin.z; }
             else if (rPoint.z > lMax.z) { rPoint.z = lMax.z; }
 
-            DebugDraw.DrawSphereOverlay(MeshExt.DebugTransform.TransformPoint(rPoint), 0.1f, Color.magenta, 1f);
+            //DebugDraw.DrawSphereOverlay(MeshExt.DebugTransform.TransformPoint(rPoint), 0.1f, Color.magenta, 1f);
 
             // Now grab the closest point
             return Root.ClosestPoint(rPoint);

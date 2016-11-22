@@ -6,6 +6,7 @@ using UnityEngine;
 using UnityEditor;
 using UnityEditor.Animations;
 using UnityEditorInternal;
+using com.ootii.Actors;
 using com.ootii.Actors.AnimationControllers;
 using com.ootii.Cameras;
 using com.ootii.Helpers;
@@ -33,9 +34,18 @@ public class MotionControllerEditor : Editor
     private List<Type> mMotionTypes = new List<Type>();
     private List<String> mMotionNames = new List<string>();
 
+    // List object for our packs
+    private ReorderableList mPackList;
+
+    private List<Type> mPackTypes = new List<Type>();
+    private List<String> mPackNames = new List<string>();
+
     // Determines if we show the layers and motions
     //private bool mShowLayers = false;
     private bool mShowSettings = false;
+
+    // Store the actor controller so we can look at it
+    private ActorController mActorController = null;
 
     /// <summary>
     /// Called when the script object is loaded
@@ -45,6 +55,9 @@ public class MotionControllerEditor : Editor
         // Grab the serialized objects
         mTarget = (MotionController)target;
         mTargetSO = new SerializedObject(target);
+
+        mActorController = mTarget._ActorController;
+        if (mActorController == null) { mActorController = mTarget.gameObject.GetComponent<ActorController>(); }
 
         // Update the motion controller layers so they can update with the definitions.
         // TRT 3/29/2016: Added so we don't reset changes at run-time when the MC
@@ -70,6 +83,9 @@ public class MotionControllerEditor : Editor
         mMotionTypes.Clear();
         mMotionNames.Clear();
 
+        mPackTypes.Clear();
+        mPackNames.Clear();
+
         // Generate the list of motions to display
         Assembly lAssembly = Assembly.GetAssembly(typeof(MotionController));
         Type[] lMotionTypes = lAssembly.GetTypes().OrderBy(x => x.Name).ToArray<Type>();
@@ -81,8 +97,24 @@ public class MotionControllerEditor : Editor
             {
                 mMotionTypes.Add(lType);
                 mMotionNames.Add(GetFriendlyName(lType));
+
+                MethodInfo[] lStaticMethods = lType.GetMethods(BindingFlags.Static | BindingFlags.Public);
+                if (lStaticMethods != null)
+                {
+                    for (int j = 0; j < lStaticMethods.Length; j++)
+                    {
+                        if (lStaticMethods[j].Name == "RegisterPack")
+                        {
+                            string lPackName = lStaticMethods[j].Invoke(null, null) as string;
+                            mPackTypes.Add(lType);
+                            mPackNames.Add(lPackName);
+                        }
+                    }
+                }
             }
         }
+
+        InstanciatePackList();
     }
 
     /// <summary>
@@ -100,6 +132,15 @@ public class MotionControllerEditor : Editor
         EditorHelper.DrawInspectorDescription("Used to manage actor movement and animations.", MessageType.None);
 
         GUILayout.Space(5);
+
+        if (mActorController != null && mActorController.UseTransformPosition)
+        {
+            EditorGUILayout.BeginVertical(EditorHelper.RedBox);
+            EditorHelper.DrawInspectorDescription("The Actor Controller is set to follow its transform and not move based on input or motions. Movement input values will be simulated.", MessageType.Info);
+            EditorGUILayout.EndVertical();
+
+            GUILayout.Space(5);
+        }
 
         EditorGUILayout.BeginHorizontal();
 
@@ -172,43 +213,56 @@ public class MotionControllerEditor : Editor
 
         EditorGUILayout.BeginHorizontal();
 
-        GUILayout.FlexibleSpace();
-
         EditorGUILayout.BeginHorizontal();
 
         GUILayout.Label("", BasicIcon, GUILayout.Width(16), GUILayout.Height(16));
 
-        if (GUILayout.Button("Basic", EditorStyles.miniButton, GUILayout.Width(70)))
+        if (GUILayout.Button("Basic", EditorStyles.miniButton, GUILayout.Width(60)))
         {
-            mTarget.EditorShowAdvanced = false;
+            mTarget.EditorTabIndex = 0;
             mIsDirty = true;
         }
 
         EditorGUILayout.EndHorizontal();
 
-        GUILayout.Space(20);
+        GUILayout.Space(1f);
+
+        EditorGUILayout.BeginHorizontal();
+
+        if (GUILayout.Button("Advanced", EditorStyles.miniButton, GUILayout.Width(65)))
+        {
+            mTarget.EditorTabIndex = 1;
+            mIsDirty = true;
+        }
+
+        EditorGUILayout.EndHorizontal();
+
+        GUILayout.FlexibleSpace();
 
         EditorGUILayout.BeginHorizontal();
 
         GUILayout.Label("", AdvancedIcon, GUILayout.Width(16), GUILayout.Height(16));
 
-        if (GUILayout.Button("Advanced", EditorStyles.miniButton, GUILayout.Width(70)))
+        if (GUILayout.Button("Packs", EditorStyles.miniButton, GUILayout.Width(60)))
         {
-            mTarget.EditorShowAdvanced = true;
+            mTarget.EditorTabIndex = 2;
             mIsDirty = true;
         }
 
         EditorGUILayout.EndHorizontal();
 
-        GUILayout.FlexibleSpace();
-
         EditorGUILayout.EndHorizontal();
 
         GUILayout.Space(5);
 
-        if (mTarget.EditorShowAdvanced)
+        if (mTarget.EditorTabIndex == 1)
         {
             bool lIsDirty = OnAdvancedInspector();
+            if (lIsDirty) { mIsDirty = true; }
+        }
+        else if (mTarget.EditorTabIndex == 2)
+        {
+            bool lIsDirty = OnPackInspector();
             if (lIsDirty) { mIsDirty = true; }
         }
         else
@@ -458,7 +512,7 @@ public class MotionControllerEditor : Editor
         EditorGUILayout.BeginHorizontal();
         GUILayout.Space(10);
 
-        lMotion = mTarget.GetMotion<Sneak>();
+        lMotion = mTarget.GetMotion<Sneak_v2>();
         lIsMotionEnabled = (lMotion != null && lMotion.IsEnabled);
 
         lNewIsMotionEnabled = EditorGUILayout.Toggle(lIsMotionEnabled, OptionToggle, GUILayout.Width(16));
@@ -486,23 +540,30 @@ public class MotionControllerEditor : Editor
         bool lIsDirty = false;
 
         // Show the Layers
+        EditorGUILayout.LabelField("Motion Layers", EditorStyles.boldLabel, GUILayout.Height(16f));
+
         GUILayout.BeginVertical(EditorHelper.GroupBox);
+        EditorHelper.DrawInspectorDescription("Motions Layers sync with the animator's layers and contain motions that work on that layer.", MessageType.None);
+
         mLayerList.DoLayoutList();
         GUILayout.EndVertical();
 
-        if (mLayerList.index >= 0)
+        if (mLayerList.index >= 0 && mLayerList.index < mTarget.MotionLayers.Count)
         {
             MotionControllerLayer lLayer = mTarget.MotionLayers[mLayerList.index];
 
+            GUILayout.Space(5f);
+
+            EditorGUILayout.LabelField("Motions", EditorStyles.boldLabel, GUILayout.Height(16f));
             GUILayout.BeginVertical(EditorHelper.GroupBox);
+            EditorHelper.DrawInspectorDescription("Motions determine how your actor will move, rotation, and animate.", MessageType.None);
 
             bool lListIsDirty = DrawLayerDetailItem(mTarget.MotionLayers[mLayerList.index]);
             if (lListIsDirty) { lIsDirty = true; }
 
-            GUILayout.EndVertical();
-
             if (mMotionList.index >= 0 && mMotionList.index < lLayer.Motions.Count)
             {
+                GUILayout.Space(5f);
                 GUILayout.BeginVertical(EditorHelper.Box);
 
                 bool lMotionIsDirty = DrawMotionDetailItem(mMotionList.index, lLayer.Motions[mMotionList.index]);
@@ -510,9 +571,88 @@ public class MotionControllerEditor : Editor
 
                 GUILayout.EndVertical();
             }
+
+            GUILayout.EndVertical();
         }
 
+        GUILayout.Space(5f);
+
+        // Show the Layers
+        EditorGUILayout.LabelField("Debug", EditorStyles.boldLabel, GUILayout.Height(16f));
+
+        GUILayout.BeginVertical(EditorHelper.GroupBox);
+        EditorHelper.DrawInspectorDescription("Determines if we'll render debug information. We can do this motion-by-motion or for all.", MessageType.None);
+
+        GUILayout.BeginVertical(EditorHelper.Box);
+
+        if (EditorHelper.BoolField("Show Debug Info", "Determines if the MC will render debug information at all.", mTarget.ShowDebug, mTarget))
+        {
+            lIsDirty = true;
+            mTarget.ShowDebug = EditorHelper.FieldBoolValue;
+        }
+
+        if (mTarget.ShowDebug)
+        {
+            if (EditorHelper.BoolField("   For All Motions", "Determines if the MC will force all motions to show debug info.", mTarget.ShowDebugForAllMotions, mTarget))
+            {
+                lIsDirty = true;
+                mTarget.ShowDebugForAllMotions = EditorHelper.FieldBoolValue;
+            }
+        }
+
+        GUILayout.EndVertical();
+
+        GUILayout.EndVertical();
+
         return lIsDirty;
+    }
+
+    /// <summary>
+    /// Draws the advanced verions of the GUI
+    /// </summary>
+    /// <returns></returns>
+    private bool OnPackInspector()
+    {
+        bool lIsDirty = false;
+
+        // Show the Layers
+        GUILayout.BeginVertical(EditorHelper.GroupBox);
+        mPackList.DoLayoutList();
+
+        if (mPackList.index >= 0)
+        {
+            GUILayout.BeginVertical(EditorHelper.Box);
+
+            bool lListIsDirty = DrawPackDetailItem(mPackList.index);
+            if (lListIsDirty) { lIsDirty = true; }
+
+            GUILayout.EndVertical();
+        }
+
+        GUILayout.EndVertical();
+
+        return lIsDirty;
+    }
+
+    /// <summary>
+    /// Allows us to render objects in the scene itself. This
+    /// is only called when the scene window has focus
+    /// </summary>
+    private void OnSceneGUI()
+    {
+        if (Event.current.type.Equals(EventType.repaint))
+        {
+            // Allow the motors to render to the scene or edit scene objects
+            if (mLayerList != null && mLayerList.index >= 0 && mLayerList.index < mTarget.MotionLayers.Count)
+            {
+                MotionControllerLayer lLayer = mTarget.MotionLayers[mLayerList.index];
+                if (mMotionList != null && mMotionList.index >= 0 && mMotionList.index < lLayer.Motions.Count)
+                {
+                    MotionControllerMotion lMotion = lLayer.Motions[mMotionList.index];
+                    if (lMotion != null) { lMotion.OnSceneGUI(); }
+                }
+            }
+        }
     }
 
     /// <summary>
@@ -569,10 +709,10 @@ public class MotionControllerEditor : Editor
     private void DrawLayerListFooter(Rect rRect)
     {
         Rect lAddRect = new Rect(rRect.x + rRect.width - 28 - 28, rRect.y + 1, 28, 15);
-        if (GUI.Button(lAddRect, new GUIContent("+", "Add Shape."), EditorStyles.miniButtonLeft)) { OnLayerListItemAdd(mLayerList); }
+        if (GUI.Button(lAddRect, new GUIContent("+", "Add Layer."), EditorStyles.miniButtonLeft)) { OnLayerListItemAdd(mLayerList); }
 
         Rect lDeleteRect = new Rect(lAddRect.x + lAddRect.width, lAddRect.y, 28, 15);
-        if (GUI.Button(lDeleteRect, new GUIContent("-", "Delete Shape."), EditorStyles.miniButtonRight)) { OnLayerListItemRemove(mLayerList); };
+        if (GUI.Button(lDeleteRect, new GUIContent("-", "Delete Layer."), EditorStyles.miniButtonRight)) { OnLayerListItemRemove(mLayerList); };
     }
 
     /// <summary>
@@ -753,10 +893,10 @@ public class MotionControllerEditor : Editor
         mMotionIndex = EditorGUI.Popup(lMotionRect, mMotionIndex, mMotionNames.ToArray());
 
         Rect lAddRect = new Rect(lMotionRect.x + lMotionRect.width + 4, lMotionRect.y, 28, 15);
-        if (GUI.Button(lAddRect, new GUIContent("+", "Add Shape."), EditorStyles.miniButtonLeft)) { OnMotionListItemAdd(mMotionList); }
+        if (GUI.Button(lAddRect, new GUIContent("+", "Add Motion."), EditorStyles.miniButtonLeft)) { OnMotionListItemAdd(mMotionList); }
 
         Rect lDeleteRect = new Rect(lAddRect.x + lAddRect.width, lAddRect.y, 28, 15);
-        if (GUI.Button(lDeleteRect, new GUIContent("-", "Delete Shape."), EditorStyles.miniButtonRight)) { OnMotionListItemRemove(mMotionList); };
+        if (GUI.Button(lDeleteRect, new GUIContent("-", "Delete Motion."), EditorStyles.miniButtonRight)) { OnMotionListItemRemove(mMotionList); };
     }
 
     /// <summary>
@@ -772,6 +912,8 @@ public class MotionControllerEditor : Editor
         lMotion.MotionLayer = mTarget.MotionLayers[mLayerList.index];
         mTarget.MotionLayers[mLayerList.index].Motions.Add(lMotion);
         mTarget.MotionLayers[mLayerList.index].MotionDefinitions.Add(lMotion.SerializeMotion());
+
+        lMotion.Reset();
 
         mMotionList.index = mTarget.MotionLayers[mLayerList.index].Motions.Count - 1;
         OnMotionListItemSelect(rList);
@@ -849,85 +991,110 @@ public class MotionControllerEditor : Editor
             EditorHelper.DrawInspectorDescription(lAttribute.Value, MessageType.None);
         }
 
-        EditorGUILayout.LabelField(new GUIContent("Namespace", "Specifies the container the motion belongs to."), new GUIContent(rMotion.GetType().Namespace, rMotion.GetType().Namespace));
+        GUILayout.Space(2f);
 
         EditorGUILayout.BeginHorizontal();
 
-        EditorGUILayout.LabelField(new GUIContent("Type", "Identifies the type of motion."), new GUIContent(lMotionTypeName), GUILayout.MinWidth(30));
+        GUILayout.Space(4f);
 
-        if (GUILayout.Button(new GUIContent("", "Animator Settings"), EditorHelper.BlueGearButton, GUILayout.Width(16), GUILayout.Height(16)))
+        if (GUILayout.Button(new GUIContent("", "Controller Settings"), EditorHelper.OrangeGearButton, GUILayout.Width(16), GUILayout.Height(16)))
         {
-            mShowSettings = !mShowSettings;
+            rMotion._EditorShowSettings = !rMotion._EditorShowSettings;
         }
 
-        GUILayout.Space(2);
+        if (GUILayout.Button(new GUIContent((rMotion._EditorShowSettings ? "Hide" : "Show") + " Controller Settings", "Click to show/hide controller based settings of the motion"), GUI.skin.label, GUILayout.MinWidth(50f)))
+        {
+            rMotion._EditorShowSettings = !rMotion._EditorShowSettings;
+        }
 
         EditorGUILayout.EndHorizontal();
 
-        // Animator API
-        if (mShowSettings)
+        if (rMotion._EditorShowSettings)
         {
-            EditorGUILayout.BeginVertical(GUI.skin.box);
+            GUILayout.Space(5f);
+
+            EditorGUILayout.LabelField(new GUIContent("Namespace", "Specifies the container the motion belongs to."), new GUIContent(rMotion.GetType().Namespace, rMotion.GetType().Namespace));
+
+            EditorGUILayout.BeginHorizontal();
+
+            EditorGUILayout.LabelField(new GUIContent("Type", "Identifies the type of motion."), new GUIContent(lMotionType.Name), GUILayout.MinWidth(30));
+
+            if (GUILayout.Button(new GUIContent("", "Animator Settings"), EditorHelper.BlueGearButton, GUILayout.Width(16), GUILayout.Height(16)))
+            {
+                mShowSettings = !mShowSettings;
+            }
 
             GUILayout.Space(2);
 
-            // Key
-            string lMotionKey = EditorGUILayout.TextField(new GUIContent("Key", "Unique key to associate with the motion type"), rMotion.Key);
-            if (lMotionKey != rMotion.Key)
+            EditorGUILayout.EndHorizontal();
+
+            // Animator API
+            if (mShowSettings)
+            {
+                EditorGUILayout.BeginVertical(GUI.skin.box);
+
+                GUILayout.Space(2);
+
+                // Key
+                string lMotionKey = EditorGUILayout.TextField(new GUIContent("Key", "Unique key to associate with the motion type"), rMotion.Key);
+                if (lMotionKey != rMotion.Key)
+                {
+                    lIsDirty = true;
+                    rMotion._Key = lMotionKey;
+                }
+
+                // Animator sub-state machine
+                rMotion._EditorAnimatorController = EditorGUILayout.ObjectField(new GUIContent("Controller", "Animator controller we are editing."), rMotion._EditorAnimatorController, typeof(UnityEditor.Animations.AnimatorController), true, null) as UnityEditor.Animations.AnimatorController;
+                if (rMotion._EditorAnimatorController == null)
+                {
+                    Animator lAnimator = mTarget.gameObject.GetComponent<Animator>();
+                    if (lAnimator != null) { rMotion._EditorAnimatorController = lAnimator.runtimeAnimatorController as UnityEditor.Animations.AnimatorController; }
+                }
+
+                rMotion._EditorAnimatorSMName = EditorGUILayout.TextField(new GUIContent("SM Name", "State machine name."), rMotion._EditorAnimatorSMName);
+
+                rMotion._EditorAttachBehaviour = EditorGUILayout.Toggle(new GUIContent("Attach Behaviour", "Determines if we attach an animator state behaviour to the state machine."), rMotion._EditorAttachBehaviour);
+
+                rMotion.OnSettingsGUI();
+
+                GUILayout.Space(2);
+                EditorGUILayout.EndVertical();
+
+                GUILayout.Space(5);
+            }
+
+            // Force the name at the top
+            string lMotionName = EditorGUILayout.TextField(new GUIContent("Name", "Friendly name of the motion that can be searched for."), rMotion.Name);
+            if (lMotionName != rMotion.Name)
             {
                 lIsDirty = true;
-                rMotion._Key = lMotionKey;
+                rMotion.Name = lMotionName;
             }
 
-            // Animator sub-state machine
-            rMotion._EditorAnimatorController = EditorGUILayout.ObjectField(new GUIContent("Controller", "Animator controller we are editing."), rMotion._EditorAnimatorController, typeof(UnityEditor.Animations.AnimatorController), true, null) as UnityEditor.Animations.AnimatorController;
-            if (rMotion._EditorAnimatorController == null)
+            // Priority to determine which motion runs
+            float lNewMotionPriority = EditorGUILayout.FloatField(new GUIContent("Priority", "Higher priorities will run over lower priorities."), rMotion.Priority);
+            if (lNewMotionPriority != rMotion.Priority)
             {
-                Animator lAnimator = mTarget.gameObject.GetComponent<Animator>();
-                if (lAnimator != null) { rMotion._EditorAnimatorController = lAnimator.runtimeAnimatorController as UnityEditor.Animations.AnimatorController; }
+                lIsDirty = true;
+                rMotion.Priority = lNewMotionPriority;
             }
 
-            rMotion._EditorAnimatorSMName = EditorGUILayout.TextField(new GUIContent("SM Name", "State machine name."), rMotion._EditorAnimatorSMName);
+            // Reactivation delay
+            float lReactivationDelay = EditorGUILayout.FloatField(new GUIContent("React. Delay", "Once deactivated, seconds before activation can occur again."), rMotion.ReactivationDelay);
+            if (lReactivationDelay != rMotion.ReactivationDelay)
+            {
+                lIsDirty = true;
+                rMotion.ReactivationDelay = lReactivationDelay;
+            }
 
-            rMotion._EditorAttachBehaviour = EditorGUILayout.Toggle(new GUIContent("Attach Behaviour", "Determines if we attach an animator state behaviour to the state machine."), rMotion._EditorAttachBehaviour);
-
-            rMotion.OnSettingsGUI();
-
-            GUILayout.Space(2);
-            EditorGUILayout.EndVertical();
-
-            GUILayout.Space(5);
-        }
-
-        // Force the name at the top
-        string lMotionName = EditorGUILayout.TextField(new GUIContent("Name", "Friendly name of the motion that can be searched for."), rMotion.Name);
-        if (lMotionName != rMotion.Name)
-        {
-            lIsDirty = true;
-            rMotion.Name = lMotionName;
-        }
-
-        // Priority to determine which motion runs
-        float lNewMotionPriority = EditorGUILayout.FloatField(new GUIContent("Priority", "Higher priorities will run over lower priorities."), rMotion.Priority);
-        if (lNewMotionPriority != rMotion.Priority)
-        {
-            lIsDirty = true;
-            rMotion.Priority = lNewMotionPriority;
-        }
-
-        // Reactivation delay
-        float lReactivationDelay = EditorGUILayout.FloatField(new GUIContent("React. Delay", "Once deactivated, seconds before activation can occur again."), rMotion.ReactivationDelay);
-        if (lReactivationDelay != rMotion.ReactivationDelay)
-        {
-            lIsDirty = true;
-            rMotion.ReactivationDelay = lReactivationDelay;
-        }
-
-        GUILayout.Space(2);
+            if (EditorHelper.BoolField("Show Debug", "Determines if the motion will render debug information (it is has any).", rMotion._ShowDebug, mTarget))
+            {
+                lIsDirty = true;
+                rMotion._ShowDebug = EditorHelper.FieldBoolValue;
+            }
+        }        
 
         EditorHelper.DrawLine();
-
-        GUILayout.Space(2);
 
         if (rMotion.ActionAlias.Length > 0 && !InputManagerHelper.IsDefined(rMotion.ActionAlias))
         {
@@ -962,6 +1129,109 @@ public class MotionControllerEditor : Editor
     }
 
     /// <summary>
+    /// Create the reorderable list
+    /// </summary>
+    private void InstanciatePackList()
+    {
+        mPackList = new ReorderableList(mPackTypes, typeof(Type), false, true, true, true);
+        mPackList.drawHeaderCallback = DrawPackListHeader;
+        mPackList.drawFooterCallback = DrawPackListFooter;
+        mPackList.drawElementCallback = DrawPackListItem;
+        mPackList.onAddCallback = OnPackListItemAdd;
+        mPackList.onRemoveCallback = OnPackListItemRemove;
+        mPackList.onSelectCallback = OnPackListItemSelect;
+        mPackList.onReorderCallback = OnPackListReorder;
+        mPackList.footerHeight = 5f;
+
+        if (mTarget.EditorPackIndex >= 0 && mTarget.EditorPackIndex < mPackList.count)
+        {
+            mPackList.index = mTarget.EditorPackIndex;
+            OnPackListItemSelect(mPackList);
+        }
+    }
+
+    /// <summary>
+    /// Header for the list
+    /// </summary>
+    /// <param name="rRect"></param>
+    private void DrawPackListHeader(Rect rRect)
+    {
+        EditorGUI.LabelField(rRect, "Motion Packs");
+    }
+
+    /// <summary>
+    /// Allows us to draw each item in the list
+    /// </summary>
+    /// <param name="rRect"></param>
+    /// <param name="rIndex"></param>
+    /// <param name="rIsActive"></param>
+    /// <param name="rIsFocused"></param>
+    private void DrawPackListItem(Rect rRect, int rIndex, bool rIsActive, bool rIsFocused)
+    {
+        if (rIndex < mPackTypes.Count)
+        {
+            Rect lNameRect = new Rect(rRect.x, rRect.y + 1, rRect.width, EditorGUIUtility.singleLineHeight);
+            EditorGUI.LabelField(lNameRect, mPackNames[rIndex]);
+        }
+    }
+
+    /// <summary>
+    /// Footer for the list
+    /// </summary>
+    /// <param name="rRect"></param>
+    private void DrawPackListFooter(Rect rRect)
+    {
+    }
+
+    /// <summary>
+    /// Allows us to add to a list
+    /// </summary>
+    /// <param name="rList"></param>
+    private void OnPackListItemAdd(ReorderableList rList)
+    {
+    }
+
+    /// <summary>
+    /// Allows us process when a list is selected
+    /// </summary>
+    /// <param name="rList"></param>
+    private void OnPackListItemSelect(ReorderableList rList)
+    {
+        mTarget.EditorPackIndex = rList.index;
+        if (mTarget.EditorPackIndex == -1) { return; }
+    }
+
+    /// <summary>
+    /// Allows us to stop before removing the item
+    /// </summary>
+    /// <param name="rList"></param>
+    private void OnPackListItemRemove(ReorderableList rList)
+    {
+    }
+
+    /// <summary>
+    /// Allows us to process after the motions are reordered
+    /// </summary>
+    /// <param name="rList"></param>
+    private void OnPackListReorder(ReorderableList rList)
+    {
+    }
+
+    /// <summary>
+    /// Renders the currently selected step
+    /// </summary>
+    /// <param name="rStep"></param>
+    private bool DrawPackDetailItem(int rIndex)
+    {
+        bool lIsDirty = false;
+
+        MethodInfo lInspector = mPackTypes[rIndex].GetMethod("OnPackInspector", BindingFlags.Static | BindingFlags.Public);
+        if (lInspector != null) { lIsDirty = (bool)lInspector.Invoke(null, new object[] { mTarget }); }
+
+        return lIsDirty;
+    }
+
+    /// <summary>
     /// Sets up the Style of walk/run
     /// </summary>
     private void EnableMMOStyle()
@@ -984,9 +1254,9 @@ public class MotionControllerEditor : Editor
         mTarget.InputSourceOwner = lInputSourceGO;
 
         // Get or create the camera
-        bool lIsAdventureRigAvailable = ReflectionHelper.IsTypeValid("com.ootii.Cameras.AdventureRig, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null");
+        //bool lIsAdventureRigAvailable = ReflectionHelper.IsTypeValid("com.ootii.Cameras.CameraController, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null");
 
-        BaseCameraRig lCameraRig = CreateCameraRig("com.ootii.Cameras.AdventureRig, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null");
+        BaseCameraRig lCameraRig = CreateCameraRig("com.ootii.Cameras.CameraController, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null");
         if (lCameraRig == null) { lCameraRig = CreateCameraRig("com.ootii.Cameras.OrbitRig, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null"); }
         if (lCameraRig == null) { return; }
 
@@ -1006,7 +1276,9 @@ public class MotionControllerEditor : Editor
 
         // Test if the right motions exist. If not, create them
         Idle lIdleMotion = CreateMotion<Idle>(0);
-        lIdleMotion.RotateWithViewInputX = true;
+        //lIdleMotion.RotateWithViewInputX = true;
+        lIdleMotion.RotateWithCamera = true;
+        lIdleMotion.RotateWithInput = false;
         lIdleMotion.RotateWithMovementInputX = true;
         lIdleMotion.ForceViewOnInput = true;
         SerializeMotion(lIdleMotion);
@@ -1014,26 +1286,26 @@ public class MotionControllerEditor : Editor
         Fall lFallMotion = CreateMotion<Fall>(0);
         SerializeMotion(lFallMotion);
 
-        WalkRunRotate lWalkMotion = CreateMotion<WalkRunRotate>(0);
-        lWalkMotion.RotateWithViewInputX = true;
-        lWalkMotion.RotateWithMovementInputX = true;
-        lWalkMotion.ForceViewOnInput = true;
+        WalkRunRotate_v2 lWalkMotion = CreateMotion<WalkRunRotate_v2>(0);
+        //lWalkMotion.RotateWithViewInputX = true;
+        //lWalkMotion.RotateWithMovementInputX = true;
+        //lWalkMotion.ForceViewOnInput = true;
         SerializeMotion(lWalkMotion);
 
-        if (lIsAdventureRigAvailable)
-        {
-            WalkRunStrafe lWalkMotionStrafe = CreateMotion<WalkRunStrafe>(0);
-            lWalkMotionStrafe.Priority = lWalkMotion.Priority + 1;
-            lWalkMotionStrafe.ActivateWithAltCameraMode = true;
-            lWalkMotionStrafe.ForceViewOnInput = false;
-            SerializeMotion(lWalkMotionStrafe);
-        }
-        else
-        {
-            DisableMotion<WalkRunStrafe>(0);
-        }
+        //if (lIsAdventureRigAvailable)
+        //{
+        //    WalkRunStrafe lWalkMotionStrafe = CreateMotion<WalkRunStrafe>(0);
+        //    lWalkMotionStrafe.Priority = lWalkMotion.Priority + 1;
+        //    //lWalkMotionStrafe.ActivateWithAltCameraMode = true;
+        //    //lWalkMotionStrafe.ForceViewOnInput = false;
+        //    SerializeMotion(lWalkMotionStrafe);
+        //}
+        //else
+        //{
+            DisableMotion<WalkRunStrafe_v2>(0);
+        //}
 
-        DisableMotion<WalkRunPivot>(0);
+        DisableMotion<WalkRunPivot_v2>(0);
 
         EditorUtility.DisplayDialog("Motion Controller", "The new style was setup", "Close");
     }
@@ -1061,9 +1333,9 @@ public class MotionControllerEditor : Editor
         mTarget.InputSourceOwner = lInputSourceGO;
 
         // Get or create the camera
-        bool lIsAdventureRigAvailable = ReflectionHelper.IsTypeValid("com.ootii.Cameras.AdventureRig, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null");
+        //bool lIsAdventureRigAvailable = ReflectionHelper.IsTypeValid("com.ootii.Cameras.CameraController, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null");
 
-        BaseCameraRig lCameraRig = CreateCameraRig("com.ootii.Cameras.AdventureRig, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null");
+        BaseCameraRig lCameraRig = CreateCameraRig("com.ootii.Cameras.CameraController, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null");
         if (lCameraRig == null) { lCameraRig = CreateCameraRig("com.ootii.Cameras.OrbitRig, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null"); }
         if (lCameraRig == null) { return; }
 
@@ -1083,7 +1355,9 @@ public class MotionControllerEditor : Editor
 
         // Test if the right motions exist. If not, create them
         Idle lIdleMotion = CreateMotion<Idle>(0);
-        lIdleMotion.RotateWithViewInputX = false;
+        //lIdleMotion.RotateWithViewInputX = false;
+        lIdleMotion.RotateWithCamera = false;
+        lIdleMotion.RotateWithInput = false;
         lIdleMotion.RotateWithMovementInputX = false;
         lIdleMotion.ForceViewOnInput = false;
         SerializeMotion(lIdleMotion);
@@ -1091,23 +1365,23 @@ public class MotionControllerEditor : Editor
         Fall lFallMotion = CreateMotion<Fall>(0);
         SerializeMotion(lFallMotion);
 
-        WalkRunPivot lWalkMotion = CreateMotion<WalkRunPivot>(0);
+        WalkRunPivot_v2 lWalkMotion = CreateMotion<WalkRunPivot_v2>(0);
         SerializeMotion(lWalkMotion);
 
-        if (lIsAdventureRigAvailable)
-        {
-            WalkRunStrafe lWalkMotionStrafe = CreateMotion<WalkRunStrafe>(0);
-            lWalkMotionStrafe.Priority = lWalkMotion.Priority + 1;
-            lWalkMotionStrafe.ActivateWithAltCameraMode = true;
-            lWalkMotionStrafe.ForceViewOnInput = false;
-            SerializeMotion(lWalkMotionStrafe);
-        }
-        else
-        {
-            DisableMotion<WalkRunStrafe>(0);
-        }
+        //if (lIsAdventureRigAvailable)
+        //{
+        //    WalkRunStrafe lWalkMotionStrafe = CreateMotion<WalkRunStrafe>(0);
+        //    lWalkMotionStrafe.Priority = lWalkMotion.Priority + 1;
+        //    //lWalkMotionStrafe.ActivateWithAltCameraMode = true;
+        //    //lWalkMotionStrafe.ForceViewOnInput = false;
+        //    SerializeMotion(lWalkMotionStrafe);
+        //}
+        //else
+        //{
+            DisableMotion<WalkRunStrafe_v2>(0);
+        //}
 
-        DisableMotion<WalkRunRotate>(0);
+        DisableMotion<WalkRunRotate_v2>(0);
 
         EditorUtility.DisplayDialog("Motion Controller", "The new style was setup", "Close");
     }
@@ -1135,7 +1409,7 @@ public class MotionControllerEditor : Editor
         mTarget.InputSourceOwner = lInputSourceGO;
 
         // Get or create the camera
-        BaseCameraRig lCameraRig = CreateCameraRig("com.ootii.Cameras.AdventureRig, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null");
+        BaseCameraRig lCameraRig = CreateCameraRig("com.ootii.Cameras.CameraController, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null");
         if (lCameraRig == null) { lCameraRig = CreateCameraRig("com.ootii.Cameras.FollowRig, Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null"); }
         if (lCameraRig == null) { return; }
 
@@ -1155,7 +1429,9 @@ public class MotionControllerEditor : Editor
 
         // Test if the right motions exist. If not, create them
         Idle lIdleMotion = CreateMotion<Idle>(0);
-        lIdleMotion.RotateWithViewInputX = true;
+        //lIdleMotion.RotateWithViewInputX = true;
+        lIdleMotion.RotateWithCamera = true;
+        lIdleMotion.RotateWithInput = false;
         lIdleMotion.RotateWithMovementInputX = false;
         lIdleMotion.ForceViewOnInput = true;
         SerializeMotion(lIdleMotion);
@@ -1163,13 +1439,13 @@ public class MotionControllerEditor : Editor
         Fall lFallMotion = CreateMotion<Fall>(0);
         SerializeMotion(lFallMotion);
 
-        WalkRunStrafe lWalkMotion = CreateMotion<WalkRunStrafe>(0);
-        lWalkMotion.ActivateWithAltCameraMode = false;
-        lWalkMotion.ForceViewOnInput = true;
+        WalkRunStrafe_v2 lWalkMotion = CreateMotion<WalkRunStrafe_v2>(0);
+        //lWalkMotion.ActivateWithAltCameraMode = false;
+        //lWalkMotion.ForceViewOnInput = true;
         SerializeMotion(lWalkMotion);
 
-        DisableMotion<WalkRunRotate>(0);
-        DisableMotion<WalkRunPivot>(0);
+        DisableMotion<WalkRunRotate_v2>(0);
+        DisableMotion<WalkRunPivot_v2>(0);
 
         EditorUtility.DisplayDialog("Motion Controller", "The new style was setup", "Close");
     }
@@ -1235,7 +1511,7 @@ public class MotionControllerEditor : Editor
     /// </summary>
     private void EnableSneaking(bool rEnable)
     {
-        MotionControllerMotion lMotion = CreateMotion<Sneak>(0);
+        MotionControllerMotion lMotion = CreateMotion<Sneak_v2>(0);
         lMotion.IsEnabled = rEnable;
         SerializeMotion(lMotion);
     }

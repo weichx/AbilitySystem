@@ -89,7 +89,11 @@ namespace UnitySampleAssets.ImageEffects
         void CreateComputeResources () {
             if (cbDrawArgs == null)
             {
-                cbDrawArgs = new ComputeBuffer (1, 16, ComputeBufferType.DrawIndirect);
+#if UNITY_4_0 || UNITY_4_0_1 || UNITY_4_1 || UNITY_4_2 || UNITY_4_3 || UNITY_4_4 || UNITY_4_5 || UNITY_4_6 || UNITY_5_0 || UNITY_5_1 || UNITY_5_2 || UNITY_5_3
+                cbDrawArgs = new ComputeBuffer(1, 16, ComputeBufferType.DrawIndirect);
+#else
+                cbDrawArgs = new ComputeBuffer(1, 16, ComputeBufferType.IndirectArguments);
+#endif
                 var args= new int[4];
                 args[0] = 0; args[1] = 1; args[2] = 0; args[3] = 0;
                 cbDrawArgs.SetData (args);

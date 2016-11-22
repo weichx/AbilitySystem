@@ -1,5 +1,5 @@
 //#define OOTII_PROFILE
-//#define USE_MOTION_STATE_TIME
+#define USE_MOTION_STATE_TIME
 
 using System;
 using System.Collections;
@@ -9,9 +9,14 @@ using com.ootii.Cameras;
 using com.ootii.Geometry;
 using com.ootii.Helpers;
 using com.ootii.Input;
+using com.ootii.Messages;
 using com.ootii.Physics;
 using com.ootii.Timing;
 using com.ootii.Utilities.Debug;
+
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 namespace com.ootii.Actors.AnimationControllers
 {
@@ -203,7 +208,7 @@ namespace com.ootii.Actors.AnimationControllers
         /// Time smoothing is used to average delta-time over several frames
         /// in order to prevent jumps in movement due to time spikes.
         /// </summary>
-        public bool _IsTimeSmoothingEnabled = true;
+        public bool _IsTimeSmoothingEnabled = false;
         public bool IsTimeSmoothingEnabled
         {
             get { return _IsTimeSmoothingEnabled; }
@@ -295,6 +300,14 @@ namespace com.ootii.Actors.AnimationControllers
         }
 
         /// <summary>
+        /// Stance that the character is currently in
+        /// </summary>
+        public int Stance
+        {
+            get { return _ActorController.State.Stance; }
+        }
+
+        /// <summary>
         /// Reports back the grounded state of the actor
         /// </summary>
         public bool IsGrounded
@@ -317,14 +330,14 @@ namespace com.ootii.Actors.AnimationControllers
                 // Build the list of available layers
                 if (mAnimator != null)
                 {
-                    mState.AnimatorStates = new AnimatorLayerState[mAnimator.layerCount];
-                    mPrevState.AnimatorStates = new AnimatorLayerState[mAnimator.layerCount];
+                    State.AnimatorStates = new AnimatorLayerState[mAnimator.layerCount];
+                    PrevState.AnimatorStates = new AnimatorLayerState[mAnimator.layerCount];
 
                     // Initialize our objects with each of the animator layers
-                    for (int i = 0; i < mState.AnimatorStates.Length; i++)
+                    for (int i = 0; i < State.AnimatorStates.Length; i++)
                     {
-                        mState.AnimatorStates[i] = new AnimatorLayerState();
-                        mPrevState.AnimatorStates[i] = new AnimatorLayerState();
+                        State.AnimatorStates[i] = new AnimatorLayerState();
+                        PrevState.AnimatorStates[i] = new AnimatorLayerState();
                     }
                 }
             }
@@ -333,22 +346,12 @@ namespace com.ootii.Actors.AnimationControllers
         /// <summary>
         /// The current state of the controller including speed, direction, etc.
         /// </summary>
-        protected MotionState mState = new MotionState();
-        public MotionState State
-        {
-            get { return mState; }
-            set { mState = value; }
-        }
+        public MotionState State = new MotionState();
 
         /// <summary>
         /// The previous state of the controller including speed, direction, etc.
         /// </summary>
-        protected MotionState mPrevState = new MotionState();
-        public MotionState PrevState
-        {
-            get { return mPrevState; }
-            set { mPrevState = value; }
-        }
+        public MotionState PrevState = new MotionState();
 
         /// <summary>
         /// Contains a list of forces currently being applied to
@@ -365,6 +368,33 @@ namespace com.ootii.Actors.AnimationControllers
         /// List of motions the avatar is able to perform.
         /// </summary>
         public List<MotionControllerLayer> MotionLayers = new List<MotionControllerLayer>();
+
+        /// <summary>
+        /// Determines if the MC will show debug info at all
+        /// </summary>
+        public bool _ShowDebug = true;
+        public bool ShowDebug
+        {
+            get { return _ShowDebug; }
+            set { _ShowDebug = value; }
+        }
+
+        /// <summary>
+        /// Determines if the MC will force motions to show debug even if they have them disabled
+        /// </summary>
+        public bool _ShowDebugForAllMotions = false;
+        public bool ShowDebugForAllMotions
+        {
+            get { return _ShowDebugForAllMotions; }
+            set { _ShowDebugForAllMotions = value; }
+        }
+
+        /// <summary>
+        /// Forces the input value based on previous values. This helps with transitions from
+        /// blend trees.
+        /// </summary>
+        [NonSerialized]
+        public Vector2 ForcedInput = Vector2.zero;
 
         /// <summary>
         /// The current speed trend decreasing, static, increasing (-1, 0, or 1)
@@ -430,6 +460,12 @@ namespace com.ootii.Actors.AnimationControllers
         public Dictionary<string, int> AnimatorStateIDs = new Dictionary<string, int>();
 
         /// <summary>
+        /// Serialized transforms that may be used by the motors. We have to store them
+        /// here since Unity won't serialize them with and support polymorphism.
+        /// </summary>
+        public List<Transform> StoredTransforms = new List<Transform>();
+
+        /// <summary>
         /// Once the objects are instanciated, awake is called before start. Use it
         /// to setup references to other objects
         /// </summary>
@@ -469,7 +505,11 @@ namespace com.ootii.Actors.AnimationControllers
             if (_InputSourceOwner != null) { _InputSource = InterfaceHelper.GetComponent<IInputSource>(_InputSourceOwner); }
 
             // If the input source is still null, see if we can grab a local input source
-            if (_InputSource == null) { _InputSource = InterfaceHelper.GetComponent<IInputSource>(gameObject); }
+            if (_AutoFindInputSource && _InputSource == null)
+            {
+                _InputSource = InterfaceHelper.GetComponent<IInputSource>(gameObject);
+                if (_InputSource != null) { _InputSourceOwner = gameObject; }
+            }
 
             // If that's still null, see if we can grab one from the scene. This may happen
             // if the MC was instanciated from a prefab which doesn't hold a reference to the input source
@@ -493,14 +533,14 @@ namespace com.ootii.Actors.AnimationControllers
             // Build the list of available layers
             if (mAnimator != null)
             {
-                mState.AnimatorStates = new AnimatorLayerState[mAnimator.layerCount];
-                mPrevState.AnimatorStates = new AnimatorLayerState[mAnimator.layerCount];
+                State.AnimatorStates = new AnimatorLayerState[mAnimator.layerCount];
+                PrevState.AnimatorStates = new AnimatorLayerState[mAnimator.layerCount];
 
                 // Initialize our objects with each of the animator layers
-                for (int i = 0; i < mState.AnimatorStates.Length; i++)
+                for (int i = 0; i < State.AnimatorStates.Length; i++)
                 {
-                    mState.AnimatorStates[i] = new AnimatorLayerState();
-                    mPrevState.AnimatorStates[i] = new AnimatorLayerState();
+                    State.AnimatorStates[i] = new AnimatorLayerState();
+                    PrevState.AnimatorStates[i] = new AnimatorLayerState();
                 }
             }
 
@@ -520,6 +560,12 @@ namespace com.ootii.Actors.AnimationControllers
         /// </summary>
         protected void Start()
         {
+#if USE_MESSAGE_DISPATCHER
+
+            // Hook into the Message Dispatcher so we can listen for them
+            MessageDispatcher.AddListener(this, "", OnMessageReceived, true);
+
+#endif
         }
 
         /// <summary>
@@ -569,7 +615,7 @@ namespace com.ootii.Actors.AnimationControllers
 #if OOTII_PROFILE
             Utilities.Profiler.Start("01");
 #endif
-            MotionState.Shift(ref mState, ref mPrevState);
+            MotionState.Shift(ref State, ref PrevState);
 #if OOTII_PROFILE
             Utilities.Profiler.Stop("01");
 #endif
@@ -583,61 +629,56 @@ namespace com.ootii.Actors.AnimationControllers
 
             if (mAnimator != null)
             {
-                lCount = mState.AnimatorStates.Length;
+                lCount = State.AnimatorStates.Length;
                 for (int i = 0; i < lCount; i++)
                 {
-                    mState.AnimatorStates[i].StateInfo = mAnimator.GetCurrentAnimatorStateInfo(i);
-                    mState.AnimatorStates[i].TransitionInfo = mAnimator.GetAnimatorTransitionInfo(i);
+                    MotionControllerMotion lActiveMotion = null;
+                    if (i < MotionLayers.Count && MotionLayers[i] != null) { lActiveMotion = MotionLayers[i].ActiveMotion; }
+
+                    State.AnimatorStates[i].StateInfo = mAnimator.GetCurrentAnimatorStateInfo(i);
+                    State.AnimatorStates[i].TransitionInfo = mAnimator.GetAnimatorTransitionInfo(i);
 
                     // Check if it's time to clear the motion phase based on reaching a state or
                     // transition that is in the motion that is currently active
-                    if (mState.AnimatorStates[i].AutoClearMotionPhase && i < MotionLayers.Count && MotionLayers[i] != null)
+                    if (State.AnimatorStates[i].AutoClearMotionPhase && lActiveMotion != null)
                     {
-                        MotionControllerMotion lActiveMotion = MotionLayers[i].ActiveMotion;
-                        if (lActiveMotion != null)
+                        if (lActiveMotion != null && lActiveMotion.HasAutoGeneratedCode)
                         {
-                            if (lActiveMotion.IsMotionState(mState.AnimatorStates[i].StateInfo.fullPathHash, mState.AnimatorStates[i].TransitionInfo.fullPathHash))
+                            if (lActiveMotion.IsMotionState(State.AnimatorStates[i].StateInfo.fullPathHash, State.AnimatorStates[i].TransitionInfo.fullPathHash))
                             {
                                 lActiveMotion.IsAnimatorActive = true; 
-                                mState.AnimatorStates[i].MotionPhase = 0;
-                                mState.AnimatorStates[i].AutoClearMotionPhase = false;
-                                mState.AnimatorStates[i].AutoClearActiveTransitionID = 0;
+                                State.AnimatorStates[i].MotionPhase = 0;
+                                State.AnimatorStates[i].AutoClearMotionPhase = false;
+                                State.AnimatorStates[i].AutoClearActiveTransitionID = 0;
                             }
-                        }
-                    }                  
-
-                    // We need to see if we're ready to clear the motion phase
-                    if (mState.AnimatorStates[i].AutoClearMotionPhase && mState.AnimatorStates[i].TransitionInfo.fullPathHash != 0)
-                    {
-                        // Update the transition info so the motion knows the animator is in synch
-                        if (mState.AnimatorStates[i].TransitionInfo.fullPathHash != mState.AnimatorStates[i].AutoClearActiveTransitionID)
-                        {
-                            if (MotionLayers.Count > i && MotionLayers[i] != null && MotionLayers[i].ActiveMotion != null)
-                            {
-                                MotionLayers[i].ActiveMotion.IsAnimatorActive = true;
-                            }
-
-                            mState.AnimatorStates[i].AutoClearMotionPhaseReady = true;
                         }
                     }
 
-                    // If the state has changed, raise the event and say we're ready to clear the phase
-                    if (mState.AnimatorStates[i].StateInfo.fullPathHash != mPrevState.AnimatorStates[i].StateInfo.fullPathHash)
+                    // If we have auto-generated code, we'll use the "IsInMotion" to see if we can clear the phase
+                    if (lActiveMotion != null && !lActiveMotion.HasAutoGeneratedCode)
                     {
-                        // Report the state change
-                        OnAnimatorStateChange(i);
-
-                        // Update the transition info so the motion knows the animator is in synch
-                        if (MotionLayers.Count > i && MotionLayers[i] != null && MotionLayers[i].ActiveMotion != null)
+                        // We need to see if we're ready to clear the motion phase
+                        if (State.AnimatorStates[i].AutoClearMotionPhase && State.AnimatorStates[i].TransitionInfo.fullPathHash != 0)
                         {
-                            if (MotionLayers[i].ActiveMotion.IsMotionState(mState.AnimatorStates[i].StateInfo.fullPathHash))
+                            // Update the transition info so the motion knows the animator is in synch
+                            if (State.AnimatorStates[i].TransitionInfo.fullPathHash != State.AnimatorStates[i].AutoClearActiveTransitionID)
                             {
-                                if (MotionLayers[i] != null && MotionLayers[i].ActiveMotion != null)
-                                {
-                                    MotionLayers[i].ActiveMotion.IsAnimatorActive = true;
-                                }
+                                lActiveMotion.IsAnimatorActive = true;
+                                State.AnimatorStates[i].AutoClearMotionPhaseReady = true;
+                            }
+                        }
 
-                                mState.AnimatorStates[i].AutoClearMotionPhaseReady = true;
+                        // If the state has changed, raise the event and say we're ready to clear the phase
+                        if (State.AnimatorStates[i].StateInfo.fullPathHash != PrevState.AnimatorStates[i].StateInfo.fullPathHash)
+                        {
+                            // Report the state change
+                            OnAnimatorStateChange(i);
+
+                            // Just as a backup, update the transition info so the motion knows the animator is in synch
+                            if (lActiveMotion.IsMotionState(State.AnimatorStates[i].StateInfo.fullPathHash))
+                            {
+                                lActiveMotion.IsAnimatorActive = true;
+                                State.AnimatorStates[i].AutoClearMotionPhaseReady = true;
                             }
                         }
                     }
@@ -653,7 +694,11 @@ namespace com.ootii.Actors.AnimationControllers
             Utilities.Profiler.Start("04");
 #endif
 
-            if (_UseSimulatedInput || _InputSource == null || !_InputSource.IsEnabled)
+            if (_ActorController._UseTransformPosition)
+            {
+                ProcessMovementInput();
+            }
+            else if (_UseSimulatedInput || _InputSource == null || !_InputSource.IsEnabled)
             {
                 ProcessSimulatedInput();
             }
@@ -675,7 +720,7 @@ namespace com.ootii.Actors.AnimationControllers
             lCount = MotionLayers.Count;
             for (int i = 0; i < lCount; i++)
             {
-                MotionLayers[i].UpdateRootMotion(rDeltaTime, rUpdateIndex, ref mRootMotionMovement, ref mRootMotionRotation);
+                MotionLayers[i].UpdateRootMotion(lDeltaTime, rUpdateIndex, ref mRootMotionMovement, ref mRootMotionRotation);
                 MotionLayers[i].UpdateMotions(lDeltaTime, rUpdateIndex);
             }
 
@@ -775,7 +820,7 @@ namespace com.ootii.Actors.AnimationControllers
             // a frame. This way we don't send a bad frame
             if (rUpdateIndex >= 1)
             {
-                SetAnimatorProperties(mState, lUseTrendData);
+                SetAnimatorProperties(ref State, lUseTrendData);
             }
 
 #if OOTII_PROFILE
@@ -787,19 +832,23 @@ namespace com.ootii.Actors.AnimationControllers
 
 #if OOTII_PROFILE
 
-            //if (_Transform.name == "Goblin")
+            //if (_Transform.name == "Jones")
             {
-                Log.FileScreenWrite(String.Format("{0} MC.Update() Motion:{1} MotionDur:{2:f4} Phase:{3} State:{4}", name, (GetActiveMotion(0) != null ? GetActiveMotion(0).GetType().Name : "null"), (GetActiveMotion(0) != null ? GetActiveMotion(0).Age : 0), mState.AnimatorStates[0].MotionPhase, AnimatorHashToString(mState.AnimatorStates[0].StateInfo, mState.AnimatorStates[0].TransitionInfo)), 3);
+                Log.FileScreenWrite(String.Format("{0} MC.Update() Motion:{1} MotionDur:{2:f4} Phase:{3} Param:{4} State:{5}", name, (GetActiveMotion(0) != null ? GetActiveMotion(0).GetType().Name : "null"), (GetActiveMotion(0) != null ? GetActiveMotion(0).Age : 0), State.AnimatorStates[0].MotionPhase, State.AnimatorStates[0].MotionParameter, AnimatorHashToString(State.AnimatorStates[0].StateInfo, State.AnimatorStates[0].TransitionInfo)), 3);
+                Log.FileScreenWrite(String.Format("{0} MC.Update() isGrv:{1} isGnd:{2} GSD:{3:f4} GSA:{4:f4} Grn:{5}", name, _ActorController.IsGravityEnabled, _ActorController.IsGrounded, (_ActorController.State.Ground == null ? "inf" : _ActorController.State.GroundSurfaceDistance.ToString("f3")), _ActorController.State.GroundSurfaceAngle.ToString("f3"), (_ActorController.State.Ground == null ? "null" : _ActorController.State.Ground.name)), 4);
+                Log.FileScreenWrite(String.Format("IM:{0:f3} IFA:{1:f3} IFC:{2:f3} Input:{3:f3}, {4:f3} FInput:{5:f3}, {6:f3}", State.InputMagnitudeTrend.Value, State.InputFromAvatarAngle, State.InputFromCameraAngle, State.InputX, State.InputY, ForcedInput.x, ForcedInput.y), 5);
 
                 if (_CameraTransform != null)
                 {
-                    float lInputFromAvatar = Mathf.Abs(NumberHelper.GetHorizontalAngle(_Transform.forward, _CameraTransform.forward));
-                    Log.FileScreenWrite(String.Format("CFA:{0:f3}", lInputFromAvatar), 4);
+                    float lCameraFromAvatar = NumberHelper.GetHorizontalAngle(_Transform.forward, _CameraTransform.forward);
+                    Log.FileScreenWrite(String.Format("CFA:{0:f3}", lCameraFromAvatar), 6);
                 }
 
                 Log.FileWrite("");
             }
+
 #endif
+
         }
 
         /// <summary>
@@ -952,6 +1001,22 @@ namespace com.ootii.Actors.AnimationControllers
                 }
             }
 
+            // Search by type name
+            if (lMotion == null)
+            {
+                for (int i = 0; i < MotionLayers.Count; i++)
+                {
+                    for (int j = 0; j < MotionLayers[i].Motions.Count; j++)
+                    {
+                        if (MotionLayers[i].Motions[j].GetType().Name == rName)
+                        {
+                            lMotion = MotionLayers[i].Motions[j];
+                            if (lMotion.IsEnabled) { return lMotion; }
+                        }
+                    }
+                }
+            }
+
             return lMotion;
         }
 
@@ -974,9 +1039,57 @@ namespace com.ootii.Actors.AnimationControllers
                 }
             }
 
+            if (lMotion == null)
+            {
+                for (int i = 0; i < MotionLayers[rLayerIndex].Motions.Count; i++)
+                {
+                    if (MotionLayers[rLayerIndex].Motions[i].GetType().Name == rName)
+                    {
+                        lMotion = MotionLayers[rLayerIndex].Motions[i];
+                        if (lMotion.IsEnabled) { return lMotion; }
+                    }
+                }
+            }
+
             return lMotion;
         }
-        
+
+        /// <summary>
+        /// Return the first motion in a layer that matches the specific motion
+        /// type.
+        /// </summary>
+        /// <param name="rLayerIndex">Layer to look through</param>
+        /// <param name="rType">Type of controller motion to look for</param>
+        /// <returns>Returns reference to the first motion matching the type or null if not found</returns>
+        public T GetMotionInterface<T>(int rLayerIndex = 0) where T : class
+        {
+            if (rLayerIndex < 0 || rLayerIndex >= MotionLayers.Count) { return default(T); }
+            if (MotionLayers[rLayerIndex].Motions.Count == 0) { return default(T); }
+
+            Type lInterfaceType = typeof(T);
+
+            T lInterface = default(T);
+            for (int i = 0; i < MotionLayers[rLayerIndex].Motions.Count; i++)
+            {
+                Type lType = MotionLayers[rLayerIndex].Motions[i].GetType();
+
+#if !UNITY_EDITOR && (NETFX_CORE || WINDOWS_UWP || UNITY_WP8 || UNITY_WP_8_1 || UNITY_WSA || UNITY_WSA_8_0 || UNITY_WSA_8_1 || UNITY_WSA_10_0)
+                if (lInterfaceType.GetTypeInfo().IsAssignableFrom(lType.GetTypeInfo()))
+#else
+                if (lInterfaceType.IsAssignableFrom(lType))
+#endif
+                {
+                    lInterface = MotionLayers[rLayerIndex].Motions[i] as T;
+                    if (MotionLayers[rLayerIndex].Motions[i].IsEnabled)
+                    {
+                        return lInterface;
+                    }
+                }
+            }
+
+            return lInterface;
+        }
+
         /// <summary>
         /// Return the first active motion in a layer.
         /// </summary>
@@ -1032,12 +1145,27 @@ namespace com.ootii.Actors.AnimationControllers
         /// <returns>Returns the motion to be activated or null if a matching motion isn't found</returns>
         public MotionControllerMotion ActivateMotion(string rMotionName, int rParameter = 0)
         {
+            // Search by string name
             for (int i = 0; i < MotionLayers.Count; i++)
             {
                 for (int j = 0; j < MotionLayers[i].Motions.Count; j++)
                 {
                     MotionControllerMotion lMotion = MotionLayers[i].Motions[j];
                     if (lMotion._Name == rMotionName)
+                    {
+                        MotionLayers[i].QueueMotion(lMotion, rParameter);
+                        return lMotion;
+                    }
+                }
+            }
+
+            // Search by type name
+            for (int i = 0; i < MotionLayers.Count; i++)
+            {
+                for (int j = 0; j < MotionLayers[i].Motions.Count; j++)
+                {
+                    MotionControllerMotion lMotion = MotionLayers[i].Motions[j];
+                    if (lMotion.GetType().Name == rMotionName)
                     {
                         MotionLayers[i].QueueMotion(lMotion, rParameter);
                         return lMotion;
@@ -1163,17 +1291,17 @@ namespace com.ootii.Actors.AnimationControllers
         /// attempts to face forward the velocity.
         /// </summary>
         /// <param name="rVelocity">Velocity to move the actor</param>
-        public void SetTargetVelocity(Vector3 rVelocity)
+        public void SetTargetVelocity(Vector3 rVelocity, float rNormalizedSpeed = 0f)
         {
             _UseSimulatedInput = true;
 
             mTargetVelocity = rVelocity;
+            mTargetNormalizedSpeed = rNormalizedSpeed;
             mIsTargetMovementSet = true;
 
             if (mTargetVelocity.sqrMagnitude > 0f)
             {
                 mTargetPosition = Vector3.zero;
-                mTargetNormalizedSpeed = 0f;
             }
         }
 
@@ -1250,16 +1378,16 @@ namespace com.ootii.Actors.AnimationControllers
             float lMagnitude = Mathf.Sqrt((lHInput * lHInput) + (lVInput * lVInput));
 
             // Add the value to our averages so we track trends. 
-            mState.InputMagnitudeTrend.Value = lMagnitude;
+            State.InputMagnitudeTrend.Value = lMagnitude;
 
             // Get out early if we can simply this
             if (lVInput == 0f && lHInput == 0f)
             {
-                mState.InputX = 0f;
-                mState.InputY = 0f;
-                mState.InputForward = Vector3.zero;
-                mState.InputFromAvatarAngle = 0f;
-                mState.InputFromCameraAngle = 0f;
+                State.InputX = 0f;
+                State.InputY = 0f;
+                State.InputForward = Vector3.zero;
+                State.InputFromAvatarAngle = 0f;
+                State.InputFromCameraAngle = 0f;
 
                 _InputSource.InputFromCameraAngle = float.NaN;
                 _InputSource.InputFromAvatarAngle = float.NaN;
@@ -1268,9 +1396,9 @@ namespace com.ootii.Actors.AnimationControllers
             }
 
             // Set the forward direction of the input
-            mState.InputX = lHInput;
-            mState.InputY = lVInput;
-            mState.InputForward = new Vector3(lHInput, 0f, lVInput);
+            State.InputX = lHInput;
+            State.InputY = lVInput;
+            State.InputForward = new Vector3(lHInput, 0f, lVInput);
 
             // Determine angles based on what components exist
             if (_CameraTransform == null)
@@ -1278,13 +1406,13 @@ namespace com.ootii.Actors.AnimationControllers
                 // Without a camera, we hope there's an input source providing the info
                 if (_InputSource == null)
                 {
-                    mState.InputFromCameraAngle = 0f;
-                    mState.InputFromAvatarAngle = 0f;
+                    State.InputFromCameraAngle = 0f;
+                    State.InputFromAvatarAngle = 0f;
                 }
                 else
                 {
-                    mState.InputFromCameraAngle = _InputSource.InputFromCameraAngle;
-                    mState.InputFromAvatarAngle = _InputSource.InputFromAvatarAngle;
+                    State.InputFromCameraAngle = _InputSource.InputFromCameraAngle;
+                    State.InputFromAvatarAngle = _InputSource.InputFromAvatarAngle;
                 }
             }
             else
@@ -1312,15 +1440,128 @@ namespace com.ootii.Actors.AnimationControllers
 
                 // Transform joystick from world space to camera space. Now the input is relative
                 // to how the camera is facing.
-                Vector3 lMoveDirection = lToCamera * mState.InputForward;
-                mState.InputFromCameraAngle = NumberHelper.GetHorizontalAngle(lCameraForward, lMoveDirection);
-                mState.InputFromAvatarAngle = NumberHelper.GetHorizontalAngle(lControllerForward, lMoveDirection);
+                Vector3 lMoveDirection = lToCamera * State.InputForward;
+                State.InputFromCameraAngle = NumberHelper.GetHorizontalAngle(lCameraForward, lMoveDirection);
+                State.InputFromAvatarAngle = NumberHelper.GetHorizontalAngle(lControllerForward, lMoveDirection);
 
                 // Keep this info in the camera as well. Note that this info isn't
                 // reliable as objects looking for it's set it will have old data
-                _InputSource.InputFromCameraAngle = (mState.InputMagnitudeTrend.Value == 0f ? float.NaN : mState.InputFromCameraAngle);
-                _InputSource.InputFromAvatarAngle = (mState.InputMagnitudeTrend.Value == 0f ? float.NaN : mState.InputFromAvatarAngle);
+                _InputSource.InputFromCameraAngle = (State.InputMagnitudeTrend.Value == 0f ? float.NaN : State.InputFromCameraAngle);
+                _InputSource.InputFromAvatarAngle = (State.InputMagnitudeTrend.Value == 0f ? float.NaN : State.InputFromAvatarAngle);
             }
+        }
+
+        /// <summary>
+        /// Simulate user input by looking at the movement that has occured. This is used
+        /// when the actor controller is simply following the transform.
+        /// </summary>
+        private void ProcessMovementInput()
+        {
+            Vector3 lVelocity = _ActorController.State.Velocity;
+
+            // Get out early if there's nothing to do
+            if (lVelocity.sqrMagnitude == 0f && mTargetPosition.sqrMagnitude == 0f && mTargetRotation == Quaternion.identity)
+            {
+                State.InputX = 0;
+                State.InputY = 0;
+                State.InputForward = Vector3.zero;
+                State.InputFromCameraAngle = 0f;
+                State.InputFromAvatarAngle = 0f;
+                State.InputMagnitudeTrend.Value = 0f;
+
+                return;
+            }
+
+            float lRotation = 0f;
+            Vector3 lMovement = Vector3.zero;
+
+            // We could be moving based on velocity
+            if (lVelocity.sqrMagnitude > 0f)
+            {
+                lMovement = lVelocity;
+
+                if (mTargetNormalizedSpeed == 0f && _MaxSpeed > 0f)
+                {
+                    mTargetNormalizedSpeed = Mathf.Clamp01(lMovement.magnitude / _MaxSpeed);
+                    if (mTargetNormalizedSpeed < 0.5f) { mTargetNormalizedSpeed = 0.5f; }
+                }
+            }
+            // Or we could be moving based on a position
+            else
+            {
+                NumberHelper.GetHorizontalDifference(_Transform.position, mTargetPosition, ref lMovement);
+            }
+
+            // Get the input relative to our forward. If we're forcing the forward, we'll use that
+            // as the base value instead of our actual forward value
+            if (mIsTargetRotationSet)
+            {
+                lRotation = NumberHelper.GetHorizontalAngle(mTargetRotation.Forward(), lMovement.normalized, _Transform.up);
+            }
+            else
+            {
+                lRotation = NumberHelper.GetHorizontalAngle(_Transform.forward, lMovement.normalized);
+            }
+
+            // Determine the simulated input
+            float lHInput = 0f;
+            float lVInput = 0f;
+
+            // Simulate the input
+            if (lMovement.magnitude < 0.001f)
+            {
+                lHInput = 0f;
+                lVInput = 0f;
+            }
+            else
+            {
+                lHInput = 0f;
+                lVInput = mTargetNormalizedSpeed;
+            }
+
+            // It's possible that our rotation will have us one way and the target is another. This
+            // is how we can strafe.
+            Quaternion lDeltaRotation = Quaternion.AngleAxis(lRotation, _Transform.up);
+            Vector3 lInputForward = lDeltaRotation.Forward();
+            lHInput = lInputForward.x * mTargetNormalizedSpeed;
+            lVInput = lInputForward.z * mTargetNormalizedSpeed;
+
+            // Set the forward direction of the input, making it relative to the forward direction of the actor
+            State.InputForward = new Vector3(lHInput, 0f, lVInput);
+            State.InputX = State.InputForward.x;
+            State.InputY = State.InputForward.z;
+
+            // Determine the relative speed
+            State.InputMagnitudeTrend.Value = Mathf.Sqrt((lHInput * lHInput) + (lVInput * lVInput));
+
+            // Direction of the avatar
+            Vector3 lControllerForward = transform.forward;
+            lControllerForward.y = 0f;
+            lControllerForward.Normalize();
+
+            // Direction of the camera
+            if (_CameraTransform == null)
+            {
+                State.InputFromCameraAngle = lRotation;
+            }
+            else
+            {
+                Vector3 lCameraForward = _CameraTransform.forward;
+                lCameraForward.y = 0f;
+                lCameraForward.Normalize();
+
+                // Create a quaternion that gets us from our world-forward to our camera direction.
+                // FromToRotation creates a quaternion using the shortest method which can sometimes
+                // flip the angle. LookRotation will attempt to keep the "up" direction "up".
+                Quaternion rToCamera = Quaternion.LookRotation(lCameraForward);
+
+                // Transform joystick from world space to camera space. Now the input is relative
+                // to how the camera is facing.
+                Vector3 lMoveDirection = rToCamera * State.InputForward;
+                State.InputFromCameraAngle = NumberHelper.GetHorizontalAngle(lCameraForward, lMoveDirection);
+            }
+
+            State.InputFromAvatarAngle = lRotation;
         }
 
         /// <summary>
@@ -1332,12 +1573,12 @@ namespace com.ootii.Actors.AnimationControllers
             // Get out early if there's nothing to do
             if (mTargetVelocity.sqrMagnitude == 0f && mTargetPosition.sqrMagnitude == 0f && mTargetRotation == Quaternion.identity) 
             {
-                mState.InputX = 0;
-                mState.InputY = 0;
-                mState.InputForward = Vector3.zero;
-                mState.InputFromCameraAngle = 0f;
-                mState.InputFromAvatarAngle = 0f;
-                mState.InputMagnitudeTrend.Value = 0f;
+                State.InputX = 0;
+                State.InputY = 0;
+                State.InputForward = Vector3.zero;
+                State.InputFromCameraAngle = 0f;
+                State.InputFromAvatarAngle = 0f;
+                State.InputMagnitudeTrend.Value = 0f;
 
                 return; 
             }
@@ -1352,7 +1593,11 @@ namespace com.ootii.Actors.AnimationControllers
                 if (mTargetVelocity.sqrMagnitude > 0f)
                 {
                     lMovement = mTargetVelocity;
-                    mTargetNormalizedSpeed = Mathf.Clamp01(lMovement.magnitude / _MaxSpeed);
+
+                    if (mTargetNormalizedSpeed == 0f && _MaxSpeed > 0f)
+                    {
+                        mTargetNormalizedSpeed = Mathf.Clamp01(lMovement.magnitude / _MaxSpeed);
+                    }
                 }
                 // Or we could be moving based on a position
                 else
@@ -1390,7 +1635,7 @@ namespace com.ootii.Actors.AnimationControllers
 
             // It's possible that our rotation will have us one way and the target is another. This
             // is how we can strafe.
-            if (mIsTargetMovementSet && mIsTargetMovementSet && mTargetPosition.sqrMagnitude > 0f)
+            if (mIsTargetMovementSet && mIsTargetRotationSet && mTargetPosition.sqrMagnitude > 0f)
             {
                 Quaternion lDeltaRotation = Quaternion.AngleAxis(lRotation, _Transform.up);
                 Vector3 lInputForward = lDeltaRotation.Forward();
@@ -1399,14 +1644,14 @@ namespace com.ootii.Actors.AnimationControllers
             }
 
             // Set the forward direction of the input, making it relative to the forward direction of the actor
-            mState.InputForward = new Vector3(lHInput, 0f, lVInput);
-            //mState.InputForward = Quaternion.FromToRotation(transform.forward, lMovement.normalized) * mState.InputForward;
+            State.InputForward = new Vector3(lHInput, 0f, lVInput);
+            //State.InputForward = Quaternion.FromToRotation(transform.forward, lMovement.normalized) * State.InputForward;
 
-            mState.InputX = mState.InputForward.x;
-            mState.InputY = mState.InputForward.z;
+            State.InputX = State.InputForward.x;
+            State.InputY = State.InputForward.z;
 
             // Determine the relative speed
-            mState.InputMagnitudeTrend.Value = Mathf.Sqrt((lHInput * lHInput) + (lVInput * lVInput));
+            State.InputMagnitudeTrend.Value = Mathf.Sqrt((lHInput * lHInput) + (lVInput * lVInput));
 
             // Direction of the avatar
             Vector3 lControllerForward = transform.forward;
@@ -1416,7 +1661,7 @@ namespace com.ootii.Actors.AnimationControllers
             // Direction of the camera
             if (_CameraTransform == null)
             {
-                mState.InputFromCameraAngle = lRotation;
+                State.InputFromCameraAngle = lRotation;
             }
             else
             {
@@ -1432,11 +1677,11 @@ namespace com.ootii.Actors.AnimationControllers
 
                 // Transform joystick from world space to camera space. Now the input is relative
                 // to how the camera is facing.
-                Vector3 lMoveDirection = rToCamera * mState.InputForward;
-                mState.InputFromCameraAngle = NumberHelper.GetHorizontalAngle(lCameraForward, lMoveDirection);
+                Vector3 lMoveDirection = rToCamera * State.InputForward;
+                State.InputFromCameraAngle = NumberHelper.GetHorizontalAngle(lCameraForward, lMoveDirection);
             }
 
-            mState.InputFromAvatarAngle = lRotation;
+            State.InputFromAvatarAngle = lRotation;
         }
 
         /// <summary>
@@ -1447,8 +1692,8 @@ namespace com.ootii.Actors.AnimationControllers
         /// <returns></returns>
         public int GetAnimatorMotionPhase(int rLayerIndex)
         {
-            if (rLayerIndex >= mState.AnimatorStates.Length) { return 0; }
-            return mState.AnimatorStates[rLayerIndex].MotionPhase;
+            if (rLayerIndex >= State.AnimatorStates.Length) { return 0; }
+            return State.AnimatorStates[rLayerIndex].MotionPhase;
         }
 
         /// <summary>
@@ -1458,11 +1703,11 @@ namespace com.ootii.Actors.AnimationControllers
         /// <param name="rPhase">Phase value to set</param>
         public void SetAnimatorMotionPhase(int rLayerIndex, int rPhase)
         {
-            if (rLayerIndex >= mState.AnimatorStates.Length) { return; }
-            mState.AnimatorStates[rLayerIndex].MotionPhase = rPhase;
-            mState.AnimatorStates[rLayerIndex].AutoClearMotionPhase = false;
-            mState.AnimatorStates[rLayerIndex].AutoClearMotionPhaseReady = false;
-            mState.AnimatorStates[rLayerIndex].AutoClearActiveTransitionID = mState.AnimatorStates[rLayerIndex].TransitionInfo.fullPathHash;
+            if (rLayerIndex >= State.AnimatorStates.Length) { return; }
+            State.AnimatorStates[rLayerIndex].MotionPhase = rPhase;
+            State.AnimatorStates[rLayerIndex].AutoClearMotionPhase = false;
+            State.AnimatorStates[rLayerIndex].AutoClearMotionPhaseReady = false;
+            State.AnimatorStates[rLayerIndex].AutoClearActiveTransitionID = State.AnimatorStates[rLayerIndex].TransitionInfo.fullPathHash;
         }
 
         /// <summary>
@@ -1473,12 +1718,12 @@ namespace com.ootii.Actors.AnimationControllers
         /// <param name="rParameter">Extra parameter to send to the animator</param>
         public void SetAnimatorMotionPhase(int rLayerIndex, int rPhase, int rParameter)
         {
-            if (rLayerIndex >= mState.AnimatorStates.Length) { return; }
-            mState.AnimatorStates[rLayerIndex].MotionPhase = rPhase;
-            mState.AnimatorStates[rLayerIndex].MotionParameter = rParameter;
-            mState.AnimatorStates[rLayerIndex].AutoClearMotionPhase = false;
-            mState.AnimatorStates[rLayerIndex].AutoClearMotionPhaseReady = false;
-            mState.AnimatorStates[rLayerIndex].AutoClearActiveTransitionID = mState.AnimatorStates[rLayerIndex].TransitionInfo.fullPathHash;
+            if (rLayerIndex >= State.AnimatorStates.Length) { return; }
+            State.AnimatorStates[rLayerIndex].MotionPhase = rPhase;
+            State.AnimatorStates[rLayerIndex].MotionParameter = rParameter;
+            State.AnimatorStates[rLayerIndex].AutoClearMotionPhase = false;
+            State.AnimatorStates[rLayerIndex].AutoClearMotionPhaseReady = false;
+            State.AnimatorStates[rLayerIndex].AutoClearActiveTransitionID = State.AnimatorStates[rLayerIndex].TransitionInfo.fullPathHash;
         }
 
         /// <summary>
@@ -1489,11 +1734,11 @@ namespace com.ootii.Actors.AnimationControllers
         /// <param name="rAutoClear">Flag to have the system clear the phase once it changes</param>
         public void SetAnimatorMotionPhase(int rLayerIndex, int rPhase, bool rAutoClear)
         {
-            if (rLayerIndex >= mState.AnimatorStates.Length) { return; }
-            mState.AnimatorStates[rLayerIndex].MotionPhase = rPhase;
-            mState.AnimatorStates[rLayerIndex].AutoClearMotionPhase = rAutoClear;
-            mState.AnimatorStates[rLayerIndex].AutoClearMotionPhaseReady = false;
-            mState.AnimatorStates[rLayerIndex].AutoClearActiveTransitionID = mState.AnimatorStates[rLayerIndex].TransitionInfo.fullPathHash;
+            if (rLayerIndex >= State.AnimatorStates.Length) { return; }
+            State.AnimatorStates[rLayerIndex].MotionPhase = rPhase;
+            State.AnimatorStates[rLayerIndex].AutoClearMotionPhase = rAutoClear;
+            State.AnimatorStates[rLayerIndex].AutoClearMotionPhaseReady = false;
+            State.AnimatorStates[rLayerIndex].AutoClearActiveTransitionID = State.AnimatorStates[rLayerIndex].TransitionInfo.fullPathHash;
         }
 
         /// <summary>
@@ -1505,12 +1750,12 @@ namespace com.ootii.Actors.AnimationControllers
         /// <param name="rAutoClear">Flag to have the system clear the phase once it changes</param>
         public void SetAnimatorMotionPhase(int rLayerIndex, int rPhase, int rParameter, bool rAutoClear)
         {
-            if (rLayerIndex >= mState.AnimatorStates.Length) { return; }
-            mState.AnimatorStates[rLayerIndex].MotionPhase = rPhase;
-            mState.AnimatorStates[rLayerIndex].MotionParameter = rParameter;
-            mState.AnimatorStates[rLayerIndex].AutoClearMotionPhase = rAutoClear;
-            mState.AnimatorStates[rLayerIndex].AutoClearMotionPhaseReady = false;
-            mState.AnimatorStates[rLayerIndex].AutoClearActiveTransitionID = mState.AnimatorStates[rLayerIndex].TransitionInfo.fullPathHash;
+            if (rLayerIndex >= State.AnimatorStates.Length) { return; }
+            State.AnimatorStates[rLayerIndex].MotionPhase = rPhase;
+            State.AnimatorStates[rLayerIndex].MotionParameter = rParameter;
+            State.AnimatorStates[rLayerIndex].AutoClearMotionPhase = rAutoClear;
+            State.AnimatorStates[rLayerIndex].AutoClearMotionPhaseReady = false;
+            State.AnimatorStates[rLayerIndex].AutoClearActiveTransitionID = State.AnimatorStates[rLayerIndex].TransitionInfo.fullPathHash;
         }
 
         /// <summary>
@@ -1520,20 +1765,20 @@ namespace com.ootii.Actors.AnimationControllers
         /// <param name="rParameter">Parameter value to set</param>
         public void SetAnimatorMotionParameter(int rLayerIndex, int rParameter)
         {
-            if (rLayerIndex >= mState.AnimatorStates.Length) { return; }
-            mState.AnimatorStates[rLayerIndex].MotionParameter = rParameter;
+            if (rLayerIndex >= State.AnimatorStates.Length) { return; }
+            State.AnimatorStates[rLayerIndex].MotionParameter = rParameter;
         }
 
         /// <summary>
         /// Update the animator with data from the current state
         /// </summary>
         /// <param name="rState">MotionState containing the current data</param>
-        private void SetAnimatorProperties(MotionState rState, bool rUseTrendData)
+        private void SetAnimatorProperties(ref MotionState rState, bool rUseTrendData)
         {
             if (mAnimator == null) { return; }
 
 #if OOTII_PROFILE
-            //Log.FileWrite("Current: " + AnimatorHashToString(mState.AnimatorStates[0].StateInfo, mState.AnimatorStates[0].TransitionInfo));
+            //Log.FileWrite("Current: " + AnimatorHashToString(State.AnimatorStates[0].StateInfo, State.AnimatorStates[0].TransitionInfo));
             //Log.FileWrite("SetAnimatorProperties  UTD:" + rUseTrendData + " MUD:" + mMecanimUpdateDelay.ToString("f4"));
             //Log.FileWrite("SetAnimatorProperties  I.x:" + rState.InputX.ToString("f4") + " I.y:" + rState.InputY.ToString("f4") + " I.fwd:" + StringHelper.ToString(rState.InputForward));
             //Log.FileWrite("SetAnimatorProperties L0MP:" + rState.AnimatorStates[0].MotionPhase);
@@ -1548,19 +1793,35 @@ namespace com.ootii.Actors.AnimationControllers
             mAnimator.SetBool("IsGrounded", _ActorController.State.IsGrounded);
             mAnimator.SetInteger("Stance", _ActorController.State.Stance);
 
-            // The raw input from the UI
-            //mAnimator.SetFloat("InputX", rState.InputX, 0.15f, Time.deltaTime);
-            //mAnimator.SetFloat("InputY", rState.InputY, 0.15f, Time.deltaTime);
-            mAnimator.SetFloat("InputX", rState.InputX);
-            mAnimator.SetFloat("InputY", rState.InputY);
-
-            // The relative speed magnitude of the character (0 to 1)
-            // Delay a bit before we update the speed if we're accelerating
-            // or decelerating.
-            mMecanimUpdateDelay -= Time.deltaTime;
-            if (!rUseTrendData || mMecanimUpdateDelay <= 0f)
+            // If we come from a blend tree, we need to force the input values so the
+            // blend tree keeps it's current state. Do that until we're done transitioning in
+            if (MotionLayers.Count > 0 && rState.AnimatorStates.Length > 0 && ForcedInput.sqrMagnitude > 0f)
             {
-                mAnimator.SetFloat("InputMagnitude", rState.InputMagnitudeTrend.Value); //, 0.05f, Time.deltaTime);
+                mAnimator.SetFloat("InputX", ForcedInput.x);
+                mAnimator.SetFloat("InputY", ForcedInput.y);
+                mAnimator.SetFloat("InputMagnitude", Mathf.Sqrt((ForcedInput.x * ForcedInput.x) + (ForcedInput.y * ForcedInput.y)));
+
+                // Once there is no transition left, clear the forced input
+                if (rState.AnimatorStates[0].MotionPhase == 0 && MotionLayers[0]._AnimatorTransitionID == 0)
+                {
+                    ForcedInput = Vector2.zero;
+                }
+            }
+            // Otherwise, use the true input
+            else
+            {
+                // The raw input from the UI
+                mAnimator.SetFloat("InputX", rState.InputX);
+                mAnimator.SetFloat("InputY", rState.InputY);
+
+                // The relative speed magnitude of the character (0 to 1)
+                // Delay a bit before we update the speed if we're accelerating
+                // or decelerating.
+                mMecanimUpdateDelay -= Time.deltaTime;
+                if (!rUseTrendData || mMecanimUpdateDelay <= 0f)
+                {
+                    mAnimator.SetFloat("InputMagnitude", rState.InputMagnitudeTrend.Value); //, 0.05f, Time.deltaTime);
+                }
             }
 
             // The magnituded averaged out over the last 10 frames
@@ -1580,20 +1841,24 @@ namespace com.ootii.Actors.AnimationControllers
                 mAnimator.SetInteger(MOTION_PARAMETER_NAMES[i], lState.MotionParameter);
 
 #if USE_MOTION_STATE_TIME
-                mAnimator.SetFloat(MOTION_STATE_TIME[i], lState.StateInfo.normalizedTime);
+                mAnimator.SetFloat(MOTION_STATE_TIME[i], lState.StateInfo.normalizedTime % 1f);
 #endif
 
-                // With Unity 5, we keep re-entering. So we need to clear out the motion
-                // phase as quickly as possible
-                if (rState.AnimatorStates[i].AutoClearMotionPhase &&
-                    rState.AnimatorStates[i].AutoClearMotionPhaseReady &&
-                    rState.AnimatorStates[i].MotionPhase != 0)
+                // If we have auto-generated code, we'll use the "IsInMotion" to see if we can clear the phase
+                if (i < MotionLayers.Count && MotionLayers[i].ActiveMotion != null && !MotionLayers[i].ActiveMotion.HasAutoGeneratedCode)
                 {
-                    rState.AnimatorStates[i].MotionPhase = 0;
-                    rState.AnimatorStates[i].AutoClearActiveTransitionID = 0;
+                    // With Unity 5, we keep re-entering. So we need to clear out the motion
+                    // phase as quickly as possible
+                    if (rState.AnimatorStates[i].AutoClearMotionPhase &&
+                        rState.AnimatorStates[i].AutoClearMotionPhaseReady &&
+                        rState.AnimatorStates[i].MotionPhase != 0)
+                    {
+                        rState.AnimatorStates[i].MotionPhase = 0;
+                        rState.AnimatorStates[i].AutoClearActiveTransitionID = 0;
 
-                    //mState.AnimatorStates[i].AutoClearMotionPhase = false;
-                    //mState.AnimatorStates[i].AutoClearMotionPhaseReady = false;
+                        //State.AnimatorStates[i].AutoClearMotionPhase = false;
+                        //State.AnimatorStates[i].AutoClearMotionPhaseReady = false;
+                    }
                 }
             }
         }
@@ -1603,7 +1868,8 @@ namespace com.ootii.Actors.AnimationControllers
         /// stops the application of any existing root motion since we're
         /// essencially overriding the function. 
         /// 
-        /// This function is called right before Update()
+        /// This function is called after Update() and after the state machines 
+        /// and the animations have been evaluated. However, before LateUpdate().
         /// </summary>
         private void OnAnimatorMove()
         {
@@ -1669,7 +1935,7 @@ namespace com.ootii.Actors.AnimationControllers
             {
                 if (MotionLayers[i].AnimatorLayerIndex == rAnimatorLayer)
                 {
-                    MotionLayers[i].OnAnimatorStateChange(rAnimatorLayer, mPrevState.AnimatorStates[rAnimatorLayer].StateInfo.fullPathHash, mState.AnimatorStates[rAnimatorLayer].StateInfo.fullPathHash);
+                    MotionLayers[i].OnAnimatorStateChange(rAnimatorLayer, PrevState.AnimatorStates[rAnimatorLayer].StateInfo.fullPathHash, State.AnimatorStates[rAnimatorLayer].StateInfo.fullPathHash);
                 }
             }
         }
@@ -1693,6 +1959,31 @@ namespace com.ootii.Actors.AnimationControllers
                     MotionLayers[i].OnAnimationEvent(rEvent);
                     if (lStateHash != 0) { break; }
                 }
+            }
+        }
+
+        /// <summary>
+        /// Sends a message to all the motions that are enabled.
+        /// </summary>
+        /// <param name="rMessage">IMessage object containing information about the message</param>
+        public void SendMessage(IMessage rMessage)
+        {
+            rMessage.IsSent = true;
+            rMessage.IsHandled = false;
+            OnMessageReceived(rMessage);
+        }
+
+        /// <summary>
+        /// Processes an incoming message and sends it to the motions that are enabled.
+        /// </summary>
+        /// <param name="rMessage">IMessage object containing information about the message</param>
+        private void OnMessageReceived(IMessage rMessage)
+        {
+            for (int i = 0; i < MotionLayers.Count; i++)
+            {
+                MotionLayers[i].OnMessageReceived(rMessage);
+
+                if (rMessage.IsHandled) { break; }
             }
         }
 
@@ -1736,8 +2027,8 @@ namespace com.ootii.Actors.AnimationControllers
         /// <returns></returns>
         public bool CompareAnimatorStateName(int rLayerIndex, string rStateName)
         {
-            if (mState.AnimatorStates[rLayerIndex].StateInfo.fullPathHash == AnimatorStateIDs[rStateName]) { return true; }
-            if (mState.AnimatorStates[rLayerIndex].TransitionInfo.fullPathHash == AnimatorStateIDs[rStateName]) { return true; }
+            if (State.AnimatorStates[rLayerIndex].StateInfo.fullPathHash == AnimatorStateIDs[rStateName]) { return true; }
+            if (State.AnimatorStates[rLayerIndex].TransitionInfo.fullPathHash == AnimatorStateIDs[rStateName]) { return true; }
 
             return false;
         }
@@ -1750,7 +2041,7 @@ namespace com.ootii.Actors.AnimationControllers
         /// <returns></returns>
         public bool CompareAnimatorTransitionName(int rLayerIndex, string rTransitionName)
         {
-            return (mState.AnimatorStates[rLayerIndex].TransitionInfo.fullPathHash == AnimatorStateIDs[rTransitionName]);
+            return (State.AnimatorStates[rLayerIndex].TransitionInfo.fullPathHash == AnimatorStateIDs[rTransitionName]);
         }
         
         /// <summary>
@@ -1778,8 +2069,8 @@ namespace com.ootii.Actors.AnimationControllers
         /// <returns></returns>
         public string GetAnimatorStateAndTransitionName()
         {
-            int lStateID = mState.AnimatorStates[0].StateInfo.fullPathHash;
-            int lTransitionID = mState.AnimatorStates[0].TransitionInfo.fullPathHash;
+            int lStateID = State.AnimatorStates[0].StateInfo.fullPathHash;
+            int lTransitionID = State.AnimatorStates[0].TransitionInfo.fullPathHash;
             return AnimatorHashToString(lStateID, lTransitionID);
         }
 
@@ -1792,7 +2083,7 @@ namespace com.ootii.Actors.AnimationControllers
         public string GetAnimatorStateName(int rLayerIndex)
         {
             string lResult = "";
-            int lStateID = mState.AnimatorStates[rLayerIndex].StateInfo.fullPathHash;
+            int lStateID = State.AnimatorStates[rLayerIndex].StateInfo.fullPathHash;
 
             if (AnimatorStateNames.ContainsKey(lStateID))
             {
@@ -1812,8 +2103,8 @@ namespace com.ootii.Actors.AnimationControllers
         {
             string lResult = "";
 
-            int lStateID = mState.AnimatorStates[rLayerIndex].StateInfo.fullPathHash;
-            int lTransitionID = mState.AnimatorStates[rLayerIndex].TransitionInfo.fullPathHash;
+            int lStateID = State.AnimatorStates[rLayerIndex].StateInfo.fullPathHash;
+            int lTransitionID = State.AnimatorStates[rLayerIndex].TransitionInfo.fullPathHash;
 
             if (lTransitionID != 0 && AnimatorStateNames.ContainsKey(lTransitionID))
             {
@@ -1821,7 +2112,7 @@ namespace com.ootii.Actors.AnimationControllers
             }
             else
             {
-                lTransitionID = mState.AnimatorStates[rLayerIndex].TransitionInfo.nameHash;
+                lTransitionID = State.AnimatorStates[rLayerIndex].TransitionInfo.nameHash;
                 if (lTransitionID != 0 && AnimatorStateNames.ContainsKey(lTransitionID))
                 {
                     lResult = AnimatorStateNames[lTransitionID];
@@ -1954,14 +2245,14 @@ namespace com.ootii.Actors.AnimationControllers
         /// </summary>
         private void DetermineTrendData()
         {
-            if (mState.InputMagnitudeTrend.Value == mPrevState.InputMagnitudeTrend.Value)
+            if (State.InputMagnitudeTrend.Value == PrevState.InputMagnitudeTrend.Value)
             {
                 if (mSpeedTrendDirection != EnumSpeedTrend.CONSTANT)
                 {
                     mSpeedTrendDirection = EnumSpeedTrend.CONSTANT;
                 }
             }
-            else if (mState.InputMagnitudeTrend.Value < mPrevState.InputMagnitudeTrend.Value)
+            else if (State.InputMagnitudeTrend.Value < PrevState.InputMagnitudeTrend.Value)
             {
                 if (mSpeedTrendDirection != EnumSpeedTrend.DECELERATE)
                 {
@@ -1972,7 +2263,7 @@ namespace com.ootii.Actors.AnimationControllers
                 // Acceleration needs to stay consistant for mecanim
                 //mNewState.Acceleration = mNewState.InputMagnitude - mSpeedTrendStart;
             }
-            else if (mState.InputMagnitudeTrend.Value > mPrevState.InputMagnitudeTrend.Value)
+            else if (State.InputMagnitudeTrend.Value > PrevState.InputMagnitudeTrend.Value)
             {
                 if (mSpeedTrendDirection != EnumSpeedTrend.ACCELERATE)
                 {
@@ -2001,10 +2292,10 @@ namespace com.ootii.Actors.AnimationControllers
         // Following properties and function only valid while editing
         // **************************************************************************************************
 
-        // Values to help us manage the editor
-        public bool EditorShowAdvanced = false;
-
 #if UNITY_EDITOR
+
+        // Values to help us manage the editor
+        public int EditorTabIndex = 0;
 
         /// <summary>
         /// Allows us to re-open the last selected layer
@@ -2015,6 +2306,86 @@ namespace com.ootii.Actors.AnimationControllers
         /// Allows us to re-open the last selected motion
         /// </summary>
         public int EditorMotionIndex = 0;
+
+        /// <summary>
+        /// Allows us to re-open the last selected pack
+        /// </summary>
+        public int EditorPackIndex = 0;
+
+        /// <summary>
+        /// Reset to default values. Reset is called when the user hits the Reset button in the Inspector's 
+        /// context menu or when adding the component the first time. This function is only called in editor mode.
+        /// </summary>
+        public void Reset()
+        {
+            Debug.Log("MC Reset()");
+            for (int i = 0; i < MotionLayers.Count; i++)
+            {
+                for (int j = 0; j < MotionLayers[i].Motions.Count; j++)
+                {
+                    MotionLayers[i].Motions[j].Reset();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Get or create the specified motion
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        public T CreateMotion<T>(int rLayerIndex, string rName = "", bool rIsEnabled = true) where T : MotionControllerMotion
+        {
+            while (MotionLayers.Count <= rLayerIndex)
+            {
+                MotionLayers.Add(new MotionControllerLayer());
+            }
+
+            int lMotionIndex = -1;
+
+            T lMotion = GetMotion(typeof(T)) as T;
+            if (lMotion == null)
+            {
+                lMotion = Activator.CreateInstance(typeof(T)) as T;
+                MotionLayers[rLayerIndex].AddMotion(lMotion);
+                MotionLayers[rLayerIndex].MotionDefinitions.Add(lMotion.SerializeMotion());
+
+                lMotionIndex = MotionLayers[rLayerIndex].Motions.Count - 1;
+
+                if (EditorApplication.isPlaying)
+                {
+                    lMotion.Awake();
+                    lMotion.Initialize();
+                    lMotion.LoadAnimatorData();
+                    lMotion.CreateInputManagerSettings();
+                }
+            }
+            else
+            {
+                lMotionIndex = MotionLayers[rLayerIndex].Motions.IndexOf(lMotion);
+            }
+
+            if (lMotionIndex >= 0)
+            {
+                if (rName.Length > 0) { lMotion.Name = rName; }
+                lMotion.IsEnabled = rIsEnabled;
+                MotionLayers[rLayerIndex].MotionDefinitions[lMotionIndex] = lMotion.SerializeMotion();
+            }
+
+            return lMotion;
+        }
+
+        /// <summary>
+        /// Serialize the motion and update it's defintion
+        /// </summary>
+        /// <param name="rMotion"></param>
+        public void SerializeMotion(MotionControllerMotion rMotion)
+        {
+            int lIndex = rMotion.MotionLayer.Motions.IndexOf(rMotion);
+            if (lIndex >= 0)
+            {
+                rMotion.MotionLayer.MotionDefinitions[lIndex] = rMotion.SerializeMotion();
+            }
+        }
 
 #endif
 

@@ -187,6 +187,11 @@ namespace com.ootii.Actors.AnimationControllers
         protected bool mIsExitTriggered = false;
 
         /// <summary>
+        /// Store the stance so we can reset it if needed
+        /// </summary>
+        protected int mStoredStance = 0;
+
+        /// <summary>
         /// Keeps us from having to reallocate over and over
         /// </summary>
         protected RaycastHit mRaycastHitInfo = RaycastExt.EmptyHitInfo;
@@ -311,6 +316,7 @@ namespace com.ootii.Actors.AnimationControllers
             mIsExitTriggered = false;
 
             // Set the state
+            mStoredStance = mActorController.State.Stance;
             mActorController.State.Stance = EnumControllerStance.CLIMB_LADDER;
 
             // Track the object we're trying to climb and store it
@@ -329,7 +335,7 @@ namespace com.ootii.Actors.AnimationControllers
                 MotionReachData lReachData = MotionReachData.Allocate();
                 lReachData.StateID = STATE_LadderBottomOn;
                 lReachData.StartTime = 0.0f;
-                lReachData.EndTime = 0.4f;
+                lReachData.EndTime = 0.9f;
                 lReachData.Power = 3;
                 lReachData.ReachTarget = mRaycastHitInfo.point - (mActorController._Transform.up * mActorController._MaxStepHeight) + (mActorController._Transform.up * 0.0f) + (mRaycastHitInfo.normal * _ReachOffset1);
                 lReachData.ReachTargetGround = mActorController.State.Ground;
@@ -440,7 +446,7 @@ namespace com.ootii.Actors.AnimationControllers
             // Clear the stance
             if (mActorController.State.Stance == EnumControllerStance.CLIMB_LADDER)
             {
-                mActorController.State.Stance = EnumControllerStance.TRAVERSAL;
+                mActorController.State.Stance = mStoredStance;
             }
 
             // Re-enable actor controller processing
@@ -1220,7 +1226,7 @@ namespace com.ootii.Actors.AnimationControllers
             lAnyStateTransition.hasExitTime = false;
             lAnyStateTransition.hasFixedDuration = true;
             lAnyStateTransition.exitTime = 0.9f;
-            lAnyStateTransition.duration = 0.1f;
+            lAnyStateTransition.duration = 0.2f;
             lAnyStateTransition.offset = 0f;
             lAnyStateTransition.mute = false;
             lAnyStateTransition.solo = false;

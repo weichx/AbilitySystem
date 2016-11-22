@@ -13,9 +13,9 @@ namespace com.ootii.Actors.AnimationControllers
     /// Idle motion for when the character is just standing and waiting
     /// for input or some interaction.
     /// </summary>
-    [MotionName("Walk Run Strafe")]
+    [MotionName("Walk Run Strafe (old)")]
     [MotionDescription("Simple walking motion that keeps the character facing forward.")]
-    public class WalkRunStrafe : MotionControllerMotion
+    public class WalkRunStrafe : MotionControllerMotion, IWalkRunMotion
     {
         /// <summary>
         /// Trigger values for th emotion
@@ -137,6 +137,16 @@ namespace com.ootii.Actors.AnimationControllers
         }
 
         /// <summary>
+        /// Determines if we shortcut the motion and start in the loop
+        /// </summary>
+        private bool mStartInMove = false;
+        public bool StartInMove
+        {
+            get { return mStartInMove; }
+            set { mStartInMove = value; }
+        }
+
+        /// <summary>
         /// Determines if we shortcut the motion and start in a run
         /// </summary>
         private bool mStartInWalk = false;
@@ -245,6 +255,19 @@ namespace com.ootii.Actors.AnimationControllers
             if (mMotionController._InputSource.MovementX == 0f && mMotionController._InputSource.MovementY == 0f) { return false; }
             if (_ActivateWithAltCameraMode && mMotionController.CameraRig != null && mMotionController.CameraRig.Mode == 0) { return false; }
 
+            // If we're not in the traversal state, this is easy
+            if (mActorController.State.Stance != EnumControllerStance.TRAVERSAL)
+            {
+                return false;
+            }
+
+            // If we're not actually moving. We use the value here since we'll
+            // stop if our value is < 0.4f;
+            if (mMotionController.State.InputMagnitudeTrend.Value < 0.4f)
+            {
+                return false;
+            }
+
             return true;
         }
 
@@ -306,7 +329,7 @@ namespace com.ootii.Actors.AnimationControllers
                 //    // transition to this sub-state machine
                 //    if (lTransitionID != TRANS_EntryState_IdlePose)
                 //    {
-                        return false;
+                return false;
                 //    }
                 //}
             }
@@ -376,7 +399,7 @@ namespace com.ootii.Actors.AnimationControllers
             // If we're still flagged as in the ranged stance, move out
             if (mClearRangedStance && mActorController.State.Stance == EnumControllerStance.COMBAT_RANGED)
             {
-                mActorController.State.Stance = EnumControllerStance.TRAVERSAL;
+                //mActorController.State.Stance = EnumControllerStance.TRAVERSAL;
             }
 
             // Continue with the deactivation
@@ -399,11 +422,11 @@ namespace com.ootii.Actors.AnimationControllers
                 AnimatorStateInfo lStateInfo = mMotionController.State.AnimatorStates[mMotionLayer._AnimatorLayerIndex].StateInfo;
                 int lStateID = lStateInfo.fullPathHash;
 
-                if (lStateID == STATE_WalkFwdLoop || 
+                if (lStateID == STATE_WalkFwdLoop ||
                     lStateID == STATE_WalkToIdle ||
                     lStateID == STATE_WalkToIdle_LDown ||
                     lStateID == STATE_WalkToIdle_RDown ||
-                    lStateID == STATE_RunFwdLoop || 
+                    lStateID == STATE_RunFwdLoop ||
                     lStateID == STATE_WalkBackward)
                 {
                     rMovement.x = 0f;
@@ -428,11 +451,11 @@ namespace com.ootii.Actors.AnimationControllers
             // Update the stance if the camera mode is set
             if (mMotionController.CameraRig != null && mMotionController.CameraRig.Mode > 0)
             {
-                mActorController.State.Stance = EnumControllerStance.COMBAT_RANGED;
+                //mActorController.State.Stance = EnumControllerStance.COMBAT_RANGED;
             }
             else
             {
-                mActorController.State.Stance = EnumControllerStance.TRAVERSAL;
+                //mActorController.State.Stance = EnumControllerStance.TRAVERSAL;
             }
 
             // We only want to process on the first update iteration
@@ -556,7 +579,7 @@ namespace com.ootii.Actors.AnimationControllers
             //if (mMotionController._InputSource.IsViewingActivated)
             if (mMotionController._InputSource.IsPressed(_RotateActionAlias))
             {
-                lYawDelta = mMotionController._InputSource.ViewX * mDegreesPer60FPSTick;
+                lYawDelta = mMotionController._InputSource.ViewX * mDegreesPer60FPSTick * TimeManager.Relative60FPSDeltaTime;
             }
 
             mYawTarget = mYawTarget + lYawDelta;

@@ -161,8 +161,8 @@ namespace com.ootii.Actors.AnimationControllers
         }
         
         /// <summary>
-                 /// Used to determine how we'll start the ladder climb
-                 /// </summary>
+        /// Used to determine how we'll start the ladder climb
+        /// </summary>
         protected int mStartState = PHASE_START;
 
         /// <summary>
@@ -195,6 +195,11 @@ namespace com.ootii.Actors.AnimationControllers
         /// meant to be generic.
         /// </summary>
         protected bool mIsExitTriggered = false;
+
+        /// <summary>
+        /// Store the stance so we can reset it if needed
+        /// </summary>
+        protected int mStoredStance = 0;
 
         /// <summary>
         /// Keeps us from having to reallocate over and over
@@ -323,6 +328,7 @@ namespace com.ootii.Actors.AnimationControllers
             mIsExitTriggered = false;
 
             // Set the state
+            mStoredStance = mActorController.State.Stance;
             mActorController.State.Stance = EnumControllerStance.CLIMB_WALL;
 
             // Track the object we're trying to climb and store it
@@ -343,20 +349,20 @@ namespace com.ootii.Actors.AnimationControllers
                 MotionReachData lReachData = MotionReachData.Allocate();
                 lReachData.StateID = STATE_ScaleWallBottomOn;
                 lReachData.StartTime = 0.0f;
-                lReachData.EndTime = 0.2f;
+                lReachData.EndTime = 0.9f;
                 lReachData.Power = 3;
                 lReachData.ReachTarget = mRaycastHitInfo.point - (mActorController._Transform.up * _MinHeight) + (mRaycastHitInfo.normal * _ReachOffset1);
                 lReachData.ReachTargetGround = mActorController.State.Ground;
                 mReachData.Add(lReachData);
 
-                lReachData = MotionReachData.Allocate();
-                lReachData.StateID = STATE_ScaleWallBottomOn;
-                lReachData.StartTime = 0.7f;
-                lReachData.EndTime = 0.85f;
-                lReachData.Power = 3;
-                lReachData.ReachTarget = mRaycastHitInfo.point - (mActorController._Transform.up * _MinHeight) + (mRaycastHitInfo.normal * _ReachOffset1);
-                lReachData.ReachTargetGround = mActorController.State.Ground;
-                mReachData.Add(lReachData);
+                //lReachData = MotionReachData.Allocate();
+                //lReachData.StateID = STATE_ScaleWallBottomOn;
+                //lReachData.StartTime = 0.7f;
+                //lReachData.EndTime = 0.85f;
+                //lReachData.Power = 3;
+                //lReachData.ReachTarget = mRaycastHitInfo.point - (mActorController._Transform.up * _MinHeight) + (mRaycastHitInfo.normal * _ReachOffset1);
+                //lReachData.ReachTargetGround = mActorController.State.Ground;
+                //mReachData.Add(lReachData);
             }
             // Top with wall behind us
             else if (mStartState == PHASE_START_TOP)
@@ -467,7 +473,7 @@ namespace com.ootii.Actors.AnimationControllers
             // Clear the stance
             if (mActorController.State.Stance == EnumControllerStance.CLIMB_WALL)
             {
-                mActorController.State.Stance = EnumControllerStance.TRAVERSAL;
+                mActorController.State.Stance = mStoredStance;
             }
 
             // Re-enable actor controller processing
@@ -1250,7 +1256,7 @@ namespace com.ootii.Actors.AnimationControllers
             lAnyStateTransition.hasExitTime = false;
             lAnyStateTransition.hasFixedDuration = true;
             lAnyStateTransition.exitTime = 0.9f;
-            lAnyStateTransition.duration = 0.1f;
+            lAnyStateTransition.duration = 0.2f;
             lAnyStateTransition.offset = 0f;
             lAnyStateTransition.mute = false;
             lAnyStateTransition.solo = false;

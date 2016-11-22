@@ -55,6 +55,13 @@ public class NavMeshInputSourceEditor : Editor
             mTarget.IsEnabled = lNewIsEnabled;
         }
 
+        bool lNewAllowUserInput = EditorGUILayout.Toggle(new GUIContent("Allow User Input", "Determines button presses will be retrieved."), mTarget.AllowUserInput);
+        if (lNewAllowUserInput != mTarget.AllowUserInput)
+        {
+            mIsDirty = true;
+            mTarget.AllowUserInput = lNewAllowUserInput;
+        }
+
         float lNewMaxViewSpeed = EditorGUILayout.FloatField(new GUIContent("Max View Speed", "Max speed that we use to simulate the view changing. A speed of 1 is normal."), mTarget.MaxViewSpeed);
         if (lNewMaxViewSpeed != mTarget.MaxViewSpeed)
         {

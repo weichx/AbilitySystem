@@ -1,2 +1,6 @@
 ﻿
-public class AbilityCreator : AssetCreator<Ability> {}
+namespace EntitySystem {
+	
+	public class AbilityCreator : AssetCreator<Ability> {}
+
+}

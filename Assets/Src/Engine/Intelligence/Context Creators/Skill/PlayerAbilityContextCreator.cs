@@ -1,4 +1,6 @@
-﻿namespace Intelligence {
+﻿using EntitySystem;
+
+namespace Intelligence {
 
     public abstract class PlayerAbilityContextCreator : PlayerContextCreator {
 

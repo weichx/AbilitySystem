@@ -1,4 +1,5 @@
 ﻿using System;
+using EntitySystem;
 using Intelligence;
 
 public enum ContextCreationStatus {

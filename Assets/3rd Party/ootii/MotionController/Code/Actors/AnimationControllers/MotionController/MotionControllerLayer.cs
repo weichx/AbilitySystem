@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using com.ootii.Base;
-using com.ootii.Helpers;
+using com.ootii.Messages;
 using com.ootii.Utilities;
 using com.ootii.Utilities.Debug;
 
@@ -418,7 +418,7 @@ namespace com.ootii.Actors.AnimationControllers
                     if (lMotion.ReactivationDelay > 0f && (lMotion.DeactivationTime + lMotion.ReactivationDelay) > Time.time) { continue; }
 
                     // If we're to force the motion, don't check others
-                    if (lMotion.QueueActivation)
+                    if (lMotion.QueueActivation && (mActiveMotion == null || mActiveMotion.TestInterruption(Motions[i])))
                     {
                         lIsQueued = true;
 
@@ -579,10 +579,26 @@ namespace com.ootii.Actors.AnimationControllers
             // Send the event to all active motions
             for (int i = 0; i < Motions.Count; i++)
             {
-                // We allow the motions to interrogate animation events.
                 if (Motions[i].IsActive)
                 {
                     Motions[i].OnAnimationEvent(rEvent);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Raised by the controller when a message is received
+        /// </summary>
+        public void OnMessageReceived(IMessage rMessage)
+        {
+            // Send the event to all motions
+            for (int i = 0; i < Motions.Count; i++)
+            {
+                if (Motions[i].IsEnabled)
+                {
+                    Motions[i].OnMessageReceived(rMessage);
+
+                    if (rMessage.IsHandled) { break; }
                 }
             }
         }

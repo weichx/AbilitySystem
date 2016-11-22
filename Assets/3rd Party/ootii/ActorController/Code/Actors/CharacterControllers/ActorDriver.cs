@@ -144,27 +144,43 @@ namespace com.ootii.Actors
             float lDeltaTime = TimeManager.SmoothedDeltaTime;
 
             // Rotate based on the mouse
-            if (mInputSource.IsViewingActivated) {
+            if (mInputSource.IsViewingActivated)
+            {
                 float lYaw = mInputSource.ViewX;
-                Quaternion lRotation = Quaternion.Euler(0f, lYaw * mDegreesPer60FPSTick, 0f);
+                Quaternion lRotation = Quaternion.Euler(0f, lYaw * mDegreesPer60FPSTick * TimeManager.Relative60FPSDeltaTime, 0f);
 
                 mActorController.Rotate(lRotation);
             }
 
-            //// Move based on WASD
+            // Move based on WASD
             Vector3 lInput = new Vector3(mInputSource.MovementX, 0f, mInputSource.MovementY);
             Vector3 lMovement = lInput * _MovementSpeed * lDeltaTime;
 
-            if (lMovement.sqrMagnitude > 0f) {
+            if (lMovement.sqrMagnitude > 0f)
+            {
                 mActorController.RelativeMove(lMovement);
             }
 
             // Jump based on space
-            if (mInputSource.IsJustPressed("Jump")) {
-                if (mActorController.State.IsGrounded) {
+            if (mInputSource.IsJustPressed("Jump"))
+            {
+                if (mActorController.State.IsGrounded)
+                {
                     mActorController.AddImpulse(transform.up * _JumpForce);
                 }
             }
         }
+
+#if UNITY_EDITOR
+
+        /// <summary>
+        /// Renders debug GUI
+        /// </summary>
+        protected virtual void OnGUI()
+        {
+        }
+
+#endif
+
     }
 }

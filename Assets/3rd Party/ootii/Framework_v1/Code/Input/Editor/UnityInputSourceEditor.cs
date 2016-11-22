@@ -146,6 +146,35 @@ public class UnityInputSourceEditor : Editor
             InputManagerHelper.AddEntry(lEntry);
         }
 
+        if (!InputManagerHelper.IsDefined("WXLeftStickX"))
+        {
+            InputManagerEntry lEntry = new InputManagerEntry();
+            lEntry.Name = "WXLeftStickX";
+            lEntry.Gravity = 0;
+            lEntry.Dead = 0.2f;
+            lEntry.Sensitivity = 1;
+            lEntry.Type = InputManagerEntryType.JOYSTICK_AXIS;
+            lEntry.Axis = 1;
+            lEntry.JoyNum = 0;
+
+            InputManagerHelper.AddEntry(lEntry);
+        }
+
+        if (!InputManagerHelper.IsDefined("WXLeftStickY"))
+        {
+            InputManagerEntry lEntry = new InputManagerEntry();
+            lEntry.Name = "WXLeftStickY";
+            lEntry.Gravity = 0;
+            lEntry.Dead = 0.2f;
+            lEntry.Sensitivity = 1;
+            lEntry.Invert = true;
+            lEntry.Type = InputManagerEntryType.JOYSTICK_AXIS;
+            lEntry.Axis = 2;
+            lEntry.JoyNum = 0;
+
+            InputManagerHelper.AddEntry(lEntry);
+        }
+
         if (!InputManagerHelper.IsDefined("WXRightStickX"))
         {
             InputManagerEntry lEntry = new InputManagerEntry();
@@ -170,6 +199,65 @@ public class UnityInputSourceEditor : Editor
             lEntry.Invert = true;
             lEntry.Type = InputManagerEntryType.JOYSTICK_AXIS;
             lEntry.Axis = 5;
+            lEntry.JoyNum = 0;
+
+            InputManagerHelper.AddEntry(lEntry);
+        }
+
+        if (!InputManagerHelper.IsDefined("MXButton0"))
+        {
+            InputManagerEntry lEntry = new InputManagerEntry();
+            lEntry.Name = "MXButton0";
+            lEntry.PositiveButton = "joystick button 16";
+            lEntry.Gravity = 1000;
+            lEntry.Dead = 0.001f;
+            lEntry.Sensitivity = 1000;
+            lEntry.Type = InputManagerEntryType.KEY_MOUSE_BUTTON;
+            lEntry.Axis = 0;
+            lEntry.JoyNum = 0;
+
+            InputManagerHelper.AddEntry(lEntry);
+        }
+
+        if (!InputManagerHelper.IsDefined("MXButton1"))
+        {
+            InputManagerEntry lEntry = new InputManagerEntry();
+            lEntry.Name = "MXButton1";
+            lEntry.PositiveButton = "joystick button 17";
+            lEntry.Gravity = 1000;
+            lEntry.Dead = 0.001f;
+            lEntry.Sensitivity = 1000;
+            lEntry.Type = InputManagerEntryType.KEY_MOUSE_BUTTON;
+            lEntry.Axis = 0;
+            lEntry.JoyNum = 0;
+
+            InputManagerHelper.AddEntry(lEntry);
+        }
+
+        if (!InputManagerHelper.IsDefined("MXLeftStickX"))
+        {
+            InputManagerEntry lEntry = new InputManagerEntry();
+            lEntry.Name = "MXLeftStickX";
+            lEntry.Gravity = 1;
+            lEntry.Dead = 0.3f;
+            lEntry.Sensitivity = 1;
+            lEntry.Type = InputManagerEntryType.JOYSTICK_AXIS;
+            lEntry.Axis = 1;
+            lEntry.JoyNum = 0;
+
+            InputManagerHelper.AddEntry(lEntry);
+        }
+
+        if (!InputManagerHelper.IsDefined("MXLeftStickY"))
+        {
+            InputManagerEntry lEntry = new InputManagerEntry();
+            lEntry.Name = "MXLeftStickY";
+            lEntry.Gravity = 1;
+            lEntry.Dead = 0.3f;
+            lEntry.Sensitivity = 1;
+            lEntry.Invert = true;
+            lEntry.Type = InputManagerEntryType.JOYSTICK_AXIS;
+            lEntry.Axis = 2;
             lEntry.JoyNum = 0;
 
             InputManagerHelper.AddEntry(lEntry);

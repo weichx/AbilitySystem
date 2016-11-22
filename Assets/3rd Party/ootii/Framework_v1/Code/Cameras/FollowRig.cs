@@ -1,5 +1,4 @@
 using UnityEngine;
-
 using com.ootii.Actors;
 using com.ootii.Geometry;
 using com.ootii.Helpers;

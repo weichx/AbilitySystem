@@ -1,5 +1,5 @@
 ﻿using UnityEngine;
-using System.Collections;
+using EntitySystem;
 
 public class PlayerTargetManager : TargetManager {
 

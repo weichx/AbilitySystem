@@ -21,14 +21,14 @@ namespace com.ootii.Geometry
         /// won't work with multi-threading and the contents need to be used immediately,
         /// as they are not persistant across alls.
         /// </summary>
-        public static RaycastHit[] SharedHitArray = new RaycastHit[10];
+        public static RaycastHit[] SharedHitArray = new RaycastHit[20];
 
         /// <summary>
         /// We use this if we don't want to re-allocate arrays. This is simple, but
         /// won't work with multi-threading and the contents need to be used immediately,
         /// as they are not persistant across alls.
         /// </summary>
-        public static Collider[] SharedColliderArray = new Collider[10];
+        public static Collider[] SharedColliderArray = new Collider[20];
 
         // ***********************************************************************************
         // Newer non-allocating versions of the call
@@ -416,7 +416,6 @@ namespace com.ootii.Geometry
 
 #endif
         }
-
 
         /// <summary>
         /// Use the non-alloc version of raycast to see if the ray hits anything. Here we are
@@ -1080,64 +1079,6 @@ namespace com.ootii.Geometry
         public static bool GetForwardEdge2(Transform rTransform, float rMinHeight, float rMaxHeight, float rEdgeDepth, float rMaxDepth, int rCollisionLayers, out RaycastHit rEdgeHitInfo)
         {
             return GetForwardEdge2(rTransform, rTransform.position, rTransform.forward, rTransform.up, rMinHeight, rMaxHeight, rEdgeDepth, rMaxDepth, rCollisionLayers, out rEdgeHitInfo);
-
-//            rEdgeHitInfo = RaycastExt.EmptyHitInfo;
-
-//            // Shoot above the expected min height to make sure that it's blocked. We want to hit something
-//            Vector3 lRayStart = rTransform.position + (rTransform.up * (rMinHeight + 0.001f));
-//            Vector3 lRayDirection = rTransform.forward;
-//            float lRayDistance = rMaxDepth;
-
-//            if (!SafeRaycast(lRayStart, lRayDirection, out rEdgeHitInfo, lRayDistance, rCollisionLayers, rTransform))
-//            {
-//                return false;
-//            }
-
-//            float lHitDepth = rEdgeHitInfo.distance;
-
-//            // Shoot above the expected height to make sure that it's open. We don't want to hit anything
-//            lRayStart = rTransform.position + (rTransform.up * (rMaxHeight + 0.001f));
-//            lRayDirection = rTransform.forward;
-//            lRayDistance = rMaxDepth;
-
-//            if (SafeRaycast(lRayStart, lRayDirection, out rEdgeHitInfo, lRayDistance, rCollisionLayers, rTransform))
-//            {
-//                // If there is no ledge, we need to stop
-//                if (rEdgeHitInfo.distance < lHitDepth + 0.1f)
-//                {
-//                    return false;
-//                }
-//            }
-
-//            // Shoot down to see if we hit a ledge. We want to hit the top of the ledge.
-//            lRayStart = lRayStart + (rTransform.forward * (lHitDepth + 0.001f));
-//            lRayDirection = -rTransform.up;
-//            lRayDistance = rMaxHeight;
-
-//            if (!SafeRaycast(lRayStart, lRayDirection, out rEdgeHitInfo, lRayDistance, rCollisionLayers, rTransform))
-//            {
-//                return false;
-//            }
-
-//            // This is the height of our edge
-//            float lEdgeHeight = (rMaxHeight + 0.001f) - rEdgeHitInfo.distance;
-
-//            // Shoot a ray forward to find the actual edge. We want to hit the front of the ledge.
-//            lRayStart = rTransform.position + (rTransform.up * (lEdgeHeight - 0.001f));
-//            lRayDirection = rTransform.forward;
-//            lRayDistance = rMaxDepth;
-
-//            if (!SafeRaycast(lRayStart, lRayDirection, out rEdgeHitInfo, lRayDistance, rCollisionLayers, rTransform))
-//            {
-//                return false;
-//            }
-
-//#if OOTII_DEBUG
-//            Utilities.Debug.DebugDraw.DrawSphereMesh(rEdgeHitInfo.point, 0.02f, Color.red, 1f);
-//#endif
-
-//            // If we get here, there was a valid hit
-//            return true;
         }
 
         /// <summary>
@@ -1147,47 +1088,6 @@ namespace com.ootii.Geometry
         public static bool GetForwardEdge2(Transform rTransform, Vector3 rPosition, float rMinHeight, float rMaxHeight, float rEdgeDepth, float rMaxDepth, int rCollisionLayers, out RaycastHit rEdgeHitInfo)
         {
             return GetForwardEdge2(rTransform, rPosition, rTransform.forward, rTransform.up, rMinHeight, rMaxHeight, rEdgeDepth, rMaxDepth, rCollisionLayers, out rEdgeHitInfo);
-//            rEdgeHitInfo = RaycastExt.EmptyHitInfo;
-
-//            // Shoot above the expected height to make sure that it's open. We don't want to hit anything
-//            Vector3 lRayStart = rPosition + (rTransform.up * (rMaxHeight + 0.001f));
-//            Vector3 lRayDirection = rTransform.forward;
-//            float lRayDistance = rMaxDepth;
-
-//            if (SafeRaycast(lRayStart, lRayDirection, out rEdgeHitInfo, lRayDistance, rCollisionLayers, rTransform, null, true))
-//            {
-//                return false;
-//            }
-
-//            // Shoot down to see if we hit a ledge. We want to hit the top of the ledge.
-//            lRayStart = lRayStart + (rTransform.forward * rMaxDepth);
-//            lRayDirection = -rTransform.up;
-//            lRayDistance = rMaxHeight - rMinHeight;
-
-//            if (!SafeRaycast(lRayStart, lRayDirection, out rEdgeHitInfo, lRayDistance, rCollisionLayers, rTransform, null, true))
-//            {
-//                return false;
-//            }
-
-//            // This is the height of our edge
-//            float lEdgeHeight = (rMaxHeight + 0.001f) - rEdgeHitInfo.distance;
-
-//            // Shoot a ray forward to find the actual edge. We want to hit the front of the ledge.
-//            lRayStart = rPosition + (rTransform.up * (lEdgeHeight - 0.001f));
-//            lRayDirection = rTransform.forward;
-//            lRayDistance = rMaxDepth;
-
-//            if (!SafeRaycast(lRayStart, lRayDirection, out rEdgeHitInfo, lRayDistance, rCollisionLayers, rTransform, null, true))
-//            {
-//                return false;
-//            }
-
-//#if OOTII_DEBUG
-//            Utilities.Debug.DebugDraw.DrawSphereMesh(rEdgeHitInfo.point, 0.02f, Color.red, 1f);
-//#endif
-
-//            // If we get here, there was a valid hit
-//            return true;
         }
 
         /// <summary>

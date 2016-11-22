@@ -144,12 +144,16 @@ public class ActorControllerEditor : Editor
 
         GUILayout.Space(5);
 
+        EditorGUILayout.LabelField("Body Shapes", EditorStyles.boldLabel, GUILayout.Height(16f));
+
         GUILayout.BeginVertical(EditorHelper.GroupBox);
+        EditorHelper.DrawInspectorDescription("Body shapes define the collision areas of the actor.", MessageType.None);
+
         mList.DoLayoutList();
-        GUILayout.EndVertical();
 
         if (mList.index >= 0)
         {
+            GUILayout.Space(5f);
             GUILayout.BeginVertical(EditorHelper.Box);
 
             bool lItemIsDirty = DrawDetailItem(mTarget.BodyShapes[mList.index]);
@@ -157,6 +161,8 @@ public class ActorControllerEditor : Editor
 
             GUILayout.EndVertical();
         }
+
+        GUILayout.EndVertical();
 
         GUILayout.Space(10);
 
@@ -190,6 +196,8 @@ public class ActorControllerEditor : Editor
     private bool OnBasicInspector()
     {
         bool lIsDirty = false;
+
+        GUILayout.Space(5f);
 
         EditorGUILayout.BeginVertical(Box, GUILayout.Height(40f));
 
@@ -394,307 +402,49 @@ public class ActorControllerEditor : Editor
             mTarget.ProcessInLateUpdate = lNewProcessInLateUpdate;
         }
 
-        EditorGUILayout.EndVertical();
-
-        GUILayout.Space(5);
-
-        // Gravity section
-        EditorGUILayout.BeginVertical(EditorHelper.Box);
-
-        // Grounding
-        EditorGUILayout.BeginHorizontal();
-
-        bool lNewIsGravityEnabled = EditorGUILayout.Toggle(new GUIContent("Is Gravity Enabled", "Determines if we'll use gravity."), mTarget.IsGravityEnabled);
-        if (lNewIsGravityEnabled != mTarget.IsGravityEnabled)
+        bool lNewInvertRotationOrder = EditorGUILayout.Toggle(new GUIContent("Invert Rotation Order", "Causes rotations to be yaw * tilt (instead of tilt * yaw). This is useful for flying, swimming, and other 3D movements."), mTarget.InvertRotationOrder);
+        if (lNewInvertRotationOrder != mTarget.InvertRotationOrder)
         {
             lIsDirty = true;
-            mTarget.IsGravityEnabled = lNewIsGravityEnabled;
+            mTarget.InvertRotationOrder = lNewInvertRotationOrder;
         }
 
-        GUILayout.Space(45);
-        EditorGUILayout.LabelField(new GUIContent("Use Fixed Update", "Determines if gravity is applied during FixedUpdate or LateUpdate."), GUILayout.Width(80));
-        bool lNewApplyGravityInFixedUpdate = EditorGUILayout.Toggle(mTarget.ApplyGravityInFixedUpdate);
-        if (lNewApplyGravityInFixedUpdate != mTarget.ApplyGravityInFixedUpdate)
-        {
-            lIsDirty = true;
-            mTarget.ApplyGravityInFixedUpdate = lNewApplyGravityInFixedUpdate;
-        }
+        GUILayout.Space(5f);
 
-        GUILayout.FlexibleSpace();
-
-        EditorGUILayout.EndHorizontal();
-
-        EditorGUILayout.BeginHorizontal();
-
-        bool lNewIsGravityRelative = EditorGUILayout.Toggle(new GUIContent("Is Relative", "Determines if gravity is relative to the ground surface normal."), mTarget.IsGravityRelative);
-        if (lNewIsGravityRelative != mTarget.IsGravityRelative)
-        {
-            lIsDirty = true;
-            mTarget.IsGravityRelative = lNewIsGravityRelative;
-            mTarget.EditorWalkOnWalls = mTarget.OrientToGround && lNewIsGravityRelative;
-        }
-
-        GUILayout.Space(45);
-        EditorGUILayout.LabelField(new GUIContent("Extrapolate", "Determines if we estimate the physics forces in Update() to smooth movement."), GUILayout.Width(80));
-        bool lNewExtrapolatePhysics = EditorGUILayout.Toggle(mTarget.ExtrapolatePhysics);
-        if (lNewExtrapolatePhysics != mTarget.ExtrapolatePhysics)
-        {
-            lIsDirty = true;
-            mTarget.ExtrapolatePhysics = lNewExtrapolatePhysics;
-        }
-
-        GUILayout.FlexibleSpace();
-
-        EditorGUILayout.EndHorizontal();
-
-        Vector3 lNewGravity = EditorGUILayout.Vector3Field(new GUIContent("Gravity", "Gravity to apply to this actor. Use (0, 0, 0) to use Unity's gravity."), mTarget.Gravity);
-        if (lNewGravity != mTarget.Gravity)
-        {
-            lIsDirty = true;
-            mTarget.Gravity = lNewGravity;
-        }
-
-        GUILayout.Space(5);
-
-        EditorGUILayout.BeginHorizontal();
-
-        // Grounding
-        float lNewSkinWidth = EditorGUILayout.FloatField(new GUIContent("Skin Width", "Range in which we'll force the actor to the ground."), mTarget.SkinWidth);
-        if (lNewSkinWidth != mTarget.SkinWidth)
-        {
-            lIsDirty = true;
-            mTarget.SkinWidth = lNewSkinWidth;
-        }
-
-        GUILayout.Space(5);
-        EditorGUILayout.LabelField(new GUIContent("Mass", "In order to be consistant with Unity physics, mass follows thier scale (1 cube unit = ~45kg = 1 point). So an averge male would be 2. (2 cube units = ~70kg = 2 points)"), GUILayout.Width(50));
-        float lNewMass = EditorGUILayout.FloatField(mTarget.Mass, GUILayout.Width(45));
-        if (lNewMass != mTarget.Mass)
-        {
-            lIsDirty = true;
-            mTarget.Mass = lNewMass;
-        }
-
-        GUILayout.FlexibleSpace();
-
-        EditorGUILayout.EndHorizontal();
-
-        GUILayout.Space(5);
-
-        //EditorGUILayout.BeginHorizontal();
-
-        //bool lNewIsGroundedForced = EditorGUILayout.Toggle(new GUIContent("Is Grounded Forced", "Determines if we'll try to force the actor to the ground"), mTarget.IsGroundedForced);
-        //if (lNewIsGroundedForced != mTarget.IsGroundedForced)
+        //if (EditorHelper.BoolField("Use Transform Position", "Determines if we ignore movement requests and simply use the transform position. This is useful for NPCs that are driven by nav mesh agents and other drivers.", mTarget.UseTransformPosition, mTarget))
         //{
-        //    mIsDirty = true;
-        //    mTarget.IsGroundedForced = lNewIsGroundedForced;
+        //    lIsDirty = true;
+        //    mTarget.UseTransformPosition = EditorHelper.FieldBoolValue;
         //}
 
-        //GUILayout.Space(45);
-        //EditorGUILayout.LabelField(new GUIContent("Skin Width", "Range in which we'll force the actor to the ground."), GUILayout.Width(50));
-        //float lNewSkinWidth = EditorGUILayout.FloatField(mTarget.SkinWidth, GUILayout.Width(65));
-        //if (lNewSkinWidth != mTarget.SkinWidth)
+        //if (EditorHelper.BoolField("Use Transform Rotation", "Determines if we ignore rotation requests and simply use the transform rotation. This is useful for NPCs that are driven by nav mesh agents and other drivers.", mTarget.UseTransformRotation, mTarget))
         //{
-        //    mIsDirty = true;
-        //    mTarget.SkinWidth = lNewSkinWidth;
+        //    lIsDirty = true;
+        //    mTarget.UseTransformRotation = EditorHelper.FieldBoolValue;
         //}
 
-        //GUILayout.FlexibleSpace();
+        //GUILayout.Space(5f);
 
-        //EditorGUILayout.EndHorizontal();
-
-        EditorGUILayout.BeginHorizontal();
-
-        float lNewGroundingStartOffset = EditorGUILayout.FloatField(new GUIContent("Grounding Start", "Distance from the actor's root that we'll start our grounding test."), mTarget.GroundingStartOffset);
-        if (lNewGroundingStartOffset != mTarget.GroundingStartOffset)
-        {
-            lIsDirty = true;
-            mTarget.GroundingStartOffset = lNewGroundingStartOffset;
-        }
-
-        GUILayout.Space(5);
-
-        EditorGUILayout.LabelField(new GUIContent("Distance", "Range that we'll raycast for grounding."), GUILayout.Width(50));
-        float lNewGroundingDistance = EditorGUILayout.FloatField(mTarget.GroundingDistance, GUILayout.Width(45));
-        if (lNewGroundingDistance != mTarget.GroundingDistance)
-        {
-            lIsDirty = true;
-            mTarget.GroundingDistance = lNewGroundingDistance;
-        }
-
-        GUILayout.FlexibleSpace();
-
-        EditorGUILayout.EndHorizontal();
-
-        float lNewBaseRadius = EditorGUILayout.FloatField(new GUIContent("Grounding Radius", "Radius of the 'feet' used to help determine grounding."), mTarget.BaseRadius);
-        if (lNewBaseRadius != mTarget.BaseRadius)
-        {
-            lIsDirty = true;
-            mTarget.BaseRadius = lNewBaseRadius;
-        }
+        EditorHelper.DrawLine();
 
         EditorGUILayout.BeginHorizontal();
 
-        bool lNewForceGrounding = EditorGUILayout.Toggle(new GUIContent("Force Grounding", "Force the character to the ground if we are close to it. This helps with curved surfaces."), mTarget.ForceGrounding);
-        if (lNewForceGrounding != mTarget.ForceGrounding)
+        EditorHelper.LabelField("Use Transform", "Determines if we ignore movement requests and simply use the transform position. This is useful for NPCs that are driven by nav mesh agents and other assets.", EditorGUIUtility.labelWidth - 4f);
+        if (EditorHelper.BoolField(mTarget.UseTransformPosition, "Use Transform Position", mTarget, 16f))
         {
             lIsDirty = true;
-            mTarget.ForceGrounding = lNewForceGrounding;
+            mTarget.UseTransformPosition = EditorHelper.FieldBoolValue;
         }
 
-        GUILayout.Space(45);
-
-        EditorGUILayout.LabelField(new GUIContent("Force Distance", "Distance within which we'll force the actor to the ground."), GUILayout.Width(50));
-        float lNewForceGroundingDistance = EditorGUILayout.FloatField(mTarget.ForceGroundingDistance, GUILayout.Width(45));
-        if (lNewForceGroundingDistance != mTarget.ForceGroundingDistance)
+        if (mTarget.UseTransformPosition)
         {
-            lIsDirty = true;
-            mTarget.ForceGroundingDistance = lNewForceGroundingDistance;
+            EditorHelper.LabelField("Rotation", "Determines if we ignore movement requests and simply use the transform position. This is useful for NPCs that are driven by nav mesh agents and other drivers.", 50f);
+            if (EditorHelper.BoolField(mTarget.UseTransformRotation, "Use Transform Rotation", mTarget, 16f))
+            {
+                lIsDirty = true;
+                mTarget.UseTransformRotation = EditorHelper.FieldBoolValue;
+            }
         }
-
-        GUILayout.FlexibleSpace();
-
-        EditorGUILayout.EndHorizontal();
-
-        GUILayout.Space(5);
-
-        bool lNewIsGroundingLayersEnabled = EditorGUILayout.Toggle(new GUIContent("Use Grounding Layers", "Determine if we will use the grounding layers to test grounding collisions against."), mTarget.IsGroundingLayersEnabled);
-        if (lNewIsGroundingLayersEnabled != mTarget.IsGroundingLayersEnabled)
-        {
-            lIsDirty = true;
-            mTarget.IsGroundingLayersEnabled = lNewIsGroundingLayersEnabled;
-        }
-
-        // Grounding layer
-        int lNewGroundingLayers = EditorHelper.LayerMaskField(new GUIContent("Grounding Layers", "Layers that we'll test grounding collisions against"), mTarget.GroundingLayers);
-        if (lNewGroundingLayers != mTarget.GroundingLayers)
-        {
-            lIsDirty = true;
-            mTarget.GroundingLayers = lNewGroundingLayers;
-        }
-
-        EditorGUILayout.EndVertical();
-
-        GUILayout.Space(5);
-
-        EditorGUILayout.BeginVertical(EditorHelper.Box);
-
-        // Is collision enabled
-        bool lNewIsCollionEnabled = EditorGUILayout.Toggle(new GUIContent("Is Collision Enabled", "Determines if we process collisions. This doesn't effect grounding."), mTarget.IsCollsionEnabled);
-        if (lNewIsCollionEnabled != mTarget.IsCollsionEnabled)
-        {
-            lIsDirty = true;
-            mTarget.IsCollsionEnabled = lNewIsCollionEnabled;
-            mTarget.EditorCollideWithObjects = lNewIsCollionEnabled;
-        }
-
-        EditorGUILayout.BeginHorizontal();
-
-        // Is collision enabled
-        bool lNewStopOnRotationCollision = EditorGUILayout.Toggle(new GUIContent("Stop Rotations", "Determines stop rotating when a collision occurs due to rotation."), mTarget.StopOnRotationCollision);
-        if (lNewStopOnRotationCollision != mTarget.StopOnRotationCollision)
-        {
-            lIsDirty = true;
-            mTarget.StopOnRotationCollision = lNewStopOnRotationCollision;
-        }
-
-        GUILayout.Space(45);
-        EditorGUILayout.LabelField(new GUIContent("Allow Pushback", "Determines if objects can move the actor."), GUILayout.Width(80));
-        bool lNewAllowPushback = EditorGUILayout.Toggle(mTarget.AllowPushback);
-        if (lNewAllowPushback != mTarget.AllowPushback)
-        {
-            lIsDirty = true;
-            mTarget.AllowPushback = lNewAllowPushback;
-            mTarget.EditorRespondToColliders = lNewAllowPushback;
-        }
-
-        GUILayout.FlexibleSpace();
-
-        EditorGUILayout.EndHorizontal();
-
-        GUILayout.Space(5);
-
-        Vector3 lNewOverlapCenter = EditorGUILayout.Vector3Field(new GUIContent("Overlap Center", "Relative center of the object where overlap is tested from."), mTarget.OverlapCenter);
-        if (lNewOverlapCenter != mTarget.OverlapCenter)
-        {
-            lIsDirty = true;
-            mTarget.OverlapCenter = lNewOverlapCenter;
-        }
-
-        float lNewOverlapRadius = EditorGUILayout.FloatField(new GUIContent("Overlap Radius", "Radius used to determine the overlap of other objects. This should be the max radius of the actor."), mTarget.OverlapRadius);
-        if (lNewOverlapRadius != mTarget.OverlapRadius)
-        {
-            lIsDirty = true;
-            mTarget.OverlapRadius = lNewOverlapRadius;
-        }
-
-        GUILayout.Space(5);
-
-        // Collisions layer
-        int lNewCollisionLayers = EditorHelper.LayerMaskField(new GUIContent("Collision Layers", "Layers that we'll test collisions against"), mTarget.CollisionLayers);
-        if (lNewCollisionLayers != mTarget.CollisionLayers)
-        {
-            lIsDirty = true;
-            mTarget.CollisionLayers = lNewCollisionLayers;
-        }
-
-        EditorGUILayout.EndVertical();
-
-        GUILayout.Space(5);
-
-        EditorGUILayout.BeginVertical(EditorHelper.Box);
-
-        bool lNewIsSlidingEnabled = EditorGUILayout.Toggle(new GUIContent("Is Sliding Enabled", "Determines if actors will slide while on slopes."), mTarget.IsSlidingEnabled);
-        if (lNewIsSlidingEnabled != mTarget.IsSlidingEnabled)
-        {
-            lIsDirty = true;
-            mTarget.IsSlidingEnabled = lNewIsSlidingEnabled;
-            mTarget.EditorSlideOnSlopes = lNewIsSlidingEnabled;
-        }
-
-        EditorGUILayout.BeginHorizontal();
-
-        float lNewMinSlopeAngle = EditorGUILayout.FloatField(new GUIContent("Min Slope", "Angle at which the actor will start to slide."), mTarget.MinSlopeAngle);
-        if (lNewMinSlopeAngle != mTarget.MinSlopeAngle)
-        {
-            lIsDirty = true;
-            mTarget.MinSlopeAngle = lNewMinSlopeAngle;
-        }
-
-        GUILayout.Space(5);
-        EditorGUILayout.LabelField(new GUIContent("Gravity Factor", "Multiplier to gravity that causes the slide."), GUILayout.Width(50));
-        float lNewMinSlopeGravityCoefficient = EditorGUILayout.FloatField(mTarget.MinSlopeGravityCoefficient, GUILayout.Width(45));
-        if (lNewMinSlopeGravityCoefficient != mTarget.MinSlopeGravityCoefficient)
-        {
-            lIsDirty = true;
-            mTarget.MinSlopeGravityCoefficient = lNewMinSlopeGravityCoefficient;
-        }
-
-        GUILayout.FlexibleSpace();
-
-        EditorGUILayout.EndHorizontal();
-
-        // Max slope
-        EditorGUILayout.BeginHorizontal();
-
-        float lNewMaxSlopeAngle = EditorGUILayout.FloatField(new GUIContent("Max Slope", "Max angle which the actor can no longer go up."), mTarget.MaxSlopeAngle);
-        if (lNewMaxSlopeAngle != mTarget.MaxSlopeAngle)
-        {
-            lIsDirty = true;
-            mTarget.MaxSlopeAngle = lNewMaxSlopeAngle;
-        }
-
-        GUILayout.Space(5);
-
-        EditorGUILayout.LabelField(new GUIContent("Step", "Max movement when breaking movement up."), GUILayout.Width(50));
-        float lNewSlopeMovementStep = EditorGUILayout.FloatField(mTarget.SlopeMovementStep, GUILayout.Width(45));
-        if (lNewSlopeMovementStep != mTarget.SlopeMovementStep)
-        {
-            lIsDirty = true;
-            mTarget.SlopeMovementStep = lNewSlopeMovementStep;
-        }
-
-        GUILayout.FlexibleSpace();
 
         EditorGUILayout.EndHorizontal();
 
@@ -702,182 +452,564 @@ public class ActorControllerEditor : Editor
 
         GUILayout.Space(5);
 
+        EditorGUILayout.LabelField("Actor Properties", EditorStyles.boldLabel, GUILayout.Height(16f));
+
+        EditorGUILayout.BeginVertical(EditorHelper.GroupBox);
+
+        EditorHelper.DrawInspectorDescription("Basic properties that define the character.", MessageType.None);
+
         EditorGUILayout.BeginVertical(EditorHelper.Box);
+
+        if (EditorHelper.FloatField("Height", "Typical height (in units) of the character along the world's y axis.", mTarget.Height, mTarget))
+        {
+            lIsDirty = true;
+            mTarget.Height = EditorHelper.FieldFloatValue;
+        }
+
+        if (EditorHelper.FloatField("Width (as radius)", "Typical radius (in units) of the character along the world's x and z axis.", mTarget.Radius, mTarget))
+        {
+            lIsDirty = true;
+            mTarget.Radius = EditorHelper.FieldFloatValue;
+        }
+
+        if (EditorHelper.FloatField("Mass", "Typical mass of the character. In order to be consistant with Unity physics, mass follows thier scale (1 cube unit = ~45kg = 1 point). So an averge male would be 2. (2 cube units = ~70kg = 2 points)", mTarget.Mass, mTarget))
+        {
+            lIsDirty = true;
+            mTarget.Mass = EditorHelper.FieldFloatValue;
+        }
+
+        EditorGUILayout.EndVertical();
+
+        EditorGUILayout.EndVertical();
+
+        GUILayout.Space(5);
+
+        if (!mTarget.UseTransformPosition)
+        {
+            // Gravity section
+
+            EditorGUILayout.LabelField("Gravity & Grounding", EditorStyles.boldLabel, GUILayout.Height(16f));
+
+            EditorGUILayout.BeginVertical(EditorHelper.GroupBox);
+
+            EditorHelper.DrawInspectorDescription("Properties that define how gravity works for this actor and how the actor will determine if they are on the ground.", MessageType.None);
+
+            EditorGUILayout.BeginVertical(EditorHelper.Box);
+
+            // Grounding
+            EditorGUILayout.BeginHorizontal();
+
+            bool lNewIsGravityEnabled = EditorGUILayout.Toggle(new GUIContent("Is Gravity Enabled", "Determines if we'll use gravity."), mTarget.IsGravityEnabled);
+            if (lNewIsGravityEnabled != mTarget.IsGravityEnabled)
+            {
+                lIsDirty = true;
+                mTarget.IsGravityEnabled = lNewIsGravityEnabled;
+            }
+
+            GUILayout.Space(45);
+            EditorGUILayout.LabelField(new GUIContent("Use Fixed Update", "Determines if gravity is applied during FixedUpdate or LateUpdate."), GUILayout.Width(80));
+            bool lNewApplyGravityInFixedUpdate = EditorGUILayout.Toggle(mTarget.ApplyGravityInFixedUpdate);
+            if (lNewApplyGravityInFixedUpdate != mTarget.ApplyGravityInFixedUpdate)
+            {
+                lIsDirty = true;
+                mTarget.ApplyGravityInFixedUpdate = lNewApplyGravityInFixedUpdate;
+            }
+
+            GUILayout.FlexibleSpace();
+
+            EditorGUILayout.EndHorizontal();
+
+            EditorGUILayout.BeginHorizontal();
+
+            bool lNewIsGravityRelative = EditorGUILayout.Toggle(new GUIContent("Is Relative", "Determines if gravity is relative to the ground surface normal."), mTarget.IsGravityRelative);
+            if (lNewIsGravityRelative != mTarget.IsGravityRelative)
+            {
+                lIsDirty = true;
+                mTarget.IsGravityRelative = lNewIsGravityRelative;
+                mTarget.EditorWalkOnWalls = mTarget.OrientToGround && lNewIsGravityRelative;
+            }
+
+            GUILayout.Space(45);
+            EditorGUILayout.LabelField(new GUIContent("Extrapolate", "Determines if we estimate the physics forces in Update() to smooth movement."), GUILayout.Width(80));
+            bool lNewExtrapolatePhysics = EditorGUILayout.Toggle(mTarget.ExtrapolatePhysics);
+            if (lNewExtrapolatePhysics != mTarget.ExtrapolatePhysics)
+            {
+                lIsDirty = true;
+                mTarget.ExtrapolatePhysics = lNewExtrapolatePhysics;
+            }
+
+            GUILayout.FlexibleSpace();
+
+            EditorGUILayout.EndHorizontal();
+
+            Vector3 lNewGravity = EditorGUILayout.Vector3Field(new GUIContent("Gravity", "Gravity to apply to this actor. Use (0, 0, 0) to use Unity's gravity."), mTarget.Gravity);
+            if (lNewGravity != mTarget.Gravity)
+            {
+                lIsDirty = true;
+                mTarget.Gravity = lNewGravity;
+            }
+
+            GUILayout.Space(5);
+
+            // Grounding
+            float lNewSkinWidth = EditorGUILayout.FloatField(new GUIContent("Skin Width", "Range in which we'll force the actor to the ground."), mTarget.SkinWidth);
+            if (lNewSkinWidth != mTarget.SkinWidth)
+            {
+                lIsDirty = true;
+                mTarget.SkinWidth = lNewSkinWidth;
+            }
+
+            GUILayout.Space(5);
+
+            //EditorGUILayout.BeginHorizontal();
+
+            //bool lNewIsGroundedForced = EditorGUILayout.Toggle(new GUIContent("Is Grounded Forced", "Determines if we'll try to force the actor to the ground"), mTarget.IsGroundedForced);
+            //if (lNewIsGroundedForced != mTarget.IsGroundedForced)
+            //{
+            //    mIsDirty = true;
+            //    mTarget.IsGroundedForced = lNewIsGroundedForced;
+            //}
+
+            //GUILayout.Space(45);
+            //EditorGUILayout.LabelField(new GUIContent("Skin Width", "Range in which we'll force the actor to the ground."), GUILayout.Width(50));
+            //float lNewSkinWidth = EditorGUILayout.FloatField(mTarget.SkinWidth, GUILayout.Width(65));
+            //if (lNewSkinWidth != mTarget.SkinWidth)
+            //{
+            //    mIsDirty = true;
+            //    mTarget.SkinWidth = lNewSkinWidth;
+            //}
+
+            //GUILayout.FlexibleSpace();
+
+            //EditorGUILayout.EndHorizontal();
+
+            EditorGUILayout.BeginHorizontal();
+
+            float lNewGroundingStartOffset = EditorGUILayout.FloatField(new GUIContent("Grounding Start", "Distance from the actor's root that we'll start our grounding test."), mTarget.GroundingStartOffset);
+            if (lNewGroundingStartOffset != mTarget.GroundingStartOffset)
+            {
+                lIsDirty = true;
+                mTarget.GroundingStartOffset = lNewGroundingStartOffset;
+            }
+
+            GUILayout.Space(5);
+
+            EditorGUILayout.LabelField(new GUIContent("Distance", "Range that we'll raycast for grounding."), GUILayout.Width(50));
+            float lNewGroundingDistance = EditorGUILayout.FloatField(mTarget.GroundingDistance, GUILayout.Width(45));
+            if (lNewGroundingDistance != mTarget.GroundingDistance)
+            {
+                lIsDirty = true;
+                mTarget.GroundingDistance = lNewGroundingDistance;
+            }
+
+            GUILayout.FlexibleSpace();
+
+            EditorGUILayout.EndHorizontal();
+
+            float lNewBaseRadius = EditorGUILayout.FloatField(new GUIContent("Grounding Radius", "Radius of the 'feet' used to help determine grounding."), mTarget.BaseRadius);
+            if (lNewBaseRadius != mTarget.BaseRadius)
+            {
+                lIsDirty = true;
+                mTarget.BaseRadius = lNewBaseRadius;
+            }
+
+            EditorGUILayout.BeginHorizontal();
+
+            bool lNewForceGrounding = EditorGUILayout.Toggle(new GUIContent("Force Grounding", "Force the character to the ground if we are close to it. This helps with curved surfaces."), mTarget.ForceGrounding);
+            if (lNewForceGrounding != mTarget.ForceGrounding)
+            {
+                lIsDirty = true;
+                mTarget.ForceGrounding = lNewForceGrounding;
+            }
+
+            GUILayout.Space(45);
+
+            EditorGUILayout.LabelField(new GUIContent("Force Distance", "Distance within which we'll force the actor to the ground."), GUILayout.Width(50));
+            float lNewForceGroundingDistance = EditorGUILayout.FloatField(mTarget.ForceGroundingDistance, GUILayout.Width(45));
+            if (lNewForceGroundingDistance != mTarget.ForceGroundingDistance)
+            {
+                lIsDirty = true;
+                mTarget.ForceGroundingDistance = lNewForceGroundingDistance;
+            }
+
+            GUILayout.FlexibleSpace();
+
+            EditorGUILayout.EndHorizontal();
+
+            GUILayout.Space(5);
+
+            bool lNewIsGroundingLayersEnabled = EditorGUILayout.Toggle(new GUIContent("Use Grounding Layers", "Determine if we will use the grounding layers to test grounding collisions against."), mTarget.IsGroundingLayersEnabled);
+            if (lNewIsGroundingLayersEnabled != mTarget.IsGroundingLayersEnabled)
+            {
+                lIsDirty = true;
+                mTarget.IsGroundingLayersEnabled = lNewIsGroundingLayersEnabled;
+            }
+
+            // Grounding layer
+            int lNewGroundingLayers = EditorHelper.LayerMaskField(new GUIContent("Grounding Layers", "Layers that we'll test grounding collisions against"), mTarget.GroundingLayers);
+            if (lNewGroundingLayers != mTarget.GroundingLayers)
+            {
+                lIsDirty = true;
+                mTarget.GroundingLayers = lNewGroundingLayers;
+            }
+
+            EditorGUILayout.EndVertical();
+
+            EditorGUILayout.EndVertical();
+
+            GUILayout.Space(5);
+
+            EditorGUILayout.LabelField("Collisions", EditorStyles.boldLabel, GUILayout.Height(16f));
+
+            EditorGUILayout.BeginVertical(EditorHelper.GroupBox);
+
+            EditorHelper.DrawInspectorDescription("Properties determine what we'll collide with and how to test for collisions.", MessageType.None);
+
+            EditorGUILayout.BeginVertical(EditorHelper.Box);
+
+            // Is collision enabled
+            bool lNewIsCollionEnabled = EditorGUILayout.Toggle(new GUIContent("Is Collision Enabled", "Determines if we process collisions. This doesn't effect grounding."), mTarget.IsCollsionEnabled);
+            if (lNewIsCollionEnabled != mTarget.IsCollsionEnabled)
+            {
+                lIsDirty = true;
+                mTarget.IsCollsionEnabled = lNewIsCollionEnabled;
+                mTarget.EditorCollideWithObjects = lNewIsCollionEnabled;
+            }
+
+            if (mTarget.IsCollsionEnabled)
+            {
+                EditorGUILayout.BeginHorizontal();
+
+                // Is collision enabled
+                bool lNewStopOnRotationCollision = EditorGUILayout.Toggle(new GUIContent("Stop Rotations", "Determines stop rotating when a collision occurs due to rotation."), mTarget.StopOnRotationCollision);
+                if (lNewStopOnRotationCollision != mTarget.StopOnRotationCollision)
+                {
+                    lIsDirty = true;
+                    mTarget.StopOnRotationCollision = lNewStopOnRotationCollision;
+                }
+
+                GUILayout.Space(45);
+                EditorGUILayout.LabelField(new GUIContent("Allow Pushback", "Determines if objects can move the actor."), GUILayout.Width(80));
+                bool lNewAllowPushback = EditorGUILayout.Toggle(mTarget.AllowPushback);
+                if (lNewAllowPushback != mTarget.AllowPushback)
+                {
+                    lIsDirty = true;
+                    mTarget.AllowPushback = lNewAllowPushback;
+                    mTarget.EditorRespondToColliders = lNewAllowPushback;
+                }
+
+                GUILayout.FlexibleSpace();
+
+                EditorGUILayout.EndHorizontal();
+
+                GUILayout.Space(5);
+
+                Vector3 lNewOverlapCenter = EditorGUILayout.Vector3Field(new GUIContent("Overlap Center", "Relative center of the object where overlap is tested from. Not required, but used by some custom drivers."), mTarget.OverlapCenter);
+                if (lNewOverlapCenter != mTarget.OverlapCenter)
+                {
+                    lIsDirty = true;
+                    mTarget.OverlapCenter = lNewOverlapCenter;
+                }
+
+                float lNewOverlapRadius = EditorGUILayout.FloatField(new GUIContent("Overlap Radius", "Radius used to determine the overlap of other objects. Not required, but used by some custom drivers."), mTarget.OverlapRadius);
+                if (lNewOverlapRadius != mTarget.OverlapRadius)
+                {
+                    lIsDirty = true;
+                    mTarget.OverlapRadius = lNewOverlapRadius;
+                }
+
+                GUILayout.Space(5);
+
+                // Collisions layer
+                int lNewCollisionLayers = EditorHelper.LayerMaskField(new GUIContent("Collision Layers", "Layers that we'll test collisions against"), mTarget.CollisionLayers);
+                if (lNewCollisionLayers != mTarget.CollisionLayers)
+                {
+                    lIsDirty = true;
+                    mTarget.CollisionLayers = lNewCollisionLayers;
+                }
+            }
+
+            EditorGUILayout.EndVertical();
+
+            EditorGUILayout.EndVertical();
+
+            GUILayout.Space(5);
+
+            EditorGUILayout.LabelField("Steps", EditorStyles.boldLabel, GUILayout.Height(16f));
+
+            EditorGUILayout.BeginVertical(EditorHelper.GroupBox);
+
+            EditorHelper.DrawInspectorDescription("Properties that define how we'll handle steps. Smooth stepping allows us to hide popping by smoothly moving up and down step heights.", MessageType.None);
+
+            EditorGUILayout.BeginVertical(EditorHelper.Box);
+
+            // Stepping
+            float lNewMaxStepHeight = EditorGUILayout.FloatField(new GUIContent("Step Height", "Max height that we can simply move onto without stopping"), mTarget.MaxStepHeight);
+            if (lNewMaxStepHeight != mTarget.MaxStepHeight)
+            {
+                lIsDirty = true;
+                mTarget.MaxStepHeight = lNewMaxStepHeight;
+            }
+
+            EditorGUILayout.BeginHorizontal();
+
+            float lNewStepUpSpeed = EditorGUILayout.FloatField(new GUIContent("Step Up Speed", "Speed (units per second) we use to move up steps."), mTarget.StepUpSpeed);
+            if (lNewStepUpSpeed != mTarget.StepUpSpeed)
+            {
+                lIsDirty = true;
+                mTarget.StepUpSpeed = lNewStepUpSpeed;
+            }
+
+            GUILayout.Space(5);
+            EditorGUILayout.LabelField(new GUIContent("Max Angle", "Max ground angle we'll allow for smoothly stepping up. More than this angle and we'll pop-up."), GUILayout.Width(50));
+            float lNewMaxStepUpAngle = EditorGUILayout.FloatField(mTarget.MaxStepUpAngle, GUILayout.Width(45));
+            if (lNewMaxStepUpAngle != mTarget.MaxStepUpAngle)
+            {
+                lIsDirty = true;
+                mTarget.MaxStepUpAngle = lNewMaxStepUpAngle;
+            }
+
+            GUILayout.FlexibleSpace();
+
+            EditorGUILayout.EndHorizontal();
+
+            float lNewStepDownSpeed = EditorGUILayout.FloatField(new GUIContent("Step Down Speed", "Speed (units per second) we use to move down steps."), mTarget.StepDownSpeed);
+            if (lNewStepDownSpeed != mTarget.StepDownSpeed)
+            {
+                lIsDirty = true;
+                mTarget.StepDownSpeed = lNewStepDownSpeed;
+            }
+
+            EditorGUILayout.EndVertical();
+
+            EditorGUILayout.EndVertical();
+
+            GUILayout.Space(5);
+
+            EditorGUILayout.LabelField("Slopes", EditorStyles.boldLabel, GUILayout.Height(16f));
+
+            EditorGUILayout.BeginVertical(EditorHelper.GroupBox);
+
+            EditorHelper.DrawInspectorDescription("Properties that define how we'll handle ramps and slopes. Including what is traversable.", MessageType.None);
+
+            EditorGUILayout.BeginVertical(EditorHelper.Box);
+
+            // Max slope
+            EditorGUILayout.BeginHorizontal();
+
+            GUILayout.Space(2);
+
+            float lNewMaxSlopeAngle = EditorGUILayout.FloatField(new GUIContent("Max Slope", "Max angle which the actor can no longer go up."), mTarget.MaxSlopeAngle);
+            if (lNewMaxSlopeAngle != mTarget.MaxSlopeAngle)
+            {
+                lIsDirty = true;
+                mTarget.MaxSlopeAngle = lNewMaxSlopeAngle;
+            }
+
+            GUILayout.Space(5);
+
+            EditorGUILayout.LabelField(new GUIContent("Size", "Max movement when breaking movement up."), GUILayout.Width(50));
+            float lNewSlopeMovementStep = EditorGUILayout.FloatField(mTarget.SlopeMovementStep, GUILayout.Width(45));
+            if (lNewSlopeMovementStep != mTarget.SlopeMovementStep)
+            {
+                lIsDirty = true;
+                mTarget.SlopeMovementStep = lNewSlopeMovementStep;
+            }
+
+            GUILayout.FlexibleSpace();
+
+            EditorGUILayout.EndHorizontal();
+
+            if (EditorHelper.BoolField("Use Step Height", "Determines if we'll use the Step Height to ignore small steep slopes.", mTarget.UseStepHeightWithMaxSlope, mTarget))
+            {
+                lIsDirty = true;
+                mTarget.UseStepHeightWithMaxSlope = EditorHelper.FieldBoolValue;
+            }
+
+            GUILayout.Space(5f);
+
+            bool lNewIsSlidingEnabled = EditorGUILayout.Toggle(new GUIContent("Is Sliding Enabled", "Determines if actors will slide while on slopes."), mTarget.IsSlidingEnabled);
+            if (lNewIsSlidingEnabled != mTarget.IsSlidingEnabled)
+            {
+                lIsDirty = true;
+                mTarget.IsSlidingEnabled = lNewIsSlidingEnabled;
+                mTarget.EditorSlideOnSlopes = lNewIsSlidingEnabled;
+            }
+
+            EditorGUILayout.BeginHorizontal();
+
+            float lNewMinSlopeAngle = EditorGUILayout.FloatField(new GUIContent("Min Slope", "Angle at which the actor will start to slide."), mTarget.MinSlopeAngle);
+            if (lNewMinSlopeAngle != mTarget.MinSlopeAngle)
+            {
+                lIsDirty = true;
+                mTarget.MinSlopeAngle = lNewMinSlopeAngle;
+            }
+
+            GUILayout.Space(5);
+            EditorGUILayout.LabelField(new GUIContent("Gravity Factor", "Multiplier to gravity that causes the slide."), GUILayout.Width(50));
+            float lNewMinSlopeGravityCoefficient = EditorGUILayout.FloatField(mTarget.MinSlopeGravityCoefficient, GUILayout.Width(45));
+            if (lNewMinSlopeGravityCoefficient != mTarget.MinSlopeGravityCoefficient)
+            {
+                lIsDirty = true;
+                mTarget.MinSlopeGravityCoefficient = lNewMinSlopeGravityCoefficient;
+            }
+
+            GUILayout.FlexibleSpace();
+
+            EditorGUILayout.EndHorizontal();
+
+            EditorGUILayout.EndVertical();
+
+            EditorGUILayout.EndVertical();
+
+            GUILayout.Space(5);
+        }
 
         // Orient to ground
-        EditorGUILayout.BeginHorizontal();
+        EditorGUILayout.LabelField("Tilting", EditorStyles.boldLabel, GUILayout.Height(16f));
 
-        bool lNewOrientToGround = EditorGUILayout.Toggle(new GUIContent("Orient to Ground", "Determines if we'll rotate the actor to match the ground he's on."), mTarget.OrientToGround);
-        if (lNewOrientToGround != mTarget.OrientToGround)
-        {
-            lIsDirty = true;
-            mTarget.OrientToGround = lNewOrientToGround;
-            mTarget.EditorWalkOnWalls = lNewOrientToGround && mTarget.IsGravityRelative;
-        }
+        EditorGUILayout.BeginVertical(EditorHelper.GroupBox);
 
-        GUILayout.Space(45);
-
-        EditorGUILayout.LabelField(new GUIContent("Keep Orientation", "Determines if keep the last orientation while jumping (ie vertical force)."), GUILayout.Width(80));
-        bool lNewKeepOrientation = EditorGUILayout.Toggle(mTarget.KeepOrientationInAir);
-        if (lNewKeepOrientation != mTarget.KeepOrientationInAir)
-        {
-            lIsDirty = true;
-            mTarget.KeepOrientationInAir = lNewKeepOrientation;
-        }
-
-        GUILayout.FlexibleSpace();
-
-        EditorGUILayout.EndHorizontal();
-
-        float lNewMinOrientToGroundAngleForSpeed = EditorGUILayout.FloatField(new GUIContent("Min Angle", "Minimum angle before the orientation time kicks in. Less than this and the rotation is instant."), mTarget.MinOrientToGroundAngleForSpeed);
-        if (lNewMinOrientToGroundAngleForSpeed != mTarget.MinOrientToGroundAngleForSpeed)
-        {
-            lIsDirty = true;
-            mTarget.MinOrientToGroundAngleForSpeed = lNewMinOrientToGroundAngleForSpeed;
-        }
-
-        EditorGUILayout.BeginHorizontal();
-
-        float lNewOrientToGroundDistance = EditorGUILayout.FloatField(new GUIContent("Max Distance", "Distance from the ground before falling reverts to the natural ground (Vector3.up)."), mTarget.OrientToGroundDistance);
-        if (lNewOrientToGroundDistance != mTarget.OrientToGroundDistance)
-        {
-            lIsDirty = true;
-            mTarget.OrientToGroundDistance = lNewOrientToGroundDistance;
-        }
-
-        GUILayout.Space(5);
-
-        EditorGUILayout.LabelField(new GUIContent("Time", "Time (in seconds) to orient to the new ground normal."), GUILayout.Width(50));
-        float lNewOrientToGroundSpeed = EditorGUILayout.FloatField(mTarget.OrientToGroundSpeed);
-        if (lNewOrientToGroundSpeed != mTarget.OrientToGroundSpeed)
-        {
-            lIsDirty = true;
-            mTarget.OrientToGroundSpeed = lNewOrientToGroundSpeed;
-        }
-
-        GUILayout.FlexibleSpace();
-
-        EditorGUILayout.EndHorizontal();
-
-        EditorGUILayout.EndVertical();
-
-        GUILayout.Space(5);
+        EditorHelper.DrawInspectorDescription("Properties that define if and how the actor orients himself to the ground.", MessageType.None);
 
         EditorGUILayout.BeginVertical(EditorHelper.Box);
 
-        // Stepping
-        float lNewMaxStepHeight = EditorGUILayout.FloatField(new GUIContent("Step Height", "Max height that we can simply move onto without stopping"), mTarget.MaxStepHeight);
-        if (lNewMaxStepHeight != mTarget.MaxStepHeight)
+        if (EditorHelper.BoolField("Orient to Ground", "Determines if we'll rotate the actor to match the ground he's on.", mTarget.OrientToGround, mTarget))
         {
             lIsDirty = true;
-            mTarget.MaxStepHeight = lNewMaxStepHeight;
+            mTarget.OrientToGround = EditorHelper.FieldBoolValue;
+            mTarget.EditorWalkOnWalls = EditorHelper.FieldBoolValue && mTarget.IsGravityRelative;
         }
 
-        EditorGUILayout.BeginHorizontal();
-
-        float lNewStepUpSpeed = EditorGUILayout.FloatField(new GUIContent("Step Up Speed", "Speed (units per second) we use to move up steps."), mTarget.StepUpSpeed);
-        if (lNewStepUpSpeed != mTarget.StepUpSpeed)
+        if (mTarget.OrientToGround)
         {
-            lIsDirty = true;
-            mTarget.StepUpSpeed = lNewStepUpSpeed;
-        }
+            if (EditorHelper.BoolField("Keep Orientation", "Determines if keep the last orientation while jumping (ie vertical force).", mTarget.KeepOrientationInAir, mTarget))
+            {
+                lIsDirty = true;
+                mTarget.KeepOrientationInAir = EditorHelper.FieldBoolValue;
+            }
 
-        GUILayout.Space(5);
-        EditorGUILayout.LabelField(new GUIContent("Max Angle", "Max ground angle we'll allow for smoothly stepping up. More than this angle and we'll pop-up."), GUILayout.Width(50));
-        float lNewMaxStepUpAngle = EditorGUILayout.FloatField(mTarget.MaxStepUpAngle, GUILayout.Width(45));
-        if (lNewMaxStepUpAngle != mTarget.MaxStepUpAngle)
-        {
-            lIsDirty = true;
-            mTarget.MaxStepUpAngle = lNewMaxStepUpAngle;
-        }
+            float lNewMinOrientToGroundAngleForSpeed = EditorGUILayout.FloatField(new GUIContent("Min Angle", "Minimum angle before the orientation time kicks in. Less than this and the rotation is instant."), mTarget.MinOrientToGroundAngleForSpeed);
+            if (lNewMinOrientToGroundAngleForSpeed != mTarget.MinOrientToGroundAngleForSpeed)
+            {
+                lIsDirty = true;
+                mTarget.MinOrientToGroundAngleForSpeed = lNewMinOrientToGroundAngleForSpeed;
+            }
 
-        GUILayout.FlexibleSpace();
+            EditorGUILayout.BeginHorizontal();
 
-        EditorGUILayout.EndHorizontal();
+            float lNewOrientToGroundDistance = EditorGUILayout.FloatField(new GUIContent("Max Distance", "Distance from the ground before falling reverts to the natural ground (Vector3.up)."), mTarget.OrientToGroundDistance);
+            if (lNewOrientToGroundDistance != mTarget.OrientToGroundDistance)
+            {
+                lIsDirty = true;
+                mTarget.OrientToGroundDistance = lNewOrientToGroundDistance;
+            }
 
-        float lNewStepDownSpeed = EditorGUILayout.FloatField(new GUIContent("Step Down Speed", "Speed (units per second) we use to move down steps."), mTarget.StepDownSpeed);
-        if (lNewStepDownSpeed != mTarget.StepDownSpeed)
-        {
-            lIsDirty = true;
-            mTarget.StepDownSpeed = lNewStepDownSpeed;
+            GUILayout.Space(5);
+
+            EditorGUILayout.LabelField(new GUIContent("Time", "Time (in seconds) to orient to the new ground normal."), GUILayout.Width(50));
+            float lNewOrientToGroundSpeed = EditorGUILayout.FloatField(mTarget.OrientToGroundSpeed);
+            if (lNewOrientToGroundSpeed != mTarget.OrientToGroundSpeed)
+            {
+                lIsDirty = true;
+                mTarget.OrientToGroundSpeed = lNewOrientToGroundSpeed;
+            }
+
+            GUILayout.FlexibleSpace();
+
+            EditorGUILayout.EndHorizontal();
         }
 
         EditorGUILayout.EndVertical();
 
-        GUILayout.Space(5);
-
-        EditorGUILayout.BeginVertical(EditorHelper.Box);
-
-        EditorGUILayout.BeginHorizontal();
-
-        EditorGUILayout.LabelField(new GUIContent("Freeze Position", "Prevents movement on the specified axis."), GUILayout.Width(EditorGUIUtility.labelWidth));
-
-        EditorGUILayout.LabelField(new GUIContent("x"), GUILayout.Width(10));
-        bool lNewFreezePositionX = EditorGUILayout.Toggle(mTarget.FreezePositionX, GUILayout.Width(20));
-        if (lNewFreezePositionX != mTarget.FreezePositionX)
-        {
-            lIsDirty = true;
-            mTarget.FreezePositionX = lNewFreezePositionX;
-        }
-
-        GUILayout.Space(5);
-        EditorGUILayout.LabelField(new GUIContent("y"), GUILayout.Width(10));
-        bool lNewFreezePositionY = EditorGUILayout.Toggle(mTarget.FreezePositionY, GUILayout.Width(20));
-        if (lNewFreezePositionY != mTarget.FreezePositionY)
-        {
-            lIsDirty = true;
-            mTarget.FreezePositionY = lNewFreezePositionY;
-        }
-
-        GUILayout.Space(5);
-        EditorGUILayout.LabelField(new GUIContent("z"), GUILayout.Width(10));
-        bool lNewFreezePositionZ = EditorGUILayout.Toggle(mTarget.FreezePositionZ, GUILayout.Width(20));
-        if (lNewFreezePositionZ != mTarget.FreezePositionZ)
-        {
-            lIsDirty = true;
-            mTarget.FreezePositionZ = lNewFreezePositionZ;
-        }
-
-        GUILayout.FlexibleSpace();
-
-        EditorGUILayout.EndHorizontal();
-
-
-        EditorGUILayout.BeginHorizontal();
-
-        EditorGUILayout.LabelField(new GUIContent("Freeze Rotation", "Prevents rotation on the specified axis."), GUILayout.Width(EditorGUIUtility.labelWidth));
-
-        EditorGUILayout.LabelField(new GUIContent("x"), GUILayout.Width(10));
-        bool lNewFreezeRotationX = EditorGUILayout.Toggle(mTarget.FreezeRotationX, GUILayout.Width(20));
-        if (lNewFreezeRotationX != mTarget.FreezeRotationX)
-        {
-            lIsDirty = true;
-            mTarget.FreezeRotationX = lNewFreezeRotationX;
-        }
-
-        GUILayout.Space(5);
-        EditorGUILayout.LabelField(new GUIContent("y"), GUILayout.Width(10));
-        bool lNewFreezeRotationY = EditorGUILayout.Toggle(mTarget.FreezeRotationY, GUILayout.Width(20));
-        if (lNewFreezeRotationY != mTarget.FreezeRotationY)
-        {
-            lIsDirty = true;
-            mTarget.FreezeRotationY = lNewFreezeRotationY;
-        }
-
-        GUILayout.Space(5);
-        EditorGUILayout.LabelField(new GUIContent("z"), GUILayout.Width(10));
-        bool lNewFreezeRotationZ = EditorGUILayout.Toggle(mTarget.FreezeRotationZ, GUILayout.Width(20));
-        if (lNewFreezeRotationZ != mTarget.FreezeRotationZ)
-        {
-            lIsDirty = true;
-            mTarget.FreezeRotationZ = lNewFreezeRotationZ;
-        }
-
-        GUILayout.FlexibleSpace();
-
-        EditorGUILayout.EndHorizontal();
-
         EditorGUILayout.EndVertical();
+
+        if (!mTarget.UseTransformPosition)
+        {
+
+            GUILayout.Space(5);
+
+            EditorGUILayout.LabelField("Limits", EditorStyles.boldLabel, GUILayout.Height(16f));
+
+            EditorGUILayout.BeginVertical(EditorHelper.GroupBox);
+
+            EditorHelper.DrawInspectorDescription("Locks movement and rotation along specific axes.", MessageType.None);
+
+            EditorGUILayout.BeginVertical(EditorHelper.Box);
+
+            EditorGUILayout.BeginHorizontal();
+
+            EditorGUILayout.LabelField(new GUIContent("Freeze Position", "Prevents movement on the specified axis."), GUILayout.Width(EditorGUIUtility.labelWidth));
+
+            EditorGUILayout.LabelField(new GUIContent("x"), GUILayout.Width(10));
+            bool lNewFreezePositionX = EditorGUILayout.Toggle(mTarget.FreezePositionX, GUILayout.Width(20));
+            if (lNewFreezePositionX != mTarget.FreezePositionX)
+            {
+                lIsDirty = true;
+                mTarget.FreezePositionX = lNewFreezePositionX;
+            }
+
+            GUILayout.Space(5);
+            EditorGUILayout.LabelField(new GUIContent("y"), GUILayout.Width(10));
+            bool lNewFreezePositionY = EditorGUILayout.Toggle(mTarget.FreezePositionY, GUILayout.Width(20));
+            if (lNewFreezePositionY != mTarget.FreezePositionY)
+            {
+                lIsDirty = true;
+                mTarget.FreezePositionY = lNewFreezePositionY;
+            }
+
+            GUILayout.Space(5);
+            EditorGUILayout.LabelField(new GUIContent("z"), GUILayout.Width(10));
+            bool lNewFreezePositionZ = EditorGUILayout.Toggle(mTarget.FreezePositionZ, GUILayout.Width(20));
+            if (lNewFreezePositionZ != mTarget.FreezePositionZ)
+            {
+                lIsDirty = true;
+                mTarget.FreezePositionZ = lNewFreezePositionZ;
+            }
+
+            GUILayout.FlexibleSpace();
+
+            EditorGUILayout.EndHorizontal();
+
+
+            EditorGUILayout.BeginHorizontal();
+
+            EditorGUILayout.LabelField(new GUIContent("Freeze Rotation", "Prevents rotation on the specified axis."), GUILayout.Width(EditorGUIUtility.labelWidth));
+
+            EditorGUILayout.LabelField(new GUIContent("x"), GUILayout.Width(10));
+            bool lNewFreezeRotationX = EditorGUILayout.Toggle(mTarget.FreezeRotationX, GUILayout.Width(20));
+            if (lNewFreezeRotationX != mTarget.FreezeRotationX)
+            {
+                lIsDirty = true;
+                mTarget.FreezeRotationX = lNewFreezeRotationX;
+            }
+
+            GUILayout.Space(5);
+            EditorGUILayout.LabelField(new GUIContent("y"), GUILayout.Width(10));
+            bool lNewFreezeRotationY = EditorGUILayout.Toggle(mTarget.FreezeRotationY, GUILayout.Width(20));
+            if (lNewFreezeRotationY != mTarget.FreezeRotationY)
+            {
+                lIsDirty = true;
+                mTarget.FreezeRotationY = lNewFreezeRotationY;
+            }
+
+            GUILayout.Space(5);
+            EditorGUILayout.LabelField(new GUIContent("z"), GUILayout.Width(10));
+            bool lNewFreezeRotationZ = EditorGUILayout.Toggle(mTarget.FreezeRotationZ, GUILayout.Width(20));
+            if (lNewFreezeRotationZ != mTarget.FreezeRotationZ)
+            {
+                lIsDirty = true;
+                mTarget.FreezeRotationZ = lNewFreezeRotationZ;
+            }
+
+            GUILayout.FlexibleSpace();
+
+            EditorGUILayout.EndHorizontal();
+
+            EditorGUILayout.EndVertical();
+
+            EditorGUILayout.EndVertical();
+        }
 
         return lIsDirty;
     }
@@ -913,6 +1045,13 @@ public class ActorControllerEditor : Editor
     private void DrawListHeader(Rect rRect)
     {
         EditorGUI.LabelField(rRect, "Body Shapes");
+
+        Rect lTitleRect = new Rect(rRect.x, rRect.y + 1, rRect.width - 80, 14);
+        if (GUI.Button(lTitleRect, "", EditorStyles.label))
+        {
+            mList.index = -1;
+            OnListItemSelect(mList);
+        }
 
         Rect lAutoRect = new Rect(rRect.width - 54, rRect.y + 1, 80, 14);
         if (GUI.Button(lAutoRect, new GUIContent("Auto Create", "Automatically create body shapes for humanoids"), EditorHelper.TinyButton))

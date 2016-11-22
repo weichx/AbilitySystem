@@ -43,7 +43,7 @@ public class MeshPartitionerEditor : Editor
 
         GUILayout.Space(10);
 
-        bool lNewParseOnStart = GUILayout.Toggle(mTarget.ParseOnStart, new GUIContent("Parse on Start", ""));
+        bool lNewParseOnStart = GUILayout.Toggle(mTarget.ParseOnStart, new GUIContent("Parse on start", ""));
         if (lNewParseOnStart != mTarget.ParseOnStart)
         {
             mIsDirty = true;

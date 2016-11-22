@@ -1,5 +1,6 @@
 ﻿using System;
 using UnityEngine;
+using EntitySystem;
 using Intelligence;
 using UnityEngine.UI;
 

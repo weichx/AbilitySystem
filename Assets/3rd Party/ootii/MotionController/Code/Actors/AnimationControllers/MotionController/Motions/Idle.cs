@@ -24,14 +24,44 @@ namespace com.ootii.Actors.AnimationControllers
         public const int PHASE_START = 100;
 
         /// <summary>
-        /// Determines if the mouse's horizontal movement is used to
-        /// rotate teh character.
+        /// Determines if we rotate to match the camera
         /// </summary>
-        public bool _RotateWithViewInputX = true;
-        public bool RotateWithViewInputX
+        public bool _RotateWithCamera = true;
+        public bool RotateWithCamera
         {
-            get { return _RotateWithViewInputX; }
-            set { _RotateWithViewInputX = value; }
+            get { return _RotateWithCamera; }
+
+            set
+            {
+                _RotateWithCamera = value;
+
+                // Register this motion with the camera
+                if (mMotionController.CameraRig is BaseCameraRig)
+                {
+                    ((BaseCameraRig)mMotionController.CameraRig).OnPostLateUpdate -= OnCameraUpdated;
+                    if (_RotateWithCamera) { ((BaseCameraRig)mMotionController.CameraRig).OnPostLateUpdate += OnCameraUpdated; }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Desired degrees of rotation per second
+        /// </summary>
+        public float _RotationToCameraSpeed = 360f;
+        public float RotationToCameraSpeed
+        {
+            get { return _RotationToCameraSpeed; }
+            set { _RotationToCameraSpeed = value; }
+        }
+
+        /// <summary>
+        /// Determines if we rotate by ourselves
+        /// </summary>
+        public bool _RotateWithInput = false;
+        public bool RotateWithInput
+        {
+            get { return _RotateWithInput; }
+            set { _RotateWithInput = value; }
         }
 
         /// <summary>
@@ -45,40 +75,14 @@ namespace com.ootii.Actors.AnimationControllers
             set { _RotateWithMovementInputX = value; }
         }
 
-        /// <summary>
-        /// Determines if we'll attempt to force the camera to view 
-        /// or forward direction... even if it's an orbit camera
-        /// </summary>
-        public bool _ForceViewOnInput = false;
-        public bool ForceViewOnInput
-        {
-            get { return _ForceViewOnInput; }
-            set { _ForceViewOnInput = value; }
-        }
-
-        /// <summary>
-        /// Determines if the character always rotates to the camera view
-        /// </summary>
-        public bool _RotateWithView = false;
-        public bool RotateWithView
-        {
-            get { return _RotateWithView; }
-            set { _RotateWithView = value; }
-        }
-
-        /// <summary>
+         /// <summary>
         /// Desired degrees of rotation per second
         /// </summary>
         public float _RotationSpeed = 120f;
         public float RotationSpeed
         {
             get { return _RotationSpeed; }
-
-            set
-            {
-                _RotationSpeed = value;
-                mDegreesPer60FPSTick = _RotationSpeed / 60f;
-            }
+            set { _RotationSpeed = value; }
         }
 
         /// <summary>
@@ -91,26 +95,26 @@ namespace com.ootii.Actors.AnimationControllers
             set { _RotationSmoothing = value; }
         }
 
-        /// <summary>
-        /// Desired degrees of rotation per second
+       /// <summary>
+        /// Determines if we'll attempt to force the camera to view 
+        /// or forward direction... even if it's an orbit camera
         /// </summary>
-        public float _RotationToViewSpeed = 360f;
-        public float RotationToViewSpeed
+        public bool _ForceViewOnInput = false;
+        public bool ForceViewOnInput
         {
-            get { return _RotationToViewSpeed; }
-            set { _RotationToViewSpeed = value; }
+            get { return _ForceViewOnInput; }
+            set { _ForceViewOnInput = value; }
         }
 
         /// <summary>
-        /// Determines if we'll force our rotation to match the camera view
+        /// Frame level rotation test
         /// </summary>
-        protected bool mForceRotationToView = false;
+        protected bool mRotateWithCamera = false;
 
         /// <summary>
-        /// Speed we'll actually apply to the rotation. This is essencially the
-        /// number of degrees per tick assuming we're running at 60 FPS
+        /// Determines if the actor rotation should be linked to the camera
         /// </summary>
-        protected float mDegreesPer60FPSTick = 1f;
+        protected bool mLinkRotation = false;
 
         /// <summary>
         /// Fields to help smooth out the mouse rotation
@@ -125,10 +129,10 @@ namespace com.ootii.Actors.AnimationControllers
         public Idle()
             : base()
         {
+            _Category = EnumMotionCategories.IDLE;
+
             _Priority = 0;
             _ActionAlias = "ActivateRotation";
-            mIsStartable = true;
-            //mIsGroundedExpected = true;
 
 #if UNITY_EDITOR
             if (_EditorAnimatorSMName.Length == 0) { _EditorAnimatorSMName = "Idle-SM"; }
@@ -142,10 +146,10 @@ namespace com.ootii.Actors.AnimationControllers
         public Idle(MotionController rController)
             : base(rController)
         {
+            _Category = EnumMotionCategories.IDLE;
+
             _Priority = 0;
             _ActionAlias = "ActivateRotation";
-            mIsStartable = true;
-            //mIsGroundedExpected = true;
 
 #if UNITY_EDITOR
             if (_EditorAnimatorSMName.Length == 0) { _EditorAnimatorSMName = "Idle-SM"; }
@@ -159,9 +163,6 @@ namespace com.ootii.Actors.AnimationControllers
         public override void Awake()
         {
             base.Awake();
-
-            // Default the speed we'll use to rotate
-            mDegreesPer60FPSTick = _RotationSpeed / 60f;
         }
 
         /// <summary>
@@ -226,19 +227,17 @@ namespace com.ootii.Actors.AnimationControllers
             mYaw = 0f;
             mYawTarget = 0f;
             mYawVelocity = 0f;
-
-            // Determine if we need to rotate to the view. We do this test
-            // when the activator first triggers
-            if (_RotateWithViewInputX && mMotionController._InputSource != null && mMotionController._InputSource.IsPressed(_ActionAlias))
-            {
-                if (mMotionController._CameraTransform != null)
-                {
-                    float lAngle = NumberHelper.GetHorizontalAngle(mActorController._Transform.forward, mMotionController._CameraTransform.forward, mActorController._Transform.up);
-                    mForceRotationToView = (Mathf.Abs(lAngle) > 1f);
-                }
-            }
+            mLinkRotation = false;
 
             mMotionController.SetAnimatorMotionPhase(mMotionLayer.AnimatorLayerIndex, Idle.PHASE_START, true);
+
+            // Register this motion with the camera
+            if (_RotateWithCamera && mMotionController.CameraRig is BaseCameraRig)
+            {
+                ((BaseCameraRig)mMotionController.CameraRig).OnPostLateUpdate += OnCameraUpdated;
+            }
+
+            // Finalize the activation
             return base.Activate(rPrevMotion);
         }
 
@@ -250,7 +249,13 @@ namespace com.ootii.Actors.AnimationControllers
             // If we're still flagged as in the ranged stance, move out
             if (mActorController.State.Stance == EnumControllerStance.COMBAT_RANGED)
             {
-                mActorController.State.Stance = EnumControllerStance.TRAVERSAL;
+                //mActorController.State.Stance = EnumControllerStance.TRAVERSAL;
+            }
+
+            // Register this motion with the camera
+            if (mMotionController.CameraRig is BaseCameraRig)
+            {
+                ((BaseCameraRig)mMotionController.CameraRig).OnPostLateUpdate -= OnCameraUpdated;
             }
 
             // Continue with the deactivation
@@ -284,41 +289,24 @@ namespace com.ootii.Actors.AnimationControllers
             mAngularVelocity = Vector3.zero;
             mRotation = Quaternion.identity;
 
-            // Update the stance if the camera mode is set
-            if (mMotionController.CameraRig != null && mMotionController.CameraRig.Mode > 0)
+            // Check if we're rotating with the camera
+            mRotateWithCamera = false;
+            if (_RotateWithCamera && mMotionController._CameraTransform != null)
             {
-                mActorController.State.Stance = EnumControllerStance.COMBAT_RANGED;
-            }
-            else
-            {
-                mActorController.State.Stance = EnumControllerStance.TRAVERSAL;
+                if (mMotionController._InputSource.IsPressed(_ActionAlias)) { mRotateWithCamera = true; }
             }
 
-            // Determine if we need to rotate to the view. We do this test
-            // when the activator first triggers
-            if (_RotateWithViewInputX && mMotionController._InputSource != null && mMotionController._InputSource.IsJustPressed(_ActionAlias))
+            // If we're meant to rotate with the camera (and OnCameraUpdate isn't already attached), do it here
+            if (mRotateWithCamera && !(mMotionController.CameraRig is BaseCameraRig))
             {
-                if (mMotionController._CameraTransform != null)
-                {
-                    float lAngle = NumberHelper.GetHorizontalAngle(mActorController._Transform.forward, mMotionController._CameraTransform.forward, mActorController._Transform.up);
-                    mForceRotationToView = (Mathf.Abs(lAngle) > 1f);
-                }
+                OnCameraUpdated(rDeltaTime, rUpdateIndex, null);
             }
 
-            // If we're trying to get to the original rotation, keep going
-            if (mForceRotationToView)
+            // If we're not rotating with the camera, rotate with the input
+            if (!mRotateWithCamera)
             {
-                GetRotationVelocityWithView(rDeltaTime, ref mAngularVelocity);
-            }
-            // Determine if the actor rotates as the input is used
-            else if ((_RotateWithViewInputX || (mMotionController.CameraRig != null && mMotionController.CameraRig.Mode > 0)) || _RotateWithMovementInputX)
-            {
-                GetRotationVelocityWithInput(rDeltaTime, ref mRotation);
-            }
-            // Determine if the actor rotates as the view rotates
-            else if (_RotateWithView)
-            {
-                GetRotationVelocityWithView(rDeltaTime, ref mAngularVelocity);
+                mLinkRotation = false;
+                RotateUsingInput(rDeltaTime, ref mRotation);
             }
         }
 
@@ -327,7 +315,7 @@ namespace com.ootii.Actors.AnimationControllers
         /// </summary>
         /// <param name="rDeltaTime"></param>
         /// <param name="rAngularVelocity"></param>
-        private void GetRotationVelocityWithInput(float rDeltaTime, ref Quaternion rRotation)
+        private void RotateUsingInput(float rDeltaTime, ref Quaternion rRotation)
         {
             // If we don't have an input source, stop
             if (mMotionController._InputSource == null) { return; }
@@ -335,18 +323,29 @@ namespace com.ootii.Actors.AnimationControllers
             // Determine this frame's rotation
             float lYawDelta = 0f;
 
-            if (lYawDelta == 0f && _RotateWithMovementInputX)
+            if (_RotateWithMovementInputX)
             {
-                lYawDelta = mMotionController._InputSource.MovementX;
+                lYawDelta = mMotionController._InputSource.MovementX * _RotationSpeed * rDeltaTime;
+                if (lYawDelta != 0f)
+                {
+                    mYaw = mYaw + lYawDelta;
+                    mYawTarget = mYaw;
+
+                    rRotation = Quaternion.Euler(0f, lYawDelta, 0f);
+
+                    // Force the camera to our view if needed
+                    if (_ForceViewOnInput && mMotionController.CameraRig is BaseCameraRig)
+                    {
+                        ((BaseCameraRig)mMotionController.CameraRig).FrameForceToFollowAnchor = true;
+                    }
+
+                    return;
+                }
             }
 
-            if (lYawDelta == 0f && (_RotateWithViewInputX || (mMotionController.CameraRig != null && mMotionController.CameraRig.Mode > 0)))
+            if (lYawDelta == 0f && _RotateWithInput && mMotionController._InputSource.IsViewingActivated)
             {
-                if (mMotionController._InputSource.IsPressed(_ActionAlias))
-                //if (mMotionController._InputSource.IsViewingActivated)
-                {
-                    lYawDelta = mMotionController._InputSource.ViewX * mDegreesPer60FPSTick;
-                }
+                lYawDelta = mMotionController._InputSource.ViewX * _RotationSpeed * rDeltaTime;
             }
 
             mYawTarget = mYawTarget + lYawDelta;
@@ -359,80 +358,47 @@ namespace com.ootii.Actors.AnimationControllers
             if (lYawDelta != 0f)
             {
                 rRotation = Quaternion.Euler(0f, lYawDelta, 0f);
+            }
 
+            // Force the camera to our view if needed
+            if (_ForceViewOnInput && mMotionController._InputSource.MovementX != 0f)
+            {
                 // If we have a camera, rotate it towards the character
-                if (_ForceViewOnInput && mMotionController.CameraRig is BaseCameraRig)
+                if (mMotionController.CameraRig is BaseCameraRig)
                 {
                     ((BaseCameraRig)mMotionController.CameraRig).FrameForceToFollowAnchor = true;
                 }
             }
         }
-
+        
         /// <summary>
-        /// Create a rotation velocity that rotates the character to match the camera's current view.
+        /// When we want to rotate based on the camera direction, we need to tweak the actor
+        /// rotation AFTER we process the camera. Otherwise, we can get small stutters during camera rotation. 
+        /// 
+        /// This is the only way to keep them totally in sync. It also means we can't run any of our AC processing
+        /// as the AC already ran. So, we do minimal work here
         /// </summary>
         /// <param name="rDeltaTime"></param>
-        /// <param name="rAngularVelocity"></param>
-        private void GetRotationVelocityWithView(float rDeltaTime, ref Vector3 rRotationalVelocity)
+        /// <param name="rUpdateCount"></param>
+        /// <param name="rCamera"></param>
+        private void OnCameraUpdated(float rDeltaTime, int rUpdateIndex, BaseCameraRig rCamera)
         {
+            if (!mRotateWithCamera) { return; }
             if (mMotionController._CameraTransform == null) { return; }
 
-            float lRotationVelocity = 0f;
+            float lToCameraAngle = Vector3Ext.HorizontalAngleTo(mMotionController._Transform.forward, mMotionController._CameraTransform.forward, mMotionController._Transform.up);
+            if (!mLinkRotation && Mathf.Abs(lToCameraAngle) <= _RotationToCameraSpeed * rDeltaTime) { mLinkRotation = true; }
 
-            // Determine the global direction the character should face
-            //float lAngle = NumberHelper.GetHorizontalAngle(mMotionController._Transform.forward, mMotionController._CameraTransform.forward);
-            float lAngle = NumberHelper.GetHorizontalAngle(mActorController._Transform.forward, mMotionController._CameraTransform.forward, mActorController._Transform.up);
-
-            // Test if we need to force a rotation speed for a smooth rotation
-            float lRotationSpeed = _RotationToViewSpeed;
-
-            // We want to work our way to the goal smoothly
-            if (lAngle > 0f)
+            if (!mLinkRotation)
             {
-                // Rotate instantly
-                if (lRotationSpeed == 0f)
-                {
-                    lRotationVelocity = lAngle / rDeltaTime;
-                }
-                else
-                {
-                    // Use the motion's rotation velocity
-                    lRotationVelocity = lRotationSpeed;
-
-                    // If we're rotating too much, limit
-                    if (lRotationVelocity * rDeltaTime > lAngle)
-                    {
-                        lRotationVelocity = lAngle / rDeltaTime;
-                    }
-                }
-            }
-            else if (lAngle < 0f)
-            {
-                // Rotate instantly
-                if (lRotationSpeed == 0f)
-                {
-                    lRotationVelocity = lAngle / rDeltaTime;
-                }
-                // Rotate over time
-                else
-                {
-                    // Use the motion's rotation velocity
-                    lRotationVelocity = -lRotationSpeed;
-
-                    // If we're rotating too much, limit
-                    if (lRotationVelocity * rDeltaTime < lAngle)
-                    {
-                        lRotationVelocity = lAngle / rDeltaTime;
-                    }
-                }
-            }
-            else
-            {
-                mForceRotationToView = false;
+                float lRotationAngle = Mathf.Abs(lToCameraAngle);
+                float lRotationSign = Mathf.Sign(lToCameraAngle);
+                lToCameraAngle = lRotationSign * Mathf.Min(_RotationToCameraSpeed * rDeltaTime, lRotationAngle);
             }
 
-            //rRotationalVelocity = mActorController._Transform.up * lRotationVelocity;
-            rRotationalVelocity = Vector3.up * lRotationVelocity;
+            Quaternion lRotation = Quaternion.AngleAxis(lToCameraAngle, Vector3.up);
+            mActorController.Yaw = mActorController.Yaw * lRotation;
+            mActorController._Transform.rotation = mActorController.Tilt * mActorController.Yaw;
         }
 
         // **************************************************************************************************
@@ -449,64 +415,54 @@ namespace com.ootii.Actors.AnimationControllers
         {
             bool lIsDirty = false;
 
-            bool lNewRotateWithView = EditorGUILayout.Toggle(new GUIContent("Rotate with View", "Determines if the actor rotates to always face the camera's view."), RotateWithView);
-            if (lNewRotateWithView != RotateWithView)
+            if (EditorHelper.BoolField("Rotate With Camera", "Determines if we rotate to match the camera.", RotateWithCamera, mMotionController))
             {
                 lIsDirty = true;
-                RotateWithView = lNewRotateWithView;
+                RotateWithCamera = EditorHelper.FieldBoolValue;
             }
 
-            float lNewRotationToViewSpeed = EditorGUILayout.FloatField(new GUIContent("Rotation to View Speed", "Degrees per second to rotate towards the camera view."), RotationToViewSpeed, GUILayout.MinWidth(30));
-            if (lNewRotationToViewSpeed != RotationToViewSpeed)
+            if (EditorHelper.TextField("Rotate Action Alias", "Action alias determines if rotation is activated. This typically matches the input source's View Activator.", ActionAlias, mMotionController))
             {
                 lIsDirty = true;
-                RotationToViewSpeed = lNewRotationToViewSpeed;
+                ActionAlias = EditorHelper.FieldStringValue;
             }
 
-            GUILayout.Space(5f);
-
-            bool lNewRotateWithViewInputX = EditorGUILayout.Toggle(new GUIContent("Rotate on ViewX", "Determines if the actor rotates based on the ViewX input."), RotateWithViewInputX);
-            if (lNewRotateWithViewInputX != RotateWithViewInputX)
+            if (EditorHelper.FloatField("Rotation Speed", "Degrees per second to rotate to the camera's direction.", RotationToCameraSpeed, mMotionController))
             {
                 lIsDirty = true;
-                RotateWithViewInputX = lNewRotateWithViewInputX;
-            }
-
-            bool lNewRotateWithMovementInputX = EditorGUILayout.Toggle(new GUIContent("Rotate on MoveX", "Determines if the actor rotates based on the MovementX input."), RotateWithMovementInputX);
-            if (lNewRotateWithMovementInputX != RotateWithMovementInputX)
-            {
-                lIsDirty = true;
-                RotateWithMovementInputX = lNewRotateWithMovementInputX;
-            }
-
-            string lNewActionAlias = EditorGUILayout.TextField(new GUIContent("Rotate Action Alias", "Action alias that is required to use the ViewX value for rotation."), ActionAlias, GUILayout.MinWidth(30));
-            if (lNewActionAlias != ActionAlias)
-            {
-                lIsDirty = true;
-                ActionAlias = lNewActionAlias;
-            }
-
-            float lNewRotationSpeed = EditorGUILayout.FloatField(new GUIContent("Rotation Speed", "Degrees per second to rotate."), RotationSpeed, GUILayout.MinWidth(30));
-            if (lNewRotationSpeed != RotationSpeed)
-            {
-                lIsDirty = true;
-                RotationSpeed = lNewRotationSpeed;
-            }
-
-            float lNewRotationSmoothing = EditorGUILayout.FloatField(new GUIContent("Rotation Smoothing", ""), RotationSmoothing);
-            if (lNewRotationSmoothing != RotationSmoothing)
-            {
-                lIsDirty = true;
-                RotationSmoothing = lNewRotationSmoothing;
+                RotationToCameraSpeed = EditorHelper.FieldFloatValue;
             }
 
             GUILayout.Space(5f);
 
-            bool lNewForceViewOnInput = EditorGUILayout.Toggle(new GUIContent("Force View", "Determines we force the camera view to look in the direction of the actor when MovementX has a value."), ForceViewOnInput);
-            if (lNewForceViewOnInput != ForceViewOnInput)
+            if (EditorHelper.BoolField("Rotate With View Input", "Determines if we rotate based on user input (view x).", RotateWithInput, mMotionController))
             {
                 lIsDirty = true;
-                ForceViewOnInput = lNewForceViewOnInput;
+                RotateWithInput = EditorHelper.FieldBoolValue;
+            }
+
+            if (EditorHelper.BoolField("Rotate With Move Input", "Determines if we rotate based on user input (movement x).", RotateWithMovementInputX, mMotionController))
+            {
+                lIsDirty = true;
+                RotateWithMovementInputX = EditorHelper.FieldBoolValue;
+            }
+
+            if (EditorHelper.FloatField("Rotation Speed", "Degrees per second to rotate the actor.", RotationSpeed, mMotionController))
+            {
+                lIsDirty = true;
+                RotationSpeed = EditorHelper.FieldFloatValue;
+            }
+
+            if (EditorHelper.FloatField("Rotation Smoothing", "Smoothing factor applied to rotation (0 disables).", RotationSmoothing, mMotionController))
+            {
+                lIsDirty = true;
+                RotationSmoothing = EditorHelper.FieldFloatValue;
+            }
+
+            if (EditorHelper.BoolField("Force View", "Determines we force the camera view to look in the direction of the actor when MovementX has a value.", ForceViewOnInput, mMotionController))
+            {
+                lIsDirty = true;
+                ForceViewOnInput = EditorHelper.FieldBoolValue;
             }
 
             return lIsDirty;

@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using EntitySystem;
 using System.Collections.Generic;
 
 namespace Intelligence {

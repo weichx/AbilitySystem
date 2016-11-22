@@ -45,25 +45,65 @@ namespace com.ootii.Helpers
 
             return rCenter;
         }
-        
+
         /// <summary>
         /// Returns the smooth and eased value over time (0 to 1)
         /// </summary>
-        /// <param name="rStart"></param>
-        /// <param name="rEnd"></param>
-        /// <param name="rTime"></param>
+        /// <param name="rStart">Start of the range</param>
+        /// <param name="rEnd">End of the range</param>
+        /// <param name="rTime">Time (0 to 1) between the range</param>
         /// <returns></returns>
         public static float SmoothStep(float rStart, float rEnd, float rTime)
         {
             if (rTime <= 0f) { return rStart; }
             if (rTime >= 1f) { return rEnd; }
 
-            rTime = rTime * rTime * rTime * (rTime * (6f * rTime - 15f) + 10f);
+            float lSmoothedTime = rTime * rTime * rTime * (rTime * (6f * rTime - 15f) + 10f);
 
-            float lDelta = rEnd - rStart;
-            float lDistance = lDelta * rTime;
-
+            float lDistance = (rEnd - rStart) * lSmoothedTime;
             return rStart + lDistance;
+        }
+
+        /// <summary>
+        /// Given the smoothed value, returns the time that that SmoothStep 
+        /// function would take to generate the smoothed value
+        /// </summary>
+        /// <param name="rStart">Start of the range</param>
+        /// <param name="rEnd">End of the range</param>
+        /// <param name="rTime">Time (0 to 1) between the range</param>
+        /// <returns></returns>
+        public static float SmoothStepTime(float rStart, float rEnd, float rValue)
+        {
+            if (rValue <= rStart) { return 0f; }
+            if (rValue >= rEnd) { return 1f; }
+
+            int lIndex = 0;
+            float lStartTime = 0.0f;
+            float lEndTime = 1.0f;
+            float lMidTime = 0f;
+            float lMidValue = 0f;
+            float lMidDiff = 0f;
+
+            do
+            {
+                lIndex++;
+
+                lMidTime = lStartTime + ((lEndTime - lStartTime) * 0.5f);
+                lMidValue = SmoothStep(rStart, rEnd, lMidTime);
+                lMidDiff = rValue - lMidValue;
+
+                if (lMidDiff > 0f)
+                {
+                    lStartTime = lMidTime;
+                }
+                else if (lMidDiff < 0f)
+                {
+                    lEndTime = lMidTime;
+                }
+            }
+            while (lIndex < 40 && Mathf.Abs(lMidDiff) > 0.0001f);
+
+            return lMidTime;
         }
 
         /// <summary>

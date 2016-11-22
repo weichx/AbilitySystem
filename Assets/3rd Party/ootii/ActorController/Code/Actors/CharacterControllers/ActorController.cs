@@ -5,10 +5,8 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using com.ootii.Geometry;
-using com.ootii.Helpers;
 using com.ootii.Physics;
 using com.ootii.Utilities;
-using com.ootii.Utilities.Debug;
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -44,7 +42,7 @@ namespace com.ootii.Actors
         /// <summary>
         /// Max angle we can be grounded on when using the sphere cast
         /// </summary>
-        public const float MAX_GROUNDING_ANGLE = 70f;
+        public const float MAX_GROUNDING_ANGLE = 85f;
 
         /// <summary>
         /// Enabled/disables the AC, but keep the camera processing
@@ -73,6 +71,26 @@ namespace com.ootii.Actors
                     mPrevState.Rotation = _Transform.rotation;
                 }
             }
+        }
+
+        /// <summary>
+        /// Ignores movement requests and simply follows the transform
+        /// </summary>
+        public bool _UseTransformPosition = false;
+        public bool UseTransformPosition
+        {
+            get { return _UseTransformPosition; }
+            set { _UseTransformPosition = value; }
+        }
+
+        /// <summary>
+        /// Ignores rotation requests and simply follows the transform
+        /// </summary>
+        public bool _UseTransformRotation = true;
+        public bool UseTransformRotation
+        {
+            get { return _UseTransformRotation; }
+            set { _UseTransformRotation = value; }
         }
 
         /// <summary>
@@ -108,6 +126,17 @@ namespace com.ootii.Actors
                     Array.Resize<ActorState>(ref mStates, _StateCount);
                 }
             }
+        }
+
+        /// <summary>
+        /// Determines if we multiply with tilt on the right side or not. Setting the 
+        /// value to true is useful for flying
+        /// </summary>
+        public bool _InvertRotationOrder = false;
+        public bool InvertRotationOrder
+        {
+            get { return _InvertRotationOrder; }
+            set { _InvertRotationOrder = value; }
         }
 
         /// <summary>
@@ -155,7 +184,7 @@ namespace com.ootii.Actors
         /// <summary>
         /// Determines if we apply gravity in fixed update or late update
         /// </summary>
-        public bool _ApplyGravityInFixedUpdate = true;
+        public bool _ApplyGravityInFixedUpdate = false;
         public bool ApplyGravityInFixedUpdate
         {
             get { return _ApplyGravityInFixedUpdate; }
@@ -163,34 +192,15 @@ namespace com.ootii.Actors
         }
 
         /// <summary>
-        /// Skin width used to help force grounding
+        /// Default height of the character. This determines how far
+        /// up the y axis the main body of the character extends
         /// </summary>
-        public float _SkinWidth = 0.01f;
-        public float SkinWidth
-        {
-            get { return _SkinWidth; }
-            set { _SkinWidth = value; }
-        }
-
-        /// <summary>
-        /// Mass of the actor
-        /// </summary>
-        public float _Mass = 2f;
-        public float Mass
-        {
-            get { return _Mass; }
-            set { _Mass = value; }
-        }
-
-        /// <summary>
-        /// Height of the actor calculated using the body shapes (when the current value is 0).
-        /// </summary>
-        protected float mHeight = 0f;
+        public float _Height = 1.8f;
         public float Height
         {
             get
             {
-                if (mHeight <= 0f)
+                if (_Height <= 0f)
                 {
                     for (int i = 0; i < BodyShapes.Count; i++)
                     {
@@ -211,14 +221,60 @@ namespace com.ootii.Actors
                             lHeight = Mathf.Max(Vector3.Distance(lEndTop, _Transform.position), lHeight);
                         }
 
-                        mHeight = Mathf.Max(lHeight, mHeight);
+                        _Height = Mathf.Max(lHeight, _Height);
                     }
                 }
 
-                return mHeight;
+                return _Height;
             }
 
-            set { mHeight = value; }
+            set
+            {
+                _Height = value;
+
+                mCenter.y = _Height * 0.5f;
+            }
+        }
+
+        /// <summary>
+        /// Width of the character. This determines how far out on the x and z
+        /// axis the main body of the character extends
+        /// </summary>
+        public float _Radius = 0.35f;
+        public float Radius
+        {
+            get { return _Radius; }
+            set { _Radius = value; }
+        }
+
+        /// <summary>
+        /// Mass of the actor. Since Unity defaults a square unit cube to a mass of
+        /// "1" and a typical human is almost 2 square units, we'll default to "2".
+        /// </summary>
+        public float _Mass = 2f;
+        public float Mass
+        {
+            get { return _Mass; }
+            set { _Mass = value; }
+        }
+
+        /// <summary>
+        /// Represents the center point of the character based on the height
+        /// </summary>
+        protected Vector3 mCenter = new Vector3(0f, 0.9f, 0f);
+        public Vector3 Center
+        {
+            get { return mCenter; }
+        }
+
+        /// <summary>
+        /// Skin width used to help force grounding
+        /// </summary>
+        public float _SkinWidth = 0.01f;
+        public float SkinWidth
+        {
+            get { return _SkinWidth; }
+            set { _SkinWidth = value; }
         }
 
         /// <summary>
@@ -400,11 +456,22 @@ namespace com.ootii.Actors
         /// <summary>
         /// Max slope angle the character can go up
         /// </summary>
-        public float _MaxSlopeAngle = 40f;
+        public float _MaxSlopeAngle = 60f;
         public float MaxSlopeAngle
         {
             get { return _MaxSlopeAngle; }
             set { _MaxSlopeAngle = value; }
+        }
+
+        /// <summary>
+        /// Determines if we'll use the step height to help test the max
+        /// slope the character can go up.
+        /// </summary>
+        public bool _UseStepHeightWithMaxSlope = true;
+        public bool UseStepHeightWithMaxSlope
+        {
+            get { return _UseStepHeightWithMaxSlope; }
+            set { _UseStepHeightWithMaxSlope = value; }
         }
 
         /// <summary>
@@ -507,7 +574,7 @@ namespace com.ootii.Actors
         /// <summary>
         /// Speed at which we smoothly move up steps
         /// </summary>
-        public float _StepUpSpeed = 1.5f;
+        public float _StepUpSpeed = 3f;
         public float StepUpSpeed
         {
             get { return _StepUpSpeed; }
@@ -517,7 +584,7 @@ namespace com.ootii.Actors
         /// <summary>
         /// Maximum angle that we'll allow smooth stepping up.
         /// </summary>
-        public float _MaxStepUpAngle = 10f;
+        public float _MaxStepUpAngle = 5f;
         public float MaxStepUpAngle
         {
             get { return _MaxStepUpAngle; }
@@ -527,7 +594,7 @@ namespace com.ootii.Actors
         /// <summary>
         /// Speed at which we smoothly move down steps
         /// </summary>
-        public float _StepDownSpeed = 1.5f;
+        public float _StepDownSpeed = 3f;
         public float StepDownSpeed
         {
             get { return _StepDownSpeed; }
@@ -655,7 +722,12 @@ namespace com.ootii.Actors
         public Quaternion Yaw
         {
             get { return mYaw; }
-            set { mYaw = value; }
+
+            set
+            {
+                mYaw = value;
+                _Transform.rotation = (_InvertRotationOrder ? mYaw * mTilt : mTilt * mYaw);
+            }
         }
 
         /// <summary>
@@ -665,7 +737,12 @@ namespace com.ootii.Actors
         public Quaternion Tilt
         {
             get { return mTilt; }
-            set { mTilt = value; }
+
+            set
+            {
+                mTilt = value;
+                _Transform.rotation = (_InvertRotationOrder ? mYaw * mTilt : mTilt * mYaw);
+            }
         }
 
         /// <summary>
@@ -940,6 +1017,9 @@ namespace com.ootii.Actors
         /// </summary>
         void Start()
         {
+            mCenter.y = _Height * 0.5f;
+
+            // Initialize the states
             mStates = new ActorState[_StateCount];
             for (int i = 0; i < mStates.Length; i++) { mStates[i] = new ActorState(); }
 
@@ -1241,18 +1321,35 @@ namespace com.ootii.Actors
             // ----------------------------------------------------------------------
             // ROTATION
             // ----------------------------------------------------------------------
+            Quaternion lFrameYaw = Quaternion.identity;
+            Quaternion lFrameTilt = Quaternion.identity;
 
+            // Use the transform rotation
+            if (_UseTransformPosition && _UseTransformRotation)
+            {
+                Quaternion lFinalRotation = _Transform.rotation;
+
+                lFinalRotation.DecomposeSwingTwist(_Transform.up, ref mTilt, ref mYaw);
+
+                mState.Rotation = lFinalRotation;
+                mState.RotationYaw = mYaw;
+                mState.RotationTilt = mTilt;
+            }
             // Force the rotation if we need to
-            if (mTargetRotation.x != float.MaxValue)
+            else if (mTargetRotation.x != float.MaxValue)
             {
                 // Force the rotation
                 mYaw = mTargetRotation;
+                mTilt = mTargetTilt;
 
-                mState.Rotation = mYaw;
+                mState.Rotation = (_InvertRotationOrder ? mYaw * mTilt : mTilt * mYaw);
                 _Transform.rotation = mState.Rotation;
 
                 // Clear out any values for the next frame
+                mTargetRotation = Quaternion.identity;
                 mTargetRotation.x = float.MaxValue;
+
+                mTargetTilt = Quaternion.identity;
             }
             else
             {
@@ -1260,15 +1357,15 @@ namespace com.ootii.Actors
                 {
                     // Determine the actual movement that will occur based on velocity
                     Quaternion lTargetRotate = Quaternion.Euler(mTargetRotationVelocity * rDeltaTime);
-                    mYaw = mYaw * lTargetRotate;
+                    lFrameYaw = lFrameYaw * lTargetRotate;
 
                     // Add any explicit rotation that may have been set
-                    mYaw = mYaw * mTargetRotate;
+                    lFrameYaw = lFrameYaw * mTargetRotate;
                 }
 
                 if (!_FreezeRotationX)
                 {
-                    mTilt = mTilt * mTargetTilt;
+                    lFrameTilt = lFrameTilt * mTargetTilt;
                 }
 
                 mTargetRotate = Quaternion.identity;
@@ -1279,9 +1376,58 @@ namespace com.ootii.Actors
             // POSITION
             // ----------------------------------------------------------------------
 
-            // Force the position if we need to
-            if (mTargetPosition.x != float.MaxValue)
+            // Use the transform position
+            if (_UseTransformPosition)
             {
+                mYaw = mYaw * lFrameYaw;
+                mTilt = mTilt * lFrameTilt;
+
+                Vector3 lFinalPosition = _Transform.position;
+
+                mState.Position = lFinalPosition;
+
+                // Determine the per second velocity
+                float lDeltaTime = (rDeltaTime > 0f ? rDeltaTime : Time.fixedDeltaTime);
+                mState.Velocity = (mState.Position - mPrevState.Position) / lDeltaTime;
+
+                // If we're not overriding the grounding, see if we are grounded
+                if (mTargetGround == null)
+                {
+                    RaycastHit lHitInfo;
+                    mState.IsGrounded = ProcessGrounding(_Transform.position, Vector3.zero, _Transform.up, mWorldUp, _BaseRadius, out lHitInfo);
+
+                    // Determine if we're tilting
+                    if (mState.IsGrounded && _OrientToGround)
+                    {
+                        if (Mathf.Abs(mState.GroundSurfaceAngle) > _MinOrientToGroundAngleForSpeed)
+                        {
+                            Vector3 lTiltUp = (mTilt * mYaw).Up();
+                            mTilt = QuaternionExt.FromToRotation(lTiltUp, mState.GroundSurfaceDirectNormal) * mTilt;
+
+                            mState.Rotation = mTilt * mYaw;
+                            mState.RotationYaw = mYaw;
+                            mState.RotationTilt = mTilt;
+                        }
+                    }
+                }
+                // Override the ground information if we're meant to
+                else
+                {
+                    mState.IsGrounded = true;
+                    mState.Ground = mTargetGround;
+                    mState.GroundPosition = mTargetGround.position;
+                    mState.GroundRotation = mTargetGround.rotation;
+                }
+
+                // Apply the rotation value here
+                _Transform.rotation = mState.Rotation;
+            }
+            // Force the position if we need to
+            else if (mTargetPosition.x != float.MaxValue)
+            {
+                mYaw = mYaw * lFrameYaw;
+                mTilt = mTilt * lFrameTilt;
+
                 // Track if the user initiated the movement
                 mState.IsMoveRequested = true;
 
@@ -1333,10 +1479,13 @@ namespace com.ootii.Actors
                 // In this case, we'll handle platforming, but ignore everything else
                 if (mOverrideProcessing)
                 {
+                    mYaw = mYaw * lFrameYaw;
+                    mTilt = mTilt * lFrameTilt;
+
                     // Set the final rotation
-					// TRT 2/25/2106
+                    // TRT 2/25/2106
                     //lFinalRotation = (_OrientToGround ? mTilt * mYaw : mYaw);
-                    lFinalRotation = mTilt * mYaw;
+                    lFinalRotation = (_InvertRotationOrder ? mYaw * mTilt : mTilt * mYaw);
 
                     // Determine the final movement based on input and platform movement
                     lFinalMovement = mState.Movement;
@@ -1388,7 +1537,12 @@ namespace com.ootii.Actors
                     // it and use it's movement for the grounding. Otherwise, we're testing 
                     // ground (the platform) from an invalid position (without the platform).
                     // ----------------------------------------------------------------------
-                    ProcessPlatforming(lActorPosition, lActorUp, Vector3.zero, mPrevState);
+                    ProcessPlatforming(lActorPosition, lActorUp, mPrevState);
+
+                    // Now that the platform rotation has been applied and the yaw/pitch cleaned,
+                    // we can apply the frame rotations
+                    mYaw = mYaw * lFrameYaw;
+                    mTilt = mTilt * lFrameTilt;
 
                     // ----------------------------------------------------------------------
                     // Quick test for grounding
@@ -1396,6 +1550,8 @@ namespace com.ootii.Actors
                     float lMaxAngle = (_MaxSlopeAngle > 0f ? _MaxSlopeAngle - 0.5f : MAX_GROUNDING_ANGLE);
 
                     // Do a simple check on our ground. If we're grounded, we'll remove any downward velocity.
+                    lActorUp = (mTilt * mYaw).Up();
+
                     lIsGrounded = ProcessGrounding(_Transform.position, mState.MovementPlatformAdjust, lActorUp, mWorldUp, _BaseRadius, out lGroundHitInfo);
                     if (lIsGrounded)
                     {
@@ -1472,6 +1628,8 @@ namespace com.ootii.Actors
                     // Process slopes for sliding or redirecting movement
                     // ----------------------------------------------------------------------
 
+                    //Graphics.GraphicsManager.DrawLine(_Transform.position + (_Transform.up * _MaxStepHeight), _Transform.position + (_Transform.up * _MaxStepHeight) + (lMovement.normalized * _OverlapRadius), Color.blue, null, 1f);
+
                     // If we're currently on a slope that is too steep, don't let us try to move up it.
                     // It doesn't really even matter if we're grounded or just close to it
                     if (mState.GroundSurfaceDistance < _SkinWidth + EPSILON && mState.GroundSurfaceAngle > lMaxAngle)
@@ -1479,24 +1637,39 @@ namespace com.ootii.Actors
                         // This check just makes sure we're dealing with slope we are directly over
                         if (mState.GroundSurfaceNormal == mState.GroundSurfaceDirectNormal)
                         {
-                            // Check if we're moving into the slope
-                            Vector3 lLateralSurfaceNormal = (mState.GroundSurfaceNormal - Vector3.Project(mState.GroundSurfaceNormal, lActorUp)).normalized;
-                            if (Vector3.Dot(lMovement.normalized, lLateralSurfaceNormal) < 0f)
-                            {
-                                // If we have a velocity pushing up, stop it
-                                Vector3 lVerticalMovementProj = Vector3.Project(lMovement, lActorUp);
-                                if (Vector3.Dot(lVerticalMovementProj.normalized, lActorUp) > 0f)
-                                {
-                                    mAccumulatedVelocity = Vector3.zero;
-                                }
-                                // If we have a velocity pushing down, allow it
-                                else
-                                {
-                                    lVerticalMovementProj = Vector3.zero;
-                                }
+                            bool lIgnoreSlope = false;
 
-                                // Remove the vertical movement  (if needed) and deflect the lateral movement.
-                                lMovement = lMovement - lVerticalMovementProj - Vector3.Project(lMovement, lLateralSurfaceNormal);
+                            // We may need to ignore this if we are using step height
+                            if (_UseStepHeightWithMaxSlope && _MaxStepHeight > 0f)
+                            {
+                                if (!RaycastExt.SafeRaycast(_Transform.position + (_Transform.up * _MaxStepHeight), lMovement.normalized, _OverlapRadius, _CollisionLayers, _Transform))
+                                {
+                                    lIgnoreSlope = true;
+                                }
+                            }
+
+                            // If we're not ignoring the max angle, we may need to remove vertical movement
+                            if (!lIgnoreSlope)
+                            {
+                                // Check if we're moving into the slope
+                                Vector3 lLateralSurfaceNormal = (mState.GroundSurfaceNormal - Vector3.Project(mState.GroundSurfaceNormal, lActorUp)).normalized;
+                                if (Vector3.Dot(lMovement.normalized, lLateralSurfaceNormal) < 0f)
+                                {
+                                    // If we have a velocity pushing up, stop it
+                                    Vector3 lVerticalMovementProj = Vector3.Project(lMovement, lActorUp);
+                                    if (Vector3.Dot(lVerticalMovementProj.normalized, lActorUp) > 0f)
+                                    {
+                                        mAccumulatedVelocity = Vector3.zero;
+                                    }
+                                    // If we have a velocity pushing down, allow it
+                                    else
+                                    {
+                                        lVerticalMovementProj = Vector3.zero;
+                                    }
+
+                                    // Remove the vertical movement  (if needed) and deflect the lateral movement.
+                                    lMovement = lMovement - lVerticalMovementProj - Vector3.Project(lMovement, lLateralSurfaceNormal);
+                                }
                             }
                         }
                     }
@@ -1575,7 +1748,7 @@ namespace com.ootii.Actors
                     } // Loop segments
 
                     // Grab the ground information for our new position
-                    Vector3 lTiltUp = mTilt.Up();
+                    Vector3 lTiltUp = (mTilt * mYaw).Up();
                     lIsGrounded = ProcessGrounding(_Transform.position, lFinalMovement, lTiltUp, mWorldUp, _BaseRadius, out lGroundHitInfo);
 
                     // If we're stepping down, we consider ourselves grounded
@@ -1596,7 +1769,7 @@ namespace com.ootii.Actors
 
                     // If we're not going to be grounded, we may need to force our way there. If we
                     // don't have an upward velocity and the ground 
-                    if (_FixGroundPenetration && (lForceSteppingDown || (!lIsGrounded && mPrevState.IsGrounded)))
+                    if (_FixGroundPenetration && _IsGravityEnabled && (lForceSteppingDown || (!lIsGrounded && mPrevState.IsGrounded)))
                     {
                         if (lForceSteppingDown || (_StepDownSpeed > 0f && mState.GroundSurfaceDirectDistance > _SkinWidth && mState.GroundSurfaceDirectDistance < _MaxStepHeight + _SkinWidth))
                         {
@@ -1885,7 +2058,7 @@ namespace com.ootii.Actors
 
 					// TRT 2/25/2016
                     //lFinalRotation = (lUseOrientation ? mTilt * mYaw : mYaw);
-                    lFinalRotation = mTilt * mYaw;
+                    lFinalRotation = (_InvertRotationOrder ? mYaw * mTilt : mTilt * mYaw);
 
                     // ----------------------------------------------------------------------
                     // Determine if we're intruding on anything
@@ -1909,6 +2082,10 @@ namespace com.ootii.Actors
                                     {
                                         Vector3 lDirection = (lBodyShapeHits[0].HitOrigin - lBodyShapeHits[0].HitPoint).normalized;
                                         lFinalMovement = lFinalMovement + (lDirection * -lBodyShapeHits[0].HitDistance);
+
+                                        //com.ootii.Graphics.GraphicsManager.DrawPoint(lBodyShapeHits[0].HitOrigin, Color.blue, null);
+                                        //com.ootii.Graphics.GraphicsManager.DrawPoint(lBodyShapeHits[0].HitPoint, Color.red, null);
+                                        //com.ootii.Graphics.GraphicsManager.DrawLine(lBodyShapeHits[0].HitOrigin, lBodyShapeHits[0].HitPoint, Color.red, null);
                                     }
 
                                     if (lStopOnRotationCollision)
@@ -1918,9 +2095,9 @@ namespace com.ootii.Actors
 
                     					// TRT 2/25/2016
                                         // lFinalRotation = (lUseOrientation ? mTilt * mYaw : mYaw);
-                                        lFinalRotation = mTilt * mYaw;
+                                        lFinalRotation = (_InvertRotationOrder ? mYaw * mTilt : mTilt * mYaw);
 
-                                        mOrientToGroundNormal = mTilt.Up();
+                                        mOrientToGroundNormal = (mTilt * mYaw).Up();
                                     }
 
                                     // No need to continue
@@ -1976,6 +2153,8 @@ namespace com.ootii.Actors
                 _Transform.position = lFinalPosition;
 
                 //Log.FileWrite("dt:" + rDeltaTime.ToString("f8") + " pos-y:" + lFinalPosition.y.ToString("f8") + " p-pos-y:" + mPrevState.Position.y.ToString("f8") + " d-y:" + (lFinalPosition.y - mPrevState.Position.y).ToString("f8") + " s-mfa" + StringHelper.ToString(mState.MovementForceAdjust));
+                //com.ootii.Graphics.GraphicsManager.DrawLine(_Transform.position, _Transform.position + (mTilt.Up() * 0.5f), Color.blue);
+
 
                 // ----------------------------------------------------------------------
                 // Clean up
@@ -2027,17 +2206,19 @@ namespace com.ootii.Actors
                 Utilities.Profiler.Stop("CLU2");
                 Utilities.Profiler.Stop("CLU0");
 
-                Log.ScreenWrite(String.Format("ui:{4} dt:{5:f4} udt:{6:f4} Hits:{3} Profilers - Tot:{0:f4} Sw:{1:f4} Ht:{2:f4}", Utilities.Profiler.ProfilerTime("CLU0"), Utilities.Profiler.ProfilerTime("CLU1"), Utilities.Profiler.ProfilerTime("CLU2"), mBodyShapeHits.Count, rUpdateIndex, rDeltaTime, Time.deltaTime), 0);
-                Log.ScreenWrite("isG:" + (mState.IsGrounded ? "1" : "0") + " isP:" + (mState.IsPoppingUp ? "1" : "0") + " isU:" + (mState.IsSteppingUp ? "1" : "0") + " isD:" + (mState.IsSteppingDown ? "1" : "0") + " ga:" + mState.GroundSurfaceAngle.ToString("f3") + " gd:" + mState.GroundSurfaceDistance.ToString("f6") + " pos-y:" + _Transform.position.y.ToString("f6"), 1);
+                Utilities.Debug.Log.ScreenWrite(String.Format("ui:{4} dt:{5:f4} udt:{6:f4} Hits:{3} Profilers - Tot:{0:f4} Sw:{1:f4} Ht:{2:f4}", Utilities.Profiler.ProfilerTime("CLU0"), Utilities.Profiler.ProfilerTime("CLU1"), Utilities.Profiler.ProfilerTime("CLU2"), mBodyShapeHits.Count, rUpdateIndex, rDeltaTime, Time.deltaTime), 0);
+                Utilities.Debug.Log.ScreenWrite("isG:" + (mState.IsGrounded ? "1" : "0") + " isP:" + (mState.IsPoppingUp ? "1" : "0") + " isU:" + (mState.IsSteppingUp ? "1" : "0") + " isD:" + (mState.IsSteppingDown ? "1" : "0") + " ga:" + mState.GroundSurfaceAngle.ToString("f3") + " gd:" + mState.GroundSurfaceDistance.ToString("f6") + " pos-y:" + _Transform.position.y.ToString("f6"), 1);
 
                 if (mState.IsColliding)
                 {
-                    Log.ScreenWrite("isC:" + (mState.IsColliding ? "1" : "0") + " c-nml:" + StringHelper.ToString(mState.ColliderHit.normal), 2);
+                    Utilities.Debug.Log.ScreenWrite("isC:" + (mState.IsColliding ? "1" : "0") + " c-nml:" + Helpers.StringHelper.ToString(mState.ColliderHit.normal), 2);
                 }
 
-                Log.FileWrite("isG:" + (mState.IsGrounded ? "1" : "0") + " isP:" + (mState.IsPoppingUp ? "1" : "0") + " isU:" + (mState.IsSteppingUp ? "1" : "0") + " isD:" + (mState.IsSteppingDown ? "1" : "0") + " isC:" + mState.IsColliding + " ga:" + mState.GroundSurfaceAngle.ToString("f3") + " gd:" + mState.GroundSurfaceDistance.ToString("f6") + " gn:" + StringHelper.ToString(mState.GroundSurfaceDirectNormal) + " pos-y:" + _Transform.position.y.ToString("f6"));
-                Log.FileWrite("f-mvm:" + StringHelper.ToString(lFinalMovement));
-                Log.FileWrite("");
+                Utilities.Debug.Log.FileWrite("isG:" + (mState.IsGrounded ? "1" : "0") + " isP:" + (mState.IsPoppingUp ? "1" : "0") + " isU:" + (mState.IsSteppingUp ? "1" : "0") + " isD:" + (mState.IsSteppingDown ? "1" : "0") + " isC:" + mState.IsColliding + " ga:" + mState.GroundSurfaceAngle.ToString("f3") + " gd:" + mState.GroundSurfaceDistance.ToString("f6") + " gn:" + Helpers.StringHelper.ToString(mState.GroundSurfaceDirectNormal) + " pos-y:" + _Transform.position.y.ToString("f6"));
+                Utilities.Debug.Log.FileWrite("f-mvm:" + Helpers.StringHelper.ToString(lFinalMovement));
+                Utilities.Debug.Log.FileWrite("");
+
+                //com.ootii.Graphics.GraphicsManager.DrawLine(_Transform.position + (_Transform.up * _MaxStepHeight), _Transform.position + (_Transform.up * _MaxStepHeight) + _Transform.forward, Color.blue);
 #endif
 
                 // If we find we are grounded, this is the time to clear our acceleration.
@@ -2078,22 +2259,44 @@ namespace com.ootii.Actors
         }
 
         /// <summary>
-        /// Sets and absolute rotation to rotate the actor to
+        /// Sets the absolut yaw of the actor, keeping the current tilt.
         /// </summary>
-        /// <param name="rRotation"></param>
-        public void SetRotation(Quaternion rRotation)
+        /// <param name="rYaw">Absolution rotation absolute the actor's y-axis</param>
+        public void SetYaw(Quaternion rYaw)
         {
-            mTargetRotation = rRotation;
+            mTargetRotation = rYaw;
+            mTargetTilt = mTilt;
         }
 
         /// <summary>
-        /// Sets an absolution "yaw" rotation for the frame. This rotation
-        /// is relative to the actor's current rotation
+        /// Sets and absolute rotation of the actor. We remove the current tilt from the
+        /// parameter and use the remaining rotation as the yaw.
+        /// </summary>
+        /// <param name="rRotation">Absolute rotation</param>
+        public void SetRotation(Quaternion rRotation)
+        {
+            mTargetRotation = Quaternion.Inverse(mTilt) * rRotation;
+            mTargetTilt = mTilt;
+        }
+
+        /// <summary>
+        /// Sets an absolute rotation of the actor using the yaw and tilt values.
         /// </summary>
         /// <param name="rRotation"></param>
-        public void Rotate(Quaternion rRotation)
+        public void SetRotation(Quaternion rYaw, Quaternion rTilt)
         {
-            mTargetRotate = mTargetRotate * rRotation;
+            mTargetRotation = rYaw;
+            mTargetTilt = rTilt;
+        }
+
+        /// <summary>
+        /// Rotates (yaw) this frame. This rotation
+        /// is relative to the actor's current rotation
+        /// </summary>
+        /// <param name="rYaw">Rotation around the character's y-axis</param>
+        public void Rotate(Quaternion rYaw)
+        {
+            mTargetRotate = mTargetRotate * rYaw;
             mTargetTilt = Quaternion.identity;
         }
 
@@ -2101,10 +2304,11 @@ namespace com.ootii.Actors
         /// Sets an absolution "yaw" rotation and "pitch" rotation for the frame. This rotation
         /// is relative to the actor's current rotation
         /// </summary>
-        /// <param name="rRotation"></param>
-        public void Rotate(Quaternion rRotation, Quaternion rTilt)
+        /// <param name="rYaw">Rotation around the character's y-axis</param>
+        /// <param name="rTilt">Rotation around the character's x-axis</param>
+        public void Rotate(Quaternion rYaw, Quaternion rTilt)
         {
-            mTargetRotate = mTargetRotate * rRotation;
+            mTargetRotate = mTargetRotate * rYaw;
             mTargetTilt = mTargetTilt * rTilt;
         }
 
@@ -2137,7 +2341,7 @@ namespace com.ootii.Actors
         }
 
         /// <summary>
-        /// Sets an absolute movement for the frame. This is in addition
+        /// Sets an absolute movement for the frame relative to how the actor is facing. This is in addition
         /// to any velocity that is set.
         /// </summary>
         /// <param name="rMovement"></param>
@@ -2213,9 +2417,12 @@ namespace com.ootii.Actors
                 {
                     for (int j = 0; j < BodyShapes.Count; j++)
                     {
-                        for (int k = 0; k < BodyShapes[j].Colliders.Length; k++)
+                        if (BodyShapes[j].Colliders != null)
                         {
-                            UnityEngine.Physics.IgnoreCollision(BodyShapes[j].Colliders[k], mIgnoreCollisions[i], false);
+                            for (int k = 0; k < BodyShapes[j].Colliders.Length; k++)
+                            {
+                                UnityEngine.Physics.IgnoreCollision(BodyShapes[j].Colliders[k], mIgnoreCollisions[i], false);
+                            }
                         }
                     }
                 }
@@ -2239,9 +2446,12 @@ namespace com.ootii.Actors
             // First, ensure any unity colliders are disabled
             for (int i = 0; i < BodyShapes.Count; i++)
             {
-                for (int j = 0; j < BodyShapes[i].Colliders.Length; j++)
+                if (BodyShapes[i].Colliders != null)
                 {
-                    UnityEngine.Physics.IgnoreCollision(BodyShapes[i].Colliders[j], rCollider, rIgnore);
+                    for (int j = 0; j < BodyShapes[i].Colliders.Length; j++)
+                    {
+                        UnityEngine.Physics.IgnoreCollision(BodyShapes[i].Colliders[j], rCollider, rIgnore);
+                    }
                 }
             }
 
@@ -2307,15 +2517,25 @@ namespace com.ootii.Actors
         /// <param name="rSafeMovement">Amount of movement that can occur before we get to the angle</param>
         /// <param name="rGroundNormal">Bad slope that we stop at</param>
         /// <returns>Determines if a slope change was hit</returns>
-        protected bool TestSlope(Vector3 rPosition, Vector3 rActorUp, Vector3 rMovement, float rCurrentGroundSurfaceAngle, ref Vector3 rSafeMovement, ref Vector3 rGroundNormal)
+        protected bool TestSlope(Vector3 rPosition, Vector3 rActorUp, Vector3 rMovement, Vector3 rPlatformMovement, float rCurrentGroundSurfaceAngle, ref Vector3 rSafeMovement, ref Vector3 rGroundNormal)
         {
             if (rMovement.sqrMagnitude == 0f)
             {
                 return false;
             }
 
-            Vector3 lMovementDirection = rMovement.normalized;
-            float lMovementDistance = rMovement.magnitude;
+            //if (rMovement == rPlatformMovement)
+            //{
+            //    if (_OrientToGround && _IsGravityRelative)
+            //    {
+            //        return false;
+            //    }
+            //}
+
+            Vector3 lUserMovement = rMovement - rPlatformMovement;
+
+            Vector3 lMovementDirection = lUserMovement.normalized;
+            float lMovementDistance = lUserMovement.magnitude;
 
             // First, shoot a ray forward to determine if we end up hitting a slope at all
             RaycastHit lHitInfo;
@@ -2373,6 +2593,16 @@ namespace com.ootii.Actors
             {
                 return false;
             }
+
+            //com.ootii.Graphics.GraphicsManager.DrawPoint(_Transform.position + rMovement, Color.blue, null, 10f);
+            //com.ootii.Graphics.GraphicsManager.DrawPoint(_Transform.position, Color.black, null, 10f);
+            //com.ootii.Graphics.GraphicsManager.DrawPoint(lHitInfo.point, Color.red, null, 10f);
+            //com.ootii.Graphics.GraphicsManager.DrawLine(_Transform.position, _Transform.position + rGroundNormal, Color.black, null, 10f);
+            //com.ootii.Graphics.GraphicsManager.DrawLine(lHitInfo.point, _Transform.position + lHitInfo.normal, Color.red, null, 10f);
+            //com.ootii.Graphics.GraphicsManager.DrawLine(_Transform.position, _Transform.position + rMovement, Color.blue, null, 10f);
+
+            //com.ootii.Graphics.GraphicsManager.DrawPoint(rPosition + (rActorUp * _MaxStepHeight), Color.magenta, null, 10f);
+            //com.ootii.Graphics.GraphicsManager.DrawLine(rPosition + (rActorUp * _MaxStepHeight), rPosition + (rActorUp * _MaxStepHeight) + lMovementDirection, Color.magenta, null, 10f);
 
             float lHitAngle = Vector3.Angle(lHitInfo.normal, rActorUp);
             rGroundNormal = lHitInfo.normal;
@@ -2451,7 +2681,7 @@ namespace com.ootii.Actors
             bool lIsSlopePushingDown = false;
             bool lIsSlopePushingUp = false;
 
-            Vector3 lActorUp = mTilt.Up();
+            Vector3 lActorUp = (mTilt * mYaw).Up();
 
             // In order to test an acurate ground, we need to test the ground including
             // the platform movement. Otherwise, the platform will get ahead of us and we won't
@@ -2508,7 +2738,7 @@ namespace com.ootii.Actors
                     // Finally, do a speed test. We don't want to pop if we don't have to
                     if (rSegmentMovement.sqrMagnitude > 0.01f)
                     {
-                        rSegmentMovement = rSegmentMovement + (mTilt.Up() * -(mState.GroundSurfaceDistance + lVerticalPlatformMovement.magnitude));
+                        rSegmentMovement = rSegmentMovement + ((mTilt * mYaw).Up() * -(mState.GroundSurfaceDistance + lVerticalPlatformMovement.magnitude));
                     }
                 }
             }
@@ -2521,7 +2751,7 @@ namespace com.ootii.Actors
                 Vector3 lSafeMovement = Vector3.zero;
                 Vector3 lGroundSurfaceNormal = mState.GroundSurfaceNormal;
 
-                if (TestSlope(_Transform.position + rSegmentPositionDelta, lActorUp, rSegmentMovement, mState.GroundSurfaceAngle, ref lSafeMovement, ref lGroundSurfaceNormal))
+                if (TestSlope(_Transform.position + rSegmentPositionDelta, lActorUp, rSegmentMovement, lPlatformMovement, mState.GroundSurfaceAngle, ref lSafeMovement, ref lGroundSurfaceNormal))
                 {
                     float lHitAngle = Vector3.Angle(lGroundSurfaceNormal, lActorUp);
                     if (lHitAngle > (_MaxSlopeAngle > 0f ? _MaxSlopeAngle - 0.5f : MAX_GROUNDING_ANGLE) && lHitAngle < 90f - EPSILON)
@@ -2576,8 +2806,10 @@ namespace com.ootii.Actors
                 //               from the ladder. Since we're trying to find a slope... makes sense the slope is the same ground as before
                 if (mPrevState.Ground == mState.Ground)
                 {
+                    Vector3 lUserMovement = (rSegmentIndex == 0 ? rSegmentMovement - lPlatformMovement : rSegmentMovement);
+
                     RaycastHit lForwardGroundHitInfo;
-                    bool lIsValidGroundTest = TestGrounding(_Transform.position + rSegmentPositionDelta + rSegmentMovement, lActorUp, mWorldUp, out lForwardGroundHitInfo);
+                    bool lIsValidGroundTest = TestGrounding(_Transform.position + rSegmentPositionDelta + lUserMovement, lActorUp, mWorldUp, out lForwardGroundHitInfo);
 
                     // Ensure we are over the sloping ground directly (no spherecast)
                     if (lIsValidGroundTest && lForwardGroundHitInfo.collider.transform == mState.Ground)
@@ -2598,22 +2830,26 @@ namespace com.ootii.Actors
 
                                 // If we're moving in the direction of the slope (not against it, but down with it), we'll adjust the
                                 // vertical component of the movement to compensate for the slope
-                                float lMovementDot = Vector3.Dot(rSegmentMovement.normalized, lSlopeDirection);
-                                if (lMovementDot > 0f)
+                                float lMovementDot = Vector3.Dot(lUserMovement.normalized, lSlopeDirection);
+                                if (lMovementDot > 0f && _IsGravityEnabled)
                                 {
-                                    Vector3 lSlopeMovement = Vector3.Project(rSegmentMovement, lSlopeDirection) + Vector3.Project(rSegmentMovement, lSlopeRight);
-                                    rSegmentMovement = lSlopeMovement.normalized * rSegmentMovement.magnitude;
+                                    Vector3 lSlopeMovement = Vector3.Project(lUserMovement, lSlopeDirection) + Vector3.Project(lUserMovement, lSlopeRight);
+                                    lUserMovement = lSlopeMovement.normalized * lUserMovement.magnitude;
 
                                     lIsSlopePushingDown = true;
+
+                                    // We'll consider this whole movement the slope adjust as it will be tested
+                                    // later if we should stop pushing down.
+                                    mState.MovementSlideAdjust = lUserMovement;
                                 }
                                 else if (lMovementDot < 0f)
                                 {
                                     lIsSlopePushingUp = true;
-                                }
 
-                                // We'll consider this whole movement the slope adjust as it will be tested
-                                // later if we should stop pushing down.
-                                mState.MovementSlideAdjust = rSegmentMovement;
+                                    // We'll consider this whole movement the slope adjust as it will be tested
+                                    // later if we should stop pushing down.
+                                    mState.MovementSlideAdjust = lUserMovement;
+                                }
                             }
                         }
                     }
@@ -2632,7 +2868,7 @@ namespace com.ootii.Actors
                 mBodyShapeHits.Clear();
 
                 Quaternion lCurrentRotation = _Transform.rotation;
-                _Transform.rotation = mTilt * mYaw;
+                _Transform.rotation = (_InvertRotationOrder ? mYaw * mTilt : mTilt * mYaw);
 
                 // For each body shape, we want to see if there will be a collision
                 // as we attempt to move. If there is, we may need to stop our deflect
@@ -2772,8 +3008,8 @@ namespace com.ootii.Actors
 
                     // We need to support 'step-up' for solid body shapes. We'll basically ignore the
                     // collision which will cause us to penetrate. Then our normal step-up process will continue.
-                    if (mState.IsGrounded && 
-                        (lMovementHitAngle < 2f || lMovementHitAngle >= MAX_GROUNDING_ANGLE) && 
+                    if (mState.IsGrounded &&
+                        (lMovementHitAngle < 2f || lMovementHitAngle >= MAX_GROUNDING_ANGLE) &&
                         (_MaxStepHeight > 0f && lBodyShapeHit.HitRootDistance < _MaxStepHeight))
                     {
                         mState.IsPoppingUp = true;
@@ -2988,13 +3224,17 @@ namespace com.ootii.Actors
                 _Transform.rotation = lCurrentRotation;
             }
 
-            // Check if the remaining movement causes us to bounce back against our movement direction. If so, we'll stop
-            // so that we don't get stuttering.
-            Vector3 lRemainingSegmentMovementProj = Vector3.Project(rRemainingMovement, mState.Movement.normalized);
-            if (Vector3.Dot(lRemainingSegmentMovementProj.normalized, mState.Movement.normalized) < 0f)
+            // TRT 10/1/16: Added the "lIsGrounded" condition to prevent hanging when we hit a edge while jumping/falling
+            if (lIsGrounded)
             {
-                // We'll keep ther vertical component only
-                rRemainingMovement = Vector3.Project(rRemainingMovement, mWorldUp);
+                // Check if the remaining movement causes us to bounce back against our movement direction. If so, we'll stop
+                // so that we don't get stuttering.
+                Vector3 lRemainingSegmentMovementProj = Vector3.Project(rRemainingMovement, mState.Movement.normalized);
+                if (Vector3.Dot(lRemainingSegmentMovementProj.normalized, mState.Movement.normalized) < 0f)
+                {
+                    // We'll keep ther vertical component only
+                    rRemainingMovement = Vector3.Project(rRemainingMovement, mWorldUp);
+                }
             }
 
             // ----------------------------------------------------------------------
@@ -3025,9 +3265,9 @@ namespace com.ootii.Actors
                     }
 
                     // Determine the final tilt
-                    Vector3 lTiltUp = mTilt.Up();
-
                     mOrientToGroundNormal = mOrientToGroundNormalTarget;
+
+                    Vector3 lTiltUp = (mTilt * mYaw).Up();
                     mTilt = QuaternionExt.FromToRotation(lTiltUp, mOrientToGroundNormal) * mTilt;
                 }
             }
@@ -3085,6 +3325,15 @@ namespace com.ootii.Actors
 
                 // Just in case we need to shoot the sphere cast
                 lRayDistance = rGroundHitInfo.distance + rGroundRadius;
+
+                // TRT 9/4/16: On non-uniform slopes (like terrain), we do a last check for grounding
+                if (!lIsGrounded && rGroundHitInfo.collider is TerrainCollider)
+                {
+                    if (mState.GroundSurfaceAngle > 10f && mState.GroundSurfaceDistance < 0.03f)
+                    {
+                        lIsGrounded = true;
+                    }
+                }
             }
             else
             {
@@ -3151,6 +3400,12 @@ namespace com.ootii.Actors
                             {
                                 lIgnore = true;
                                 lIsGrounded = false;
+
+                                // TRT 7/17/16 - Need to reset the distance based on the direct
+                                if (mState.GroundSurfaceDistance < 0.01f)
+                                {
+                                    mState.GroundSurfaceDistance = float.MaxValue;
+                                }
                             }
                         }
                     }
@@ -3435,7 +3690,7 @@ namespace com.ootii.Actors
         /// <param name="rMovement">Desired movement</param>
         /// <param name="rState">Current state</param>
         /// <param name="rPrevState">Previous state</param>
-        protected void ProcessPlatforming(Vector3 rActorPosition, Vector3 rActorUp, Vector3 rMovement, ActorState rPrevState)
+        protected void ProcessPlatforming(Vector3 rActorPosition, Vector3 rActorUp, ActorState rPrevState)
         {
             Transform lGround = rPrevState.Ground;
             bool lIsGrounded = rPrevState.IsGrounded;
@@ -3448,91 +3703,220 @@ namespace com.ootii.Actors
 
             if (lGround == null) { return; }
 
-            if (rPrevState.GroundLocalContactPoint.sqrMagnitude == 0f) { return; }
+            //if (rPrevState.GroundLocalContactPoint.sqrMagnitude == 0f) { return; }
 
-            Vector3 lGroundTranslate = Vector3.zero;
+            //Vector3 lGroundTranslate = Vector3.zero;
             //Vector3 lGroundOrbit = Vector3.zero;
             Vector3 lGroundMove = Vector3.zero;
             Quaternion lGroundRotate = Quaternion.identity;
 
-            // Since we are on the same ground process movement
-            if (lGround == rPrevState.PrevGround)
-            {
-                // Test if the platform as moved
-                lGroundTranslate = lGround.position - rPrevState.GroundPosition;
+            //// Since we are on the same ground process movement
+            //if (lGround == rPrevState.PrevGround)
+            //{
+            //    // Test if the platform as moved
+            //    lGroundTranslate = lGround.position - rPrevState.GroundPosition;
 
-                // Test if the platform has rotated
-                if (!QuaternionExt.IsEqual(lGround.rotation, rPrevState.GroundRotation))
-                {
-                    // Rotate the avatar
-                    lGroundRotate = Quaternion.Inverse(rPrevState.GroundRotation) * lGround.rotation;
+            //    // Test if the platform has rotated
+            //    if (!QuaternionExt.IsEqual(lGround.rotation, rPrevState.GroundRotation))
+            //    {
+            //        // Rotate the avatar
+            //        //lGroundRotate = Quaternion.Inverse(rPrevState.GroundRotation) * lGround.rotation;
+            //        lGroundRotate = Quaternion.Inverse(rPrevState.GroundRotation) * lGround.rotation;
 
-                    // Find the difference between the last orbit and this one. This will remove
-                    // any constant offset the local contact point has from the support's center
-                    //Vector3 lPrevOrbit = rPrevState.GroundRotation * rPrevState.GroundLocalContactPoint;
-                    //Vector3 lCurrentOrbit = lGround.rotation * rPrevState.GroundLocalContactPoint;
-                    //lGroundOrbit = (lCurrentOrbit - lPrevOrbit);
-                }
+            //        // Find the difference between the last orbit and this one. This will remove
+            //        // any constant offset the local contact point has from the support's center
+            //        //Vector3 lPrevOrbit = rPrevState.GroundRotation * rPrevState.GroundLocalContactPoint;
+            //        //Vector3 lCurrentOrbit = lGround.rotation * rPrevState.GroundLocalContactPoint;
+            //        //lGroundOrbit = (lCurrentOrbit - lPrevOrbit);
+            //    }
 
-                //lGroundMove = lGroundTranslate + lGroundOrbit;
+            //    //lGroundMove = lGroundTranslate + lGroundOrbit;
 
-                if (lGroundTranslate.sqrMagnitude > 0f || !QuaternionExt.IsIdentity(lGroundRotate))
-                {
-                    Vector3 lNewPosition = lGround.TransformPoint(rPrevState.GroundLocalContactPoint);
-                    lGroundMove = (lNewPosition - _Transform.position) - rMovement;
+            //    if (lGroundTranslate.sqrMagnitude > 0f || !QuaternionExt.IsIdentity(lGroundRotate))
+            //    {
+            //        Vector3 lNewPosition = lGround.TransformPoint(rPrevState.GroundLocalContactPoint);
+            //        lGroundMove = (lNewPosition - _Transform.position);
 
-                    if (lGroundMove.sqrMagnitude > 0f)
-                    {
-                        //float lGroundSurfaceDistance = mPrevState.GroundSurfaceDistance;
+            //        if (lGroundMove.sqrMagnitude > 0f)
+            //        {
+            //            //float lGroundSurfaceDistance = mPrevState.GroundSurfaceDistance;
 
-                        // If we get here, we need to find the distance to the ground
-                        //RaycastHit lGroundHitInfo;
-                        //if (TestGrounding(rActorPosition + lGroundMove, rActorUp, rActorUp, out lGroundHitInfo))
-                        //{
-                        //    if (lGroundHitInfo.collider.transform == mPrevState.Ground)
-                        //    {
-                        //        lGroundSurfaceDistance = lGroundHitInfo.distance;
-                        //    }
-                        //}
+            //            // If we get here, we need to find the distance to the ground
+            //            //RaycastHit lGroundHitInfo;
+            //            //if (TestGrounding(rActorPosition + lGroundMove, rActorUp, rActorUp, out lGroundHitInfo))
+            //            //{
+            //            //    if (lGroundHitInfo.collider.transform == mPrevState.Ground)
+            //            //    {
+            //            //        lGroundSurfaceDistance = lGroundHitInfo.distance;
+            //            //    }
+            //            //}
 
-                        // Determine how the platform is moving. 
-                        Vector3 lVerticalGroundMoveProj = Vector3.Project(lGroundMove, rActorUp);
-                        float lVerticalGroundMoveDot = Vector3.Dot(lVerticalGroundMoveProj, rActorUp);
-                        if (lVerticalGroundMoveDot > 0f)
-                        {
-                            // If it's moving up and we're penetrating it, simply add enough movement that gets
-                            // us onto the platform.
-                            if (mState.GroundSurfaceDistance < 0f)
-                            {
-                                //lGroundMove = lGroundMove - lVerticalGroundMoveProj + (rActorUp * (-lGroundSurfaceDistance + _SkinWidth));
-                            }
-                        }
-                        else if (lVerticalGroundMoveDot < 0f)
-                        {
-                            //If the platform is moving down, we may need to push ourselves down to the platform
-                            if (!lIsGrounded && rPrevState.IsGrounded)
-                            {
-                                // Since there's already gravity attached, we need to take that into account
-                                //Vector3 lVerticalMovementProj = Vector3.Project(rMovement, rActorUp);
-                                //float lVerticalMovementDot = Vector3.Dot(lVerticalMovementProj, rActorUp);
-                                //float lVerticalMovement = (lVerticalMovementDot < 0f ? lVerticalMovementProj.magnitude : 0f);
+            //            // Determine how the platform is moving. 
+            //            Vector3 lVerticalGroundMoveProj = Vector3.Project(lGroundMove, rActorUp);
+            //            float lVerticalGroundMoveDot = Vector3.Dot(lVerticalGroundMoveProj, rActorUp);
+            //            if (lVerticalGroundMoveDot > 0f)
+            //            {
+            //                // If it's moving up and we're penetrating it, simply add enough movement that gets
+            //                // us onto the platform.
+            //                if (mState.GroundSurfaceDistance < 0f)
+            //                {
+            //                    //lGroundMove = lGroundMove - lVerticalGroundMoveProj + (rActorUp * (-lGroundSurfaceDistance + _SkinWidth));
+            //                }
+            //            }
+            //            else if (lVerticalGroundMoveDot < 0f)
+            //            {
+            //                if (IsGravityEnabled)
+            //                {
+            //                    //If the platform is moving down, we may need to push ourselves down to the platform
+            //                    if (!lIsGrounded && rPrevState.IsGrounded)
+            //                    {
+            //                        // Since there's already gravity attached, we need to take that into account
+            //                        //Vector3 lVerticalMovementProj = Vector3.Project(rMovement, rActorUp);
+            //                        //float lVerticalMovementDot = Vector3.Dot(lVerticalMovementProj, rActorUp);
+            //                        //float lVerticalMovement = (lVerticalMovementDot < 0f ? lVerticalMovementProj.magnitude : 0f);
 
-                                lIsGrounded = true;
-                                //lGroundMove = lGroundMove - lVerticalGroundMoveProj + (rActorUp * -Mathf.Max(lGroundSurfaceDistance - _SkinWidth - lVerticalMovement, 0f));
-                            }
-                        }
-                    }
-                }
-            }
+            //                        lIsGrounded = true;
+            //                        //lGroundMove = lGroundMove - lVerticalGroundMoveProj + (rActorUp * -Mathf.Max(lGroundSurfaceDistance - _SkinWidth - lVerticalMovement, 0f));
+            //                    }
+            //                }
+            //                else
+            //                {
+            //                    lIsGrounded = false;
+            //                }
+            //            }
+            //        }
+            //    }
+            //}
 
             // If we're still not grounded an there was not adjusted move, we must simply need to stop
             if (lIsGrounded)
             {
-                mYaw = mYaw * lGroundRotate;
+                //mYaw = mYaw * lGroundRotate;
+
+                Quaternion lSwing = Quaternion.identity;
+                Quaternion lTwist = Quaternion.identity;
+                //QuaternionExt.DecomposeSwingTwist(lGroundRotate, lGround.up, ref lSwing, ref lTwist);
+
+                //mYaw = mYaw * lTwist;
+                //mTilt = mTilt * lSwing;
+
+
+
+                //Vector3 lUp = lGroundRotate * (mTilt * mYaw).Up();
+                //Quaternion lRotation =  (mTilt * mYaw) * lGroundRotate;
+                //QuaternionExt.DecomposeSwingTwist(lRotation, Vector3.up, ref lSwing, ref lTwist);
+                //mYaw = lTwist;
+                //mTilt = lSwing;
+
+                if (lGround != null && lGround == rPrevState.PrevGround)
+                {
+                    // Rotation change
+                    Matrix4x4 lOldMatrix = Matrix4x4.TRS(mPrevState.GroundPosition, mPrevState.GroundRotation, lGround.lossyScale);
+                    Matrix4x4 lNewMatrix = Matrix4x4.TRS(lGround.position, lGround.rotation, lGround.lossyScale);
+
+                    Vector3 lForward = lOldMatrix.inverse.MultiplyVector(_Transform.forward);
+                    lForward = lNewMatrix.MultiplyVector(lForward);
+
+                    Vector3 lUp = lOldMatrix.inverse.MultiplyVector(_Transform.up);
+                    lUp = lNewMatrix.MultiplyVector(lUp);
+
+                    Quaternion lRotation = Quaternion.LookRotation(lForward, lUp);
+                    lRotation.DecomposeSwingTwist(lUp, ref lSwing, ref lTwist);
+                    mYaw = lTwist;
+                    mTilt = lSwing;
+
+                    // If we're not orienting to the ground, we need to undo any tilting
+                    if (!_OrientToGround)
+                    {
+                        mTilt = QuaternionExt.FromToRotation(lUp, _Transform.up) * mTilt;
+                    }
+
+                    // Position change
+                    Vector3 lPosition = lOldMatrix.inverse.MultiplyPoint(_Transform.position);
+                    lPosition = lNewMatrix.MultiplyPoint(lPosition);
+
+                    lGroundMove = (lPosition - _Transform.position);
+
+                    //Vector3 lTransUp = _Transform.up;
+                    //Vector3 lFullUp = (mTilt * mYaw).Up();
+                    //Vector3 lTiltUp = mTilt.Up();
+                    //com.ootii.Graphics.GraphicsManager.DrawLine(lPosition, lPosition + (mYaw.Forward() * 4.0f), Color.magenta, null, 0f);
+                    //com.ootii.Graphics.GraphicsManager.DrawLine(lPosition, lPosition + (mTilt.Forward() * 3.5f), Color.yellow, null, 0f);
+                    //com.ootii.Graphics.GraphicsManager.DrawLine(lPosition, lPosition + (lRotation.Up() * 3f), Color.cyan, null, 0f);
+                    //com.ootii.Graphics.GraphicsManager.DrawLine(lPosition, lPosition + (lUp * 2.5f), Color.white, null, 0f);
+                    //com.ootii.Graphics.GraphicsManager.DrawLine(lPosition, lPosition + (lTransUp * 2f), Color.black, null, 0f);
+                    //com.ootii.Graphics.GraphicsManager.DrawLine(lPosition, lPosition + (lFullUp * 1.5f), Color.red, null, 0f);
+                    //com.ootii.Graphics.GraphicsManager.DrawLine(lPosition, lPosition + (lTiltUp * 1f), Color.green, null, 0f);
+                }
 
                 mState.RotationPlatformAdjust = lGroundRotate;
                 mState.MovementPlatformAdjust = lGroundMove;
             }
+        }
+
+        /// <summary>
+        /// Adds a body shape to the list
+        /// </summary>
+        /// <param name="rBodyShape">Body shape to add</param>
+        public void AddBodyShape(BodyShape rBodyShape)
+        {
+            if (BodyShapes.Contains(rBodyShape)) { return; }
+
+            rBodyShape._CharacterController = this;
+            rBodyShape._Parent = _Transform;
+            BodyShapes.Add(rBodyShape);
+
+            SerializeBodyShapes();
+        }
+
+        /// <summary>
+        /// Removes a body shape
+        /// </summary>
+        /// <param name="rBodyShape">Body shape to remove</param>
+        public void RemoveBodyShape(BodyShape rBodyShape)
+        {
+            if (rBodyShape == null) { return; }
+
+            if (BodyShapes.Contains(rBodyShape))
+            {
+                rBodyShape.DestroyUnityColliders();
+                BodyShapes.Remove(rBodyShape);
+            }
+
+            SerializeBodyShapes();
+        }
+
+        /// <summary>
+        /// Removes a body shape based on the name
+        /// </summary>
+        /// <param name="rName">Name of the body shape to remove</param>
+        public void RemoveBodyShape(string rName)
+        {
+            for (int i = BodyShapes.Count - 1; i >= 0; i--)
+            {
+                if (BodyShapes[i].Name == rName)
+                {
+                    BodyShapes[i].DestroyUnityColliders();
+                    BodyShapes.RemoveAt(i);
+                }
+            }
+
+            SerializeBodyShapes();
+        }
+
+        /// <summary>
+        /// Removes a body shape based on the name
+        /// </summary>
+        /// <param name="rName">Name of the body shape to remove</param>
+        public void RemoveBodyShapes()
+        {
+            for (int i = BodyShapes.Count - 1; i >= 0; i--)
+            {
+                BodyShapes[i].DestroyUnityColliders();
+            }
+
+            BodyShapes.Clear();
+            mBodyShapeDefinitions.Clear();
         }
 
         /// <summary>

@@ -1,3 +1,7 @@
 ﻿using Intelligence;
 
-public class DecisionPackageCreator : AssetCreator<DecisionPackage> {}
+namespace EntitySystem {
+	
+	public class DecisionPackageCreator : AssetCreator<DecisionPackage> {}
+
+}

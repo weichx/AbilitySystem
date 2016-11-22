@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
 
-namespace EntityEngine.Timing {
+namespace EntitySystem.Timing {
 
     public class TimeManager : MonoBehaviour {
         public static Timer GameTimer = new Timer();

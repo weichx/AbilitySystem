@@ -12,6 +12,43 @@ namespace com.ootii.Geometry
         // Allows for floating point error
         public const float EPSILON = 0.0001f;
 
+        /// <summary>
+        /// Allows us to ignore collisions against a single transform
+        /// </summary>
+        public static Transform Ignore = null;
+
+        /// <summary>
+        /// Allows us to ignore collisions against an array of transforms
+        /// </summary>
+        public static Transform[] IgnoreArray = null;
+
+        /// <summary>
+        /// Directions used for finding the closes point on terrain
+        /// </summary>
+        public static Vector3[] SphericalDirections = null;
+
+        /// <summary>
+        /// Static constructor
+        /// </summary>
+        static GeometryExt()
+        {
+            SphericalDirections = new Vector3[14];
+            SphericalDirections[0] = Vector3.forward;
+            SphericalDirections[1] = Vector3.back;
+            SphericalDirections[2] = Vector3.right;
+            SphericalDirections[3] = Vector3.left;
+            SphericalDirections[4] = Vector3.up;
+            SphericalDirections[5] = Vector3.down;
+            SphericalDirections[6] = Vector3.Normalize(new Vector3(1f, 1f, 1f));
+            SphericalDirections[7] = Vector3.Normalize(new Vector3(-1f, 1f, 1f));
+            SphericalDirections[8] = Vector3.Normalize(new Vector3(1f, -1f, 1f));
+            SphericalDirections[9] = Vector3.Normalize(new Vector3(-1f, -1f, 1f));
+            SphericalDirections[10] = Vector3.Normalize(new Vector3(1f, 1f, -1f));
+            SphericalDirections[11] = Vector3.Normalize(new Vector3(-1f, 1f, -1f));
+            SphericalDirections[12] = Vector3.Normalize(new Vector3(1f, -1f, -1f));
+            SphericalDirections[13] = Vector3.Normalize(new Vector3(-1f, -1f, -1f));
+        }
+
         #region Closest Contact Point Functions
 
         /// <summary>
@@ -21,8 +58,18 @@ namespace com.ootii.Geometry
         /// <param name="rRadius"></param>
         /// <param name="rCollider"></param>
         /// <returns></returns>
-        public static Vector3 ClosestPoint(Vector3 rPoint, Collider rCollider)
+        public static Vector3 ClosestPoint(Vector3 rPoint, Collider rCollider, int rCollisionLayers = -1)
         {
+            // Ensure our collider is actually on a layer we can collide with
+            if (rCollisionLayers > -1 && rCollider != null && rCollider.gameObject != null)
+            {
+                if (((1 << rCollider.gameObject.layer) & rCollisionLayers) == 0)
+                {
+                    return Vector3.zero;
+                }
+            }
+
+            // Find the contact point
             Vector3 lContactPoint = Vector3.zero;
 
             // Use the box collider
@@ -48,16 +95,20 @@ namespace com.ootii.Geometry
             // Use the terrain collider
             else if (rCollider is TerrainCollider)
             {
-                // We can't use the custom terrain collider here
+                lContactPoint = ClosestPoint(rPoint, (TerrainCollider)rCollider, 4f, rCollisionLayers);
             }
             // Use the mesh collider
             else if (rCollider is MeshCollider)
             {
                 MeshCollider lCollider = (MeshCollider)rCollider;
 
+                // If no mesh, we can stop
+                if (lCollider.sharedMesh == null)
+                {
+                }
                 // Planes are expensive with octrees because they aren't really volumes (2d vs 3d)
                 // So, we turn the plane into a box collider
-                if (lCollider.sharedMesh.name == "Plane")
+                else if (lCollider.sharedMesh.name == "Plane")
                 {
                     Transform lTransform = lCollider.transform;
 
@@ -67,6 +118,12 @@ namespace com.ootii.Geometry
                     //lColliderSize.z *= lTransform.lossyScale.z;
 
                     lContactPoint = ClosestPoint(rPoint, lTransform, Vector3.zero, lColliderSize);
+                }
+                // If the shared mesh isn't readable, we need to use the bounds
+                else if (!lCollider.sharedMesh.isReadable)
+                {
+                    lContactPoint = lCollider.ClosestPointOnBounds(rPoint);
+                    Debug.LogWarning(string.Format("{0}'s mesh is not imported as 'Read/Write Enabled' and may not be accurate. For accurate collisions, check 'Read/Write Enabled' on the model's import settings.", lCollider.name));
                 }
                 // Otherwise, use the octree
                 else
@@ -86,8 +143,18 @@ namespace com.ootii.Geometry
         /// <param name="rRadius"></param>
         /// <param name="rCollider"></param>
         /// <returns></returns>
-        public static Vector3 ClosestPoint(Vector3 rPoint, float rRadius, Collider rCollider)
+        public static Vector3 ClosestPoint(Vector3 rPoint, float rRadius, Collider rCollider, int rCollisionLayers = -1)
         {
+            // Ensure our collider is actually on a layer we can collide with
+            if (rCollisionLayers > -1 && rCollider != null && rCollider.gameObject != null)
+            {
+                if (((1 << rCollider.gameObject.layer) & rCollisionLayers) == 0)
+                {
+                    return Vector3.zero;
+                }
+            }
+
+            // Find the contact point
             Vector3 lContactPoint = Vector3.zero;
 
             // Use the box collider
@@ -113,16 +180,20 @@ namespace com.ootii.Geometry
             // Use the terrain collider
             else if (rCollider is TerrainCollider)
             {
-                // We can't use the custom terrain collider here
+                lContactPoint = ClosestPoint(rPoint, (TerrainCollider)rCollider, rRadius, rCollisionLayers);
             }
             // Use the mesh collider
             else if (rCollider is MeshCollider)
             {
                 MeshCollider lCollider = (MeshCollider)rCollider;
 
+                // If no mesh, we can stop
+                if (lCollider.sharedMesh == null)
+                {
+                }
                 // Planes are expensive with octrees because they aren't really volumes (2d vs 3d)
                 // So, we turn the plane into a box collider
-                if (lCollider.sharedMesh.name == "Plane")
+                else if (lCollider.sharedMesh.name == "Plane")
                 {
                     Transform lTransform = lCollider.transform;
 
@@ -132,6 +203,12 @@ namespace com.ootii.Geometry
                     //lColliderSize.z *= lTransform.lossyScale.z;
 
                     lContactPoint = ClosestPoint(rPoint, lTransform, Vector3.zero, lColliderSize);
+                }
+                // If the shared mesh isn't readable, we need to use the bounds
+                else if (!lCollider.sharedMesh.isReadable)
+                {
+                    lContactPoint = lCollider.ClosestPointOnBounds(rPoint);
+                    Debug.LogWarning(string.Format("{0}'s mesh is not imported as 'Read/Write Enabled' and may not be accurate. For accurate collisions, check 'Read/Write Enabled' on the model's import settings.", lCollider.name));
                 }
                 // Otherwise, use the octree
                 else
@@ -301,7 +378,7 @@ namespace com.ootii.Geometry
             Vector3 lHalfColliderSize = rColliderSize * 0.5f;
 
             // Move the world space point to local space
-            Vector3 lLocalPosition = lTransform.InverseTransformPoint(rPoint);
+            Vector3 lLocalPosition = (lTransform != null ? lTransform.InverseTransformPoint(rPoint) : rPoint);
 
             // Check if we're outside the box
             if (lLocalPosition.x < -lHalfColliderSize.x ||
@@ -345,6 +422,11 @@ namespace com.ootii.Geometry
             }
 
             // Finally, go back to world space
+            if (lTransform == null)
+            {
+                return lLocalPosition;
+            }
+
             return lTransform.TransformPoint(lLocalPosition);
         }
 
@@ -386,13 +468,13 @@ namespace com.ootii.Geometry
             Transform lTransform = rCollider.transform;
 
             // Direction from the collider to our position
-            Vector3 lDirection = Vector3.Normalize(rPoint - lTransform.position);
+            Vector3 lDirection = Vector3.Normalize(rPoint - (lTransform.position + rCollider.center));
 
             // Get a point on the sphere's surface that is in the direction of our target point
             Vector3 lLocalPosition = lDirection * (rCollider.radius * lTransform.localScale.x);
 
             // Turn that into world space
-            return lTransform.position + lLocalPosition;
+            return (lTransform.position + rCollider.center) + lLocalPosition;
         }
 
         /// <summary>
@@ -559,26 +641,104 @@ namespace com.ootii.Geometry
         /// <summary>
         /// Finds the closest point on the terrain collider
         /// </summary>
+        /// <param name="rPoint">Point to test</param>
         /// <param name="rCollider">Collider we're testing</param>
-        /// <param name="rPosition">Desired position</param>
         /// <returns>Contact point</returns>
-        public static Vector3 ClosestPoint(Vector3 rPoint, Vector3 rDirection, float rRadius, TerrainCollider rCollider)
+        public static Vector3 ClosestPoint(Vector3 rPoint, TerrainCollider rCollider, float rRadius = 4f, int rCollisionLayers = -1)
         {
-            RaycastHit lHitInfo;
+            RaycastHit lHitInfo = new RaycastHit();
+            lHitInfo.distance = float.MaxValue;
 
-            if (UnityEngine.Physics.SphereCast(rPoint, rRadius * 0.5f, rDirection, out lHitInfo, rRadius))
+            for (int i = 0; i < SphericalDirections.Length; i++)
             {
-                if (lHitInfo.collider == rCollider)
+                //com.ootii.Graphics.GraphicsManager.DrawLine(rPoint, rPoint + (SphericalDirections[i] * (lRadius + 0.05f)), Color.cyan);
+
+                RaycastHit lRayHitInfo;
+#if (UNITY_4_0 || UNITY_4_0_1 || UNITY_4_1 || UNITY_4_2 || UNITY_4_3 || UNITY_4_4 || UNITY_4_5 || UNITY_4_6 || UNITY_5_0 || UNITY_5_1 || UNITY_5_2)
+                if (UnityEngine.Physics.Raycast(rPoint, SphericalDirections[i], out lRayHitInfo, rRadius + 0.05f, rCollisionLayers))
+#else
+                if (UnityEngine.Physics.Raycast(rPoint, SphericalDirections[i], out lRayHitInfo, rRadius + 0.05f, rCollisionLayers, QueryTriggerInteraction.Ignore))
+#endif
                 {
-                    // Turns out we can't actually trust the sphere cast as it sometimes returns incorrect point and normal values.
-                    RaycastHit lRayHitInfo;
-                    if (UnityEngine.Physics.Raycast(rPoint, lHitInfo.point - rPoint, out lRayHitInfo, rRadius + 0.01f))
+                    if (lRayHitInfo.distance < lHitInfo.distance && !IgnoreCollider(lRayHitInfo.collider))
                     {
                         lHitInfo = lRayHitInfo;
                     }
-
-                    return lHitInfo.point;
                 }
+            }
+
+            // If we have a valid hit, return that point
+            if (lHitInfo.distance < float.MaxValue)
+            {
+                return lHitInfo.point;
+            }
+
+            // Default value
+            return Vector3.zero;
+        }
+
+        /// <summary>
+        /// Finds the closest point on the terrain collider
+        /// </summary>
+        /// <param name="rCollider">Collider we're testing</param>
+        /// <param name="rPosition">Desired position</param>
+        /// <returns>Contact point</returns>
+        public static Vector3 ClosestPoint(Vector3 rPoint, Vector3 rDirection, float rRadius, TerrainCollider rCollider, int rCollisionLayers = -1)
+        {
+            RaycastHit lHitInfo;
+
+            // If there's movement, we can do do a sphere cast
+            if (rDirection.sqrMagnitude > 0f)
+            {
+#if (UNITY_4_0 || UNITY_4_0_1 || UNITY_4_1 || UNITY_4_2 || UNITY_4_3 || UNITY_4_4 || UNITY_4_5 || UNITY_4_6 || UNITY_5_0 || UNITY_5_1 || UNITY_5_2)
+                if (UnityEngine.Physics.SphereCast(rPoint, rRadius * 0.5f, rDirection, out lHitInfo, rRadius, rCollisionLayers))
+#else
+                if (UnityEngine.Physics.SphereCast(rPoint, rRadius * 0.5f, rDirection, out lHitInfo, rRadius, rCollisionLayers, QueryTriggerInteraction.Ignore))
+#endif
+                {
+                    if (lHitInfo.collider == rCollider)
+                    {
+                        // Turns out we can't actually trust the sphere cast as it sometimes returns incorrect point and normal values.
+                        RaycastHit lRayHitInfo;
+#if (UNITY_4_0 || UNITY_4_0_1 || UNITY_4_1 || UNITY_4_2 || UNITY_4_3 || UNITY_4_4 || UNITY_4_5 || UNITY_4_6 || UNITY_5_0 || UNITY_5_1 || UNITY_5_2)
+                        if (UnityEngine.Physics.Raycast(rPoint, lHitInfo.point - rPoint, out lRayHitInfo, rRadius + 0.01f, rCollisionLayers))
+#else
+                        if (UnityEngine.Physics.Raycast(rPoint, lHitInfo.point - rPoint, out lRayHitInfo, rRadius + 0.01f, rCollisionLayers, QueryTriggerInteraction.Ignore))
+#endif
+                        {
+                            lHitInfo = lRayHitInfo;
+                        }
+
+                        return lHitInfo.point;
+                    }
+                }
+            }
+
+            // If we didn't get a hit, do sphere based ray tests
+            lHitInfo = new RaycastHit();
+            lHitInfo.distance = float.MaxValue;
+            for (int i = 0; i < SphericalDirections.Length; i++)
+            {
+                //com.ootii.Graphics.GraphicsManager.DrawLine(rPoint, rPoint + (SphericalDirections[i] * (rRadius + 0.05f)), Color.cyan);
+
+                RaycastHit lRayHitInfo;
+#if (UNITY_4_0 || UNITY_4_0_1 || UNITY_4_1 || UNITY_4_2 || UNITY_4_3 || UNITY_4_4 || UNITY_4_5 || UNITY_4_6 || UNITY_5_0 || UNITY_5_1 || UNITY_5_2)
+                if (UnityEngine.Physics.Raycast(rPoint, SphericalDirections[i], out lRayHitInfo, rRadius + 0.05f, rCollisionLayers))
+#else
+                if (UnityEngine.Physics.Raycast(rPoint, SphericalDirections[i], out lRayHitInfo, rRadius + 0.05f, rCollisionLayers, QueryTriggerInteraction.Ignore))
+#endif
+                {
+                    if (lRayHitInfo.distance < lHitInfo.distance && !IgnoreCollider(lRayHitInfo.collider))
+                    {
+                        lHitInfo = lRayHitInfo;
+                    }
+                }
+            }
+
+            // If we have a valid hit, return that point
+            if (lHitInfo.distance < float.MaxValue)
+            {
+                return lHitInfo.point;
             }
 
             return Vector3.zero;
@@ -634,8 +794,18 @@ namespace com.ootii.Geometry
         /// <param name="rRadius"></param>
         /// <param name="rCollider"></param>
         /// <returns></returns>
-        public static void ClosestPoints(Vector3 rStart, Vector3 rEnd, float rRadius, Collider rCollider, ref Vector3 rLinePoint, ref Vector3 rColliderPoint)
+        public static void ClosestPoints(Vector3 rStart, Vector3 rEnd, float rRadius, Collider rCollider, ref Vector3 rLinePoint, ref Vector3 rColliderPoint, int rCollisionLayers = -1)
         {
+            // Ensure our collider is actually on a layer we can collide with
+            if (rCollisionLayers > -1 && rCollider != null && rCollider.gameObject != null)
+            {
+                if (((1 << rCollider.gameObject.layer) & rCollisionLayers) == 0)
+                {
+                    return;
+                }
+            }
+
+            // Find the contact point
             // Use the box collider
             if (rCollider is BoxCollider)
             {
@@ -659,7 +829,7 @@ namespace com.ootii.Geometry
             // Use the terrain collider
             else if (rCollider is TerrainCollider)
             {
-                ClosestPoints(rStart, rEnd, Vector3.zero, rRadius, (TerrainCollider)rCollider, ref rLinePoint, ref rColliderPoint);
+                ClosestPoints(rStart, rEnd, (TerrainCollider)rCollider, ref rLinePoint, ref rColliderPoint, rRadius, rCollisionLayers);
             }
             // Use the mesh collider
             else if (rCollider is MeshCollider)
@@ -1115,7 +1285,7 @@ namespace com.ootii.Geometry
             Vector3 lLine = rEnd - rStart;
             Vector3 lLineDirection = lLine.normalized;
 
-            Vector3 lToSphere = lTransform.position - rStart;
+            Vector3 lToSphere = (lTransform.position + rCollider.center) - rStart;
 
             float lCosAngle = Vector3.Dot(lToSphere, lLineDirection);
             Vector3 lProject = lLineDirection * Mathf.Max(lCosAngle, 0f);
@@ -1123,7 +1293,7 @@ namespace com.ootii.Geometry
 
             rLinePoint = rStart + (lLineDirection * lAdjLength);
 
-            lToSphere = lTransform.position - rLinePoint;
+            lToSphere = (lTransform.position + rCollider.center) - rLinePoint;
             rColliderPoint = rLinePoint + (lToSphere.normalized * (lToSphere.magnitude - lRadius));
         }
 
@@ -1293,109 +1463,99 @@ namespace com.ootii.Geometry
             rColliderPoint = rLinePoint + (lToCapsule.normalized * (lToCapsule.magnitude - rController.radius));
         }
 
+
         /// <summary>
         /// Finds the closest points between a line segment and a terrain collider
         /// </summary>
         /// <param name="rCollider">Collider we're testing</param>
         /// <param name="rPosition">Desired position</param>
         /// <returns>Contact point</returns>
-        public static void ClosestPoints(Vector3 rStart, Vector3 rEnd, Vector3 rMovement, float rRadius, TerrainCollider rCollider, ref Vector3 rLinePoint, ref Vector3 rColliderPoint)
+        public static void ClosestPoints(Vector3 rStart, Vector3 rEnd, TerrainCollider rCollider, ref Vector3 rLinePoint, ref Vector3 rColliderPoint, float rRadius = 4f, int rCollisionLayers = -1)
         {
-            Vector3 lDirection = rMovement.normalized;
-            float lDistance = rMovement.magnitude;
+            // Taking a new approach to finding the closest point on terrain
+            float lStep = rRadius;
+            float lClosestDistance = float.MaxValue;
 
-            RaycastHit lHitInfo;
-            if (UnityEngine.Physics.CapsuleCast(rStart, rEnd, rRadius, lDirection, out lHitInfo, lDistance))
+            float lLineLength = (rEnd - rStart).magnitude;
+            Vector3 lLineDirection = (rEnd - rStart).normalized;
+
+            for (float lStepped = 0; lStepped < lLineLength + lStep; lStepped += lStep)
             {
-                if (lHitInfo.collider == rCollider)
-                {
-                    rColliderPoint = lHitInfo.point;
-                    rLinePoint = ClosestPoint(rColliderPoint, rStart, rEnd);
+                if (lStepped > lLineLength) { lStepped = lLineLength; }
 
-                    return;
+                Vector3 lPoint = rStart + (lLineDirection * lStepped);
+                Vector3 lColliderPoint = ClosestPoint(lPoint, rRadius, rCollider, rCollisionLayers);
+
+                if (lColliderPoint.sqrMagnitude > 0f)
+                {
+                    float lColliderPointDistance = (lColliderPoint - lPoint).sqrMagnitude;
+                    if (lColliderPointDistance < lClosestDistance)
+                    {
+                        rLinePoint = lPoint;
+                        rColliderPoint = lColliderPoint;
+
+                        lClosestDistance = lColliderPointDistance;
+                    }
                 }
+
+                if (lStepped == lLineLength) { break; }
             }
-
-            Vector3 lToStart = rStart - rEnd;
-            Vector3 lToStartDirection = lToStart.normalized;
-            float lToStartDistance = lToStart.magnitude;
-
-            // First, start at the end point (usually the top) and do a sphere cast to the start point
-            if (UnityEngine.Physics.SphereCast(rEnd, rRadius, lToStartDirection, out lHitInfo, lToStartDistance))
+        }
+        
+        /// <summary>
+        /// Finds the closest points between a line segment and a terrain collider
+        /// </summary>
+        /// <param name="rCollider">Collider we're testing</param>
+        /// <param name="rPosition">Desired position</param>
+        /// <returns>Contact point</returns>
+        public static void ClosestPoints(Vector3 rStart, Vector3 rEnd, Vector3 rMovement, TerrainCollider rCollider, ref Vector3 rLinePoint, ref Vector3 rColliderPoint, float rRadius = 4f, int rCollisionLayers = -1)
+        {
+            if (rMovement.sqrMagnitude > 0f)
             {
-                // Turns out we can't actually trust the sphere cast as it sometimes returns incorrect point and normal values.
-                RaycastHit lRayHitInfo;
-                if (UnityEngine.Physics.Raycast(rEnd, lHitInfo.point - rEnd, out lRayHitInfo, lToStartDistance + 0.01f))
-                {
-                    lHitInfo = lRayHitInfo;
-                }
+                Vector3 lDirection = rMovement.normalized;
+                float lDistance = rMovement.magnitude;
 
-                rColliderPoint = lHitInfo.point;
-                rLinePoint = ClosestPoint(rColliderPoint, rStart, rEnd);
-
-                return;
-            }
-            // Since there was no hit, do the reverse
-            else if (UnityEngine.Physics.SphereCast(rStart, rRadius, -lToStartDirection, out lHitInfo, lToStartDistance))
-            {
-                // Turns out we can't actually trust the sphere cast as it sometimes returns incorrect point and normal values.
-                RaycastHit lRayHitInfo;
-                if (UnityEngine.Physics.Raycast(rStart, lHitInfo.point - rStart, out lRayHitInfo, lToStartDistance + 0.01f))
-                {
-                    lHitInfo = lRayHitInfo;
-                }
-
-                rColliderPoint = lHitInfo.point;
-                rLinePoint = ClosestPoint(rColliderPoint, rStart, rEnd);
-
-                return;
-            }
-            // If we get here, there is no collision at all (maybe the capsule is horizontal) or 
-            // the terrain already pushed into the spheres.
-            else
-            {
-                // We're going to try some more ray-casts. If there is no movement direction, 
-                // we'll have to assume that the terrain is "down"
-                if (lDirection.sqrMagnitude < EPSILON)
-                {
-                    lDirection = Vector3.down;
-                    lDistance = rRadius * 3f;
-                }
-
-                // First, start at the start point (usually the bottom) and do a raycast along the direction
-                if (UnityEngine.Physics.Raycast(rStart, lDirection, out lHitInfo, lDistance))
+                RaycastHit lHitInfo;
+                if (UnityEngine.Physics.CapsuleCast(rStart, rEnd, rRadius, lDirection, out lHitInfo, lDistance, rCollisionLayers))
                 {
                     if (lHitInfo.collider == rCollider)
                     {
                         rColliderPoint = lHitInfo.point;
-                        rLinePoint = rStart;
+                        rLinePoint = ClosestPoint(rColliderPoint, rStart, rEnd);
 
                         return;
                     }
-                }
-
-                // Since there was no hit, test end point (usually the bottom)
-                if (UnityEngine.Physics.Raycast(rEnd, lDirection, out lHitInfo, lDistance))
-                {
-                    if (lHitInfo.collider == rCollider)
-                    {
-                        rColliderPoint = lHitInfo.point;
-                        rLinePoint = rEnd;
-
-                        return;
-                    }
-                }
-
-                // Finally, try a smaller capsule
-                if (rRadius > 0.05f)
-                {
-                    ClosestPoints(rStart, rEnd, rMovement, rRadius * 0.5f, rCollider, ref rLinePoint, ref rColliderPoint);
                 }
             }
 
-            // If we got here, we must not have a valid collision. This can occur when the capsule is already
-            // penetrating the terrain
-            //ClosestPoints(rStart, rEnd, rRadius, rCollider, ref rLinePoint, ref rColliderPoint);
+            // Taking a new approach to finding the closest point on terrain
+            float lStep = rRadius;
+            float lClosestDistance = float.MaxValue;
+
+            float lLineLength = (rEnd - rStart).magnitude;
+            Vector3 lLineDirection = (rEnd - rStart).normalized;
+
+            for (float lStepped = 0; lStepped < lLineLength + lStep; lStepped += lStep)
+            {
+                if (lStepped > lLineLength) { lStepped = lLineLength; }
+
+                Vector3 lPoint = rStart + (lLineDirection * lStepped);
+                Vector3 lColliderPoint = ClosestPoint(lPoint, rMovement, rRadius, rCollider, rCollisionLayers);
+
+                if (lColliderPoint.sqrMagnitude > 0f)
+                {
+                    float lColliderPointDistance = (lColliderPoint - lPoint).sqrMagnitude;
+                    if (lColliderPointDistance < lClosestDistance)
+                    {
+                        rLinePoint = lPoint;
+                        rColliderPoint = lColliderPoint;
+
+                        lClosestDistance = lColliderPointDistance;
+                    }
+                }
+
+                if (lStepped == lLineLength) { break; }
+            }
         }
 
         /// <summary>
@@ -1406,6 +1566,8 @@ namespace com.ootii.Geometry
         /// <returns>Contact point</returns>
         public static void ClosestPoints(Vector3 rStart, Vector3 rEnd, float rRadius, MeshCollider rCollider, ref Vector3 rLinePoint, ref Vector3 rColliderPoint)
         {
+            if (rCollider == null || rCollider.sharedMesh == null) { return; }
+
             // Planes are expensive with octrees because they aren't really volumes (2d vs 3d)
             // So, we turn the plane into a box collider
             if (rCollider.sharedMesh.name == "Plane")
@@ -1422,48 +1584,119 @@ namespace com.ootii.Geometry
                 return;
             }
 
-            // Otherwise, do the mesh collider test
-            Vector3 lStartContactPoint = MeshExt.ClosestPoint(rStart, rRadius, rCollider.gameObject.transform, rCollider.sharedMesh);
-            Vector3 lEndContactPoint = MeshExt.ClosestPoint(rEnd, rRadius, rCollider.gameObject.transform, rCollider.sharedMesh);
+            Vector3 lLine = rEnd - rStart;
+            float lLineLength = lLine.magnitude;
 
-            float lStartMag = lStartContactPoint.sqrMagnitude;
-            float lEndMag = lEndContactPoint.sqrMagnitude;
-
-            if (lStartMag > 0f && lEndMag > 0f)
+            if (lLineLength == 0f)
             {
-                //if (Vector3.Distance(lStartContactPoint, lEndContactPoint) < EPSILON)
-                //{
-                //    rLinePoint = rStart;
-                //    rColliderPoint = lStartContactPoint;
-                //}
-                //else
-                //{
-                //    ClosestPoints(rStart, rEnd, lStartContactPoint, lEndContactPoint, ref rLinePoint, ref rColliderPoint);
-                //}
+                rLinePoint = rStart;
 
-                float lStartDistance = Vector3.Distance(lStartContactPoint, rStart);
-                float lEndDistance = Vector3.Distance(lEndContactPoint, rEnd);
-                if (lStartDistance <= lEndDistance)
+                if (!rCollider.sharedMesh.isReadable)
                 {
-                    rLinePoint = rStart;
-                    rColliderPoint = lStartContactPoint;
+                    rColliderPoint = rCollider.ClosestPointOnBounds(rStart);
+                    Debug.LogWarning(string.Format("{0}'s mesh is not imported as 'Read/Write Enabled' and may not be accurate. For accurate collisions, check 'Read/Write Enabled' on the model's import settings.", rCollider.name));
                 }
                 else
                 {
-                    rLinePoint = rEnd;
-                    rColliderPoint = lEndContactPoint;
+                    rColliderPoint = MeshExt.ClosestPoint(rStart, rRadius, rCollider.gameObject.transform, rCollider.sharedMesh);
                 }
             }
-            else if (lStartMag > 0f)
+            else
             {
-                rLinePoint = rStart;
-                rColliderPoint = lStartContactPoint;
+                float lStep = rRadius * 0.5f;
+                float lClosestDistance = float.MaxValue;
+
+                Vector3 lLineDirection = lLine.normalized;
+                for (float lStepped = 0f; lStepped < lLineLength + lStep; lStepped += lStep)
+                {
+                    if (lStepped > lLineLength) { lStepped = lLineLength; }
+
+                    Vector3 lPoint = rStart + (lLineDirection * lStepped);
+
+                    Vector3 lColliderPoint;
+                    if (!rCollider.sharedMesh.isReadable)
+                    {
+                        lColliderPoint = rCollider.ClosestPointOnBounds(lPoint);
+                        Debug.LogWarning(string.Format("{0}'s mesh is not imported as 'Read/Write Enabled' and may not be accurate. For accurate collisions, check 'Read/Write Enabled' on the model's import settings.", rCollider.name));
+                    }
+                    else
+                    {
+                        lColliderPoint = MeshExt.ClosestPoint(lPoint, rRadius, rCollider.gameObject.transform, rCollider.sharedMesh);
+                    }
+
+                    if (lColliderPoint.sqrMagnitude > 0f)
+                    {
+                        float lColliderPointDistance = (lColliderPoint - lPoint).sqrMagnitude;
+                        if (lColliderPointDistance < lClosestDistance)
+                        {
+                            rLinePoint = lPoint;
+                            rColliderPoint = lColliderPoint;
+
+                            lClosestDistance = lColliderPointDistance;
+                        }
+                    }
+
+                    if (lStepped == lLineLength) { break; }
+                }
             }
-            else if (lEndMag > 0f)
-            {
-                rLinePoint = rEnd;
-                rColliderPoint = lEndContactPoint;
-            }
+
+            //Graphics.GraphicsManager.DrawPoint(rLinePoint, Color.yellow, null, 2f);
+            //Graphics.GraphicsManager.DrawPoint(rColliderPoint, Color.green, null, 2f);
+
+            //// Otherwise, do the mesh collider test
+            //Vector3 lStartContactPoint = MeshExt.ClosestPoint(rStart, rRadius, rCollider.gameObject.transform, rCollider.sharedMesh);
+            //Vector3 lEndContactPoint = MeshExt.ClosestPoint(rEnd, rRadius, rCollider.gameObject.transform, rCollider.sharedMesh);
+
+
+            //if (lStartContactPoint.sqrMagnitude > 0f)
+            //{
+            //    Graphics.GraphicsManager.DrawPoint(lStartContactPoint, Color.yellow, null, 2f);
+            //}
+
+            //if (lEndContactPoint.sqrMagnitude > 0f)
+            //{
+            //    Graphics.GraphicsManager.DrawPoint(lStartContactPoint, Color.green, null, 2f);
+            //}
+
+
+            //float lStartMag = lStartContactPoint.sqrMagnitude;
+            //float lEndMag = lEndContactPoint.sqrMagnitude;
+
+            //if (lStartMag > 0f && lEndMag > 0f)
+            //{
+            //    //if (Vector3.Distance(lStartContactPoint, lEndContactPoint) < EPSILON)
+            //    //{
+            //    //    rLinePoint = rStart;
+            //    //    rColliderPoint = lStartContactPoint;
+            //    //}
+            //    //else
+            //    //{
+            //    //    ClosestPoints(rStart, rEnd, lStartContactPoint, lEndContactPoint, ref rLinePoint, ref rColliderPoint);
+            //    //}
+
+            //    float lStartDistance = Vector3.Distance(lStartContactPoint, rStart);
+            //    float lEndDistance = Vector3.Distance(lEndContactPoint, rEnd);
+            //    if (lStartDistance <= lEndDistance)
+            //    {
+            //        rLinePoint = rStart;
+            //        rColliderPoint = lStartContactPoint;
+            //    }
+            //    else
+            //    {
+            //        rLinePoint = rEnd;
+            //        rColliderPoint = lEndContactPoint;
+            //    }
+            //}
+            //else if (lStartMag > 0f)
+            //{
+            //    rLinePoint = rStart;
+            //    rColliderPoint = lStartContactPoint;
+            //}
+            //else if (lEndMag > 0f)
+            //{
+            //    rLinePoint = rEnd;
+            //    rColliderPoint = lEndContactPoint;
+            //}
         }
 
         #endregion
@@ -1847,6 +2080,62 @@ namespace com.ootii.Geometry
         #endregion
 
         #region Support Functions
+
+        /// <summary>
+        /// Determines if we should ignore the collider
+        /// </summary>
+        /// <param name="rCollider"></param>
+        /// <returns></returns>
+        private static bool IgnoreCollider(Collider rCollider)
+        {
+            if (rCollider == null || rCollider.transform == null)
+            {
+                return true;
+            }
+
+            if (rCollider.isTrigger)
+            {
+                return true;
+            }
+
+            if (Ignore != null)
+            {
+                if (rCollider.transform == Ignore) { return true; }
+                if (IsDescendant(Ignore, rCollider.transform)) { return true; }
+            }
+
+            if (IgnoreArray != null)
+            {
+                for (int i = 0; i < IgnoreArray.Length; i++)
+                {
+                    if (rCollider.transform == IgnoreArray[i]) { return true; }
+                    if (IsDescendant(IgnoreArray[i], rCollider.transform)) { return true; }
+                }
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Determines if the "descendant" transform is a child (or grand child)
+        /// of the "parent" transform.
+        /// </summary>
+        /// <param name="rParent"></param>
+        /// <param name="rTest"></param>
+        /// <returns></returns>
+        private static bool IsDescendant(Transform rParent, Transform rDescendant)
+        {
+            if (rParent == null) { return false; }
+
+            Transform lDescendantParent = rDescendant;
+            while (lDescendantParent != null)
+            {
+                if (lDescendantParent == rParent) { return true; }
+                lDescendantParent = lDescendantParent.parent;
+            }
+
+            return false;
+        }
 
         private static void GetLineDistanceFromBoxFace(ref Vector3 rBoxExtents, ref Vector3 rBoxPoint, ref Vector3 rBoxDirection, ref Vector3 rExtentToPoint, int rIndex0, int rIndex1, int rIndex2, ref float mLineDistance)
         {

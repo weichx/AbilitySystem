@@ -41,14 +41,16 @@ namespace com.ootii.Geometry
         /// <returns></returns>
         public static Transform FindChildTransform(Transform rParent, string rName)
         {
+            string lParentName = rParent.name;
+
             // We found it. Get out fast
-            if (rParent.name == rName) { return rParent; }
+            if (lParentName == rName) { return rParent; }
 
             // Handle the case where the bone name is nested in a namespace
-            int lIndex = rParent.name.IndexOf(':');
+            int lIndex = lParentName.IndexOf(':');
             if (lIndex >= 0)
             {
-                string lParentName = rParent.name.Substring(lIndex + 1);
+                lParentName = lParentName.Substring(lIndex + 1);
                 if (lParentName == rName) { return rParent; }
             }
 

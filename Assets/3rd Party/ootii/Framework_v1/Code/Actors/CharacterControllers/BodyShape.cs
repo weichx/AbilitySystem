@@ -394,7 +394,15 @@ namespace com.ootii.Actors
                 if (!lProperty.CanWrite) { continue; }
 
                 JSONNode lValueNode = lDefinitionNode[lProperty.Name];
-                if (lValueNode == null) { continue; }
+                if (lValueNode == null)
+                {
+                    if (lProperty.PropertyType == typeof(string))
+                    {
+                        lProperty.SetValue(this, "", null);
+                    }
+
+                    continue;
+                }
 
                 if (lProperty.PropertyType == typeof(string))
                 {

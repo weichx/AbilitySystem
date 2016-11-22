@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using EntitySystem;
 
 public class FactionManager {
     //todo this is overly simple for now on purpose

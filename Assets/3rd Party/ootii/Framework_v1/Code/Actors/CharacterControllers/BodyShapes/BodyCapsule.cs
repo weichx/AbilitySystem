@@ -196,8 +196,10 @@ namespace com.ootii.Actors
 
             float lOverlapRadius = (Vector3.Distance(lBodyShapePos1, lBodyShapePos2) / 2f) + _Radius;
 
+            GeometryExt.Ignore = _Parent;
+
             Collider[] lColliders = null;
-            int lColliderHits = RaycastExt.SafeOverlapSphere(lPosition, lOverlapRadius, out lColliders, -1, _Parent);
+            int lColliderHits = RaycastExt.SafeOverlapSphere(lPosition, lOverlapRadius, out lColliders, rLayerMask, _Parent);
 
             for (int i = 0; i < lColliderHits; i++)
             {
@@ -210,7 +212,7 @@ namespace com.ootii.Actors
                 // Once we get here, we have a valid collider
                 Vector3 lLinePoint = Vector3.zero;
                 Vector3 lColliderPoint = Vector3.zero;
-                GeometryExt.ClosestPoints(lBodyShapePos1, lBodyShapePos2, _Radius, lColliders[i], ref lLinePoint, ref lColliderPoint);
+                GeometryExt.ClosestPoints(lBodyShapePos1, lBodyShapePos2, _Radius, lColliders[i], ref lLinePoint, ref lColliderPoint, rLayerMask);
 
                 float lDistance = Vector3.Distance(lLinePoint, lColliderPoint);
                 if (lDistance < _Radius + 0.001f)
@@ -226,6 +228,9 @@ namespace com.ootii.Actors
                     lHits.Add(lHit);
                 }
             }
+
+            GeometryExt.Ignore = null;
+            GeometryExt.IgnoreArray = null;
 
             return lHits;
         }
@@ -307,14 +312,14 @@ namespace com.ootii.Actors
                     Vector3 lLinePoint = Vector3.zero;
                     Vector3 lColliderPoint = Vector3.zero;
 
-                    if (lBodyShapeHit.HitCollider is TerrainCollider)
-                    {
-                        GeometryExt.ClosestPoints(lBodyShapePos1, lBodyShapePos2, rDirection * rDistance, _Radius, (TerrainCollider)lBodyShapeHit.HitCollider, ref lLinePoint, ref lColliderPoint);
-                    }
-                    else
-                    {
-                        GeometryExt.ClosestPoints(lBodyShapePos1, lBodyShapePos2, _Radius, lBodyShapeHit.HitCollider, ref lLinePoint, ref lColliderPoint);
-                    }
+                    //if (lBodyShapeHit.HitCollider is TerrainCollider)
+                    //{
+                    //    GeometryExt.ClosestPoints(lBodyShapePos1, lBodyShapePos2, rDirection * rDistance, (TerrainCollider)lBodyShapeHit.HitCollider, ref lLinePoint, ref lColliderPoint, _Radius, rLayerMask);
+                    //}
+                    //else
+                    //{
+                        GeometryExt.ClosestPoints(lBodyShapePos1, lBodyShapePos2, _Radius, lBodyShapeHit.HitCollider, ref lLinePoint, ref lColliderPoint, rLayerMask);
+                    //}
 
                     // If we don't have a valid point, we will skip
                     if (lColliderPoint == Vector3.zero)
@@ -430,19 +435,19 @@ namespace com.ootii.Actors
             rShapePoint = lStartPosition;
             rContactPoint = Vector3.zero;
 
-            Utilities.Profiler.Start("CP");
+            //Utilities.Profiler.Start("CP");
 
             // Test the collider for the closest contact point
-            if (rProcessTerrain && rCollider is TerrainCollider)
-            {
-                GeometryExt.ClosestPoints(lStartPosition, lEndPosition, rMovement.normalized, _Radius, (TerrainCollider)rCollider, ref rShapePoint, ref rContactPoint);
-            }
-            else
-            {
+            //if (rProcessTerrain && rCollider is TerrainCollider)
+            //{
+            //    GeometryExt.ClosestPoints(lStartPosition, lEndPosition, rMovement.normalized, _Radius, (TerrainCollider)rCollider, ref rShapePoint, ref rContactPoint);
+            //}
+            //else
+            //{
                 GeometryExt.ClosestPoints(lStartPosition, lEndPosition, _Radius, rCollider, ref rShapePoint, ref rContactPoint);
-            }
+            //}
 
-            Utilities.Profiler.Stop("CP");
+            //Utilities.Profiler.Stop("CP");
 
             // Report back if we have a valid contact point
             return (rContactPoint.sqrMagnitude > 0f);
@@ -602,7 +607,7 @@ namespace com.ootii.Actors
         {
             bool lIsDirty = false;
 
-            EditorGUILayout.LabelField("Body Capsule", EditorStyles.boldLabel);
+            EditorHelper.DrawSmallTitle("Body Capsule");
 
             if (_Parent != null)
             {

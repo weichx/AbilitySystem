@@ -1,9 +1,14 @@
 ﻿using Intelligence;
-//todo maybe this is an interface
-public abstract class ResourceAdjuster {
 
-    public string resourceId;
+namespace EntitySystem.Resources {
+	
+	//todo maybe this is an interface
+	public abstract class ResourceAdjuster {
 
-    public abstract float Adjust(float delta, Resource resource, Context context);
+	    public string resourceId;
+
+	    public abstract float Adjust(float delta, Resource resource, Context context);
+
+	}
 
 }

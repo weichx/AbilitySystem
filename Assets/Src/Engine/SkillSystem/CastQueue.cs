@@ -1,6 +1,6 @@
 ﻿using Intelligence;
 
-namespace AbilitySystem {
+namespace EntitySystem {
 
     public class CastQueue {
 

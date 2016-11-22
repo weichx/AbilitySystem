@@ -10,9 +10,9 @@ namespace com.ootii.Actors.AnimationControllers
 {
     /// <summary>
     /// </summary>
-    [MotionName("Walk Run Pivot")]
+    [MotionName("Walk Run Pivot (old)")]
     [MotionDescription("Standard movement (walk/run) for an adventure game.")]
-    public class WalkRunPivot : MotionControllerMotion
+    public class WalkRunPivot : MotionControllerMotion, IWalkRunMotion
     {
         /// <summary>
         /// Trigger values for th emotion
@@ -84,6 +84,16 @@ namespace com.ootii.Actors.AnimationControllers
         {
             get { return _RemoveLateralMovement; }
             set { _RemoveLateralMovement = value; }
+        }
+
+        /// <summary>
+        /// Determines if we shortcut the motion and start in the loop
+        /// </summary>
+        private bool mStartInMove = false;
+        public bool StartInMove
+        {
+            get { return mStartInMove; }
+            set { mStartInMove = value; }
         }
 
         /// <summary>
@@ -207,11 +217,10 @@ namespace com.ootii.Actors.AnimationControllers
             }
 
             // If we're not in the traversal state, this is easy
-            //if (lState.Stance != EnumControllerStance.TRAVERSAL) 
-            //{
-            //    mInputActiveStartTime = 0f;
-            //    return false; 
-            //}
+            if (mActorController.State.Stance != EnumControllerStance.TRAVERSAL)
+            {
+                return false;
+            }
 
             //// If there is no activation delay, continue
             //if (ACTIVATE_DELAY > 0f)

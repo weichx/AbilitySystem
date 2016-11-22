@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
+using EntitySystem;
 
 public class StatusPage_DetailView : DetailView<StatusEffect> {
 

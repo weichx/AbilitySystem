@@ -36,6 +36,39 @@ namespace com.ootii.Cameras
         bool LockMode { get; set; }
 
         /// <summary>
+        /// Determines if the specified mode can be activated. This does not activate
+        /// the mode, but determines if it can be
+        /// </summary>
+        void EnableMode(int rMode, bool rEnable);
+
+        /// <summary>
+        /// Clears out any target we're moving to
+        /// </summary>
+        void ClearTargetYawPitch();
+
+        /// <summary>
+        /// Causes us to ignore user input and force the camera to the specified localangles
+        /// </summary>
+        /// <param name="rYaw">Target local yaw</param>
+        /// <param name="rPitch">Target local pitch</param>
+        /// <param name="rSpeed">Degrees per second we'll rotate. A value of -1 uses the current yaw speed.</param>
+        /// <param name="rAutoClearTarget">Determines if we'll clear the target once we reach it.</param>
+        void SetTargetYawPitch(float rYaw, float rPitch, float rSpeed = -1f, bool rAutoClearTarget = true);
+
+        /// <summary>
+        /// Clears the forward direction target we're trying to reach
+        /// </summary>
+        void ClearTargetForward();
+
+        /// <summary>
+        /// Causes us to ignore user input and force the camera to a specific direction.
+        /// </summary>
+        /// <param name="rForward">Forward direction the camera should look.</param>
+        /// <param name="rSpeed">Speed at which we get there. A value of -1 uses the current yaw speed.</param>
+        /// <param name="rAutoClearTarget">Determines if we'll clear the target once we reach it.</param>
+        void SetTargetForward(Vector3 rForward, float rSpeed = -1f, bool rAutoClearTarget = true);
+
+        /// <summary>
         /// Determines if the camer uses it's own late update
         /// or it if relies on the character controller to call 
         /// ControllerLateUpdate

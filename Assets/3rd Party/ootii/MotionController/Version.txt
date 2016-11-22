@@ -1,3 +1,16 @@
 Motion Controller
-Version 2.18
-Jun 5, 2016
+Version 2.34
+Nov 18, 2016
+
+
+==== Garbage Creation (at edit-time) ====
+
+1. 9/28/2016 U5.4.1f:  Assigning delegates creates 104B
+http://jacksondunstan.com/articles/3264
+
+2. 9/28/2016 U5.4.1f:  Using Unity's Input.GetButtonDown() creates 406B
+
+
+==== Performance (at edit-time) ====
+
+1. 9/28/2016 U5.4.1f: 100 Unity Default + MC = 105 FPS
