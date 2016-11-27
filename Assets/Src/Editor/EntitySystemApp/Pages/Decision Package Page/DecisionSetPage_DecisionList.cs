@@ -1,6 +1,7 @@
 ﻿using System;
 using UnityEngine;
 using UnityEditor;
+using EntitySystem;
 using Intelligence;
 using System.Collections.Generic;
 using System.Reflection;

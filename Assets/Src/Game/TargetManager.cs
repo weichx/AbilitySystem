@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using EntitySystem;
 
 public class TargetManager : MonoBehaviour {
 

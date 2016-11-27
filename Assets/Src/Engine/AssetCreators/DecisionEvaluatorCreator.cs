@@ -2,16 +2,20 @@
 using Intelligence;
 using UnityEngine;
 
-public class DecisionEvaluatorCreator : AssetCreator<DecisionEvaluator> {
-    [HideInInspector]
-    public string contextTypeName;
+namespace EntitySystem {
+	
+	public class DecisionEvaluatorCreator : AssetCreator<DecisionEvaluator> {
+	    [HideInInspector]
+	    public string contextTypeName;
 
-    public override void SetSourceAsset(DecisionEvaluator asset) {
-        base.SetSourceAsset(asset);
-        contextTypeName = asset.contextType.AssemblyQualifiedName;
-    }
+	    public override void SetSourceAsset(DecisionEvaluator asset) {
+	        base.SetSourceAsset(asset);
+	        contextTypeName = asset.contextType.AssemblyQualifiedName;
+	    }
 
-    public Type GetContextType() {
-        return Type.GetType(contextTypeName);
-    }
+	    public Type GetContextType() {
+	        return Type.GetType(contextTypeName);
+	    }
+	}
+
 }

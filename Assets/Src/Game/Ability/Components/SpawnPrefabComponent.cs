@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using Intelligence;
+using EntitySystem;
 
 public class SpawnPrefab : AbilityComponent<Context> {
 

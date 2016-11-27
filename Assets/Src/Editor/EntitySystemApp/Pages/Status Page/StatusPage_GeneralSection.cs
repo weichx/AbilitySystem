@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using UnityEditor;
+using EntitySystem;
 
 public class StatusPage_GeneralSection : SectionBase<StatusEffect> {
 

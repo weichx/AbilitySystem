@@ -1,3 +1,8 @@
-﻿public interface IContextAware {
-    void SetContext(Intelligence.Context context);
+﻿
+namespace Intelligence {
+	
+	public interface IContextAware {
+	    void SetContext(Context context);
+	}
+
 }

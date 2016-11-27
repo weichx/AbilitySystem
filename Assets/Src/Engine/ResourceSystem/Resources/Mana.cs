@@ -1,6 +1,10 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class Mana : Resource {
+namespace EntitySystem.Resources {
+	
+	public class Mana : Resource {
+	}
+
 }
 

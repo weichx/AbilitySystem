@@ -1,7 +1,11 @@
 ﻿using System;
 
-internal class AbilityMissingException : Exception {
+namespace EntitySystem {
+	
+	internal class AbilityMissingException : Exception {
 
-    public AbilityMissingException(string message) : base(message) {}
+	    public AbilityMissingException(string message) : base(message) {}
+
+	}
 
 }

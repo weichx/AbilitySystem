@@ -1,5 +1,6 @@
 ﻿using UnityEditor;
 using UnityEngine;
+using EntitySystem;
 
 public class AbilityPage_DetailView : DetailView<Ability> {
 

@@ -1,4 +1,5 @@
 ﻿using Intelligence;
+using EntitySystem;
 
 public class AddStatusEffect : AbilityComponent<SingleTargetContext> {
 

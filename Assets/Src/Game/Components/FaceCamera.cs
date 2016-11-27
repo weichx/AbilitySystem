@@ -2,7 +2,7 @@
 
 public class FaceCamera : MonoBehaviour {
 
-    public new Camera camera;
+    private new Camera camera;
 
     void Start () {
         camera = Camera.main;

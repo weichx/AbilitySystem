@@ -1,2 +1,7 @@
-﻿
-public class StatusEffectCreator : AssetCreator<StatusEffect> {}
+﻿using EntitySystem;
+
+namespace EntitySystem {
+	
+	public class StatusEffectCreator : AssetCreator<StatusEffect> {}
+
+}

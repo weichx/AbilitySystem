@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using UnityEditor;
+using EntitySystem;
 
 [PropertyDrawerFor(typeof(FloatValue))]
 public class FloatValueDrawerX : PropertyDrawerX {

@@ -1,3 +1,6 @@
+// Upgrade NOTE: replaced '_Projector' with 'unity_Projector'
+// Upgrade NOTE: replaced '_ProjectorClip' with 'unity_ProjectorClip'
+
 Shader "Effects/Projector/AlphaBlended" {
 	Properties {
 	_TintColor ("Tint Color", Color) = (0.5,0.5,0.5,1)
@@ -30,8 +33,8 @@ Shader "Effects/Projector/AlphaBlended" {
 				float2 texcoord : TEXCOORD2;
 			};
 			
-			float4x4 _Projector;
-			float4x4 _ProjectorClip;
+			float4x4 unity_Projector;
+			float4x4 unity_ProjectorClip;
 			float4 _MainTex_ST;
 
 
@@ -39,8 +42,8 @@ Shader "Effects/Projector/AlphaBlended" {
 			{
 				v2f o;
 				o.pos = mul (UNITY_MATRIX_MVP, vertex);
-				o.uvMainTex = mul (_Projector, vertex);
-				o.uvFalloff = mul (_ProjectorClip, vertex);
+				o.uvMainTex = mul (unity_Projector, vertex);
+				o.uvFalloff = mul (unity_ProjectorClip, vertex);
 				//o.uv_CutoutTex = mul (_Projector, vertex);
 				//o.uv = TRANSFORM_TEX (mul (_Projector, vertex).xy, _MainTex);
 				

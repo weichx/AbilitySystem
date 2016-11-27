@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
+using EntitySystem;
 
 public class Nameplate : MonoBehaviour {
 

@@ -4,129 +4,132 @@ using System.Collections.Generic;
 ///<summary>
 ///A modifiable variable that is bounded by a modifiable min and max 
 ///</summary>
-public class FloatRange {
 
-    [HideInInspector] [SerializeField] protected List<FloatModifier> modifiers;
+namespace EntitySystem {
+	
+	public class FloatRange {
 
-    [HideInInspector] [SerializeField] protected float baseValue;
-    [HideInInspector] [SerializeField] protected float currentValue;
-    [HideInInspector] [SerializeField] protected float flatBonus;
-    [HideInInspector] [SerializeField] protected float percentBonus;
+	    [HideInInspector] [SerializeField] protected List<FloatModifier> modifiers;
 
-    [SerializeField] protected FloatRangeBoundry min;
-    [SerializeField] protected FloatRangeBoundry max;
+	    [HideInInspector] [SerializeField] protected float baseValue;
+	    [HideInInspector] [SerializeField] protected float currentValue;
+	    [HideInInspector] [SerializeField] protected float flatBonus;
+	    [HideInInspector] [SerializeField] protected float percentBonus;
 
-    public FloatRange() : this(0, float.MinValue, float.MaxValue) { }
+	    [SerializeField] protected FloatRangeBoundry min;
+	    [SerializeField] protected FloatRangeBoundry max;
 
-    public FloatRange(float value, float minBase = float.MinValue, float maxBase = float.MaxValue) {
-        modifiers = new List<FloatModifier>();
-        min = new FloatRangeBoundry(this, minBase);
-        max = new FloatRangeBoundry(this, maxBase);
-    }
+	    public FloatRange() : this(0, float.MinValue, float.MaxValue) { }
 
-    public void SetModifier(string id, FloatModifier modifier) {
-        modifier = new FloatModifier(id, modifier);
+	    public FloatRange(float value, float minBase = float.MinValue, float maxBase = float.MaxValue) {
+	        modifiers = new List<FloatModifier>();
+	        min = new FloatRangeBoundry(this, minBase);
+	        max = new FloatRangeBoundry(this, maxBase);
+	    }
 
-        for (int i = 0; i < modifiers.Count; i++) {
-            if (modifiers[i].id == id) {
-                FloatModifier prev = modifiers[i];
-                flatBonus -= prev.flatBonus;
-                percentBonus -= prev.percentBonus;
-                break;
-            }
-        }
+	    public void SetModifier(string id, FloatModifier modifier) {
+	        modifier = new FloatModifier(id, modifier);
 
-        modifiers.Add(modifier);
+	        for (int i = 0; i < modifiers.Count; i++) {
+	            if (modifiers[i].id == id) {
+	                FloatModifier prev = modifiers[i];
+	                flatBonus -= prev.flatBonus;
+	                percentBonus -= prev.percentBonus;
+	                break;
+	            }
+	        }
 
-        flatBonus += modifier.flatBonus;
-        percentBonus += modifier.percentBonus;
+	        modifiers.Add(modifier);
 
-        BaseValue = BaseValue; //weird but works
+	        flatBonus += modifier.flatBonus;
+	        percentBonus += modifier.percentBonus;
 
-    }
+	        BaseValue = BaseValue; //weird but works
 
-    public FloatModifier[] GetReadOnlyModiferList() {
-        return modifiers.ToArray();
-    }
+	    }
 
-    public void RemoveModifier(string id) {
-        for (int i = 0; i < modifiers.Count; i++) {
-            if (modifiers[i].id == id) {
-                FloatModifier prev = modifiers[i];
-                flatBonus -= prev.flatBonus;
-                percentBonus -= prev.percentBonus;
-                BaseValue = BaseValue;
-                break;
-            }
-        }
-    }
+	    public FloatModifier[] GetReadOnlyModiferList() {
+	        return modifiers.ToArray();
+	    }
 
-    public FloatRangeBoundry Min {
-        get { return min; }
-    }
+	    public void RemoveModifier(string id) {
+	        for (int i = 0; i < modifiers.Count; i++) {
+	            if (modifiers[i].id == id) {
+	                FloatModifier prev = modifiers[i];
+	                flatBonus -= prev.flatBonus;
+	                percentBonus -= prev.percentBonus;
+	                BaseValue = BaseValue;
+	                break;
+	            }
+	        }
+	    }
 
-    public FloatRangeBoundry Max {
-        get { return max; }
-    }
+	    public FloatRangeBoundry Min {
+	        get { return min; }
+	    }
 
-    public float BaseValue {
-        get { return baseValue; }
-        set {
-            if (baseValue != value) {
-                baseValue = value;
-                float minVal = min.Value;
-                float maxVal = max.Value;
-                float flatTotal = baseValue + flatBonus;
-                float total = flatTotal + (flatTotal * percentBonus);
-                currentValue = Mathf.Clamp(total, minVal, maxVal);
-            }
-        }
-    }
+	    public FloatRangeBoundry Max {
+	        get { return max; }
+	    }
 
-    public float Value {
-        get {
-            float minVal = min.Value;
-            float maxVal = max.Value;
-            float flatTotal = baseValue + flatBonus;
-            float total = flatTotal + (flatTotal * percentBonus);
-            currentValue = Mathf.Clamp(total, minVal, maxVal);
-            return currentValue;
-        }
-        set {
-            currentValue = Mathf.Clamp(value, min.Value, max.Value);
-        }
-    }
+	    public float BaseValue {
+	        get { return baseValue; }
+	        set {
+	            if (baseValue != value) {
+	                baseValue = value;
+	                float minVal = min.Value;
+	                float maxVal = max.Value;
+	                float flatTotal = baseValue + flatBonus;
+	                float total = flatTotal + (flatTotal * percentBonus);
+	                currentValue = Mathf.Clamp(total, minVal, maxVal);
+	            }
+	        }
+	    }
 
-    //todo -- get
-    public float NormalizedValue {
-        set {
-            float val = Mathf.Clamp01(value);
-            float flatTotal = baseValue + flatBonus;
-            float total = flatTotal + (flatTotal * percentBonus);
-            currentValue = Mathf.Clamp(val * total, min.Value, max.Value);
-        }
-    }
+	    public float Value {
+	        get {
+	            float minVal = min.Value;
+	            float maxVal = max.Value;
+	            float flatTotal = baseValue + flatBonus;
+	            float total = flatTotal + (flatTotal * percentBonus);
+	            currentValue = Mathf.Clamp(total, minVal, maxVal);
+	            return currentValue;
+	        }
+	        set {
+	            currentValue = Mathf.Clamp(value, min.Value, max.Value);
+	        }
+	    }
 
-    public class FloatRangeBoundry : FloatValue {
+	    //todo -- get
+	    public float NormalizedValue {
+	        set {
+	            float val = Mathf.Clamp01(value);
+	            float flatTotal = baseValue + flatBonus;
+	            float total = flatTotal + (flatTotal * percentBonus);
+	            currentValue = Mathf.Clamp(val * total, min.Value, max.Value);
+	        }
+	    }
 
-        [HideInInspector] public FloatRange parent;
+	    public class FloatRangeBoundry : EntitySystem.FloatValue {
 
-        public FloatRangeBoundry() : base(0) {
-            parent = null;
-        }
+	        [HideInInspector] public FloatRange parent;
 
-        public FloatRangeBoundry(FloatRange parent, float baseValue = 0f) : base(baseValue) {
-            this.parent = parent;
-        }
+	        public FloatRangeBoundry() : base(0) {
+	            parent = null;
+	        }
 
-        public override float BaseValue {
-            get { return base.BaseValue; }
-            set {
-                base.BaseValue = value;
-                parent.Value = parent.Value;
-            }
-        }
+	        public FloatRangeBoundry(FloatRange parent, float baseValue = 0f) : base(baseValue) {
+	            this.parent = parent;
+	        }
 
-    }
+	        public override float BaseValue {
+	            get { return base.BaseValue; }
+	            set {
+	                base.BaseValue = value;
+	                parent.Value = parent.Value;
+	            }
+	        }
+
+	    }
+	}
 }
-

@@ -19,7 +19,6 @@ namespace Intelligence {
                 CharacterActionStatus.Completed : CharacterActionStatus.Running;
         }
 
-
     }
 
 }

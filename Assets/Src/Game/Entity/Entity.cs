@@ -1,8 +1,10 @@
 ﻿using System;
 using UnityEngine;
 
-//todo make custom inspector and change back to FloatRange
-public partial class Entity {
+namespace EntitySystem {
+		
+    //todo make custom inspector and change back to FloatRange
+    public partial class Entity {
 
     public CharacterParameters parameters;
     public CharacterEquipment equipment;

@@ -1,6 +1,7 @@
 ﻿using System;
 using Intelligence;
 using UnityEngine;
+using EntitySystem;
 
 public class AbilityPage_ComponentSection : ListSection<Ability> {
 

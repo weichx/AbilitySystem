@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using UnityEditor;
+using EntitySystem;
 
 [CustomEditor(typeof(Entity))]
 public class EntityInspector : Editor {
