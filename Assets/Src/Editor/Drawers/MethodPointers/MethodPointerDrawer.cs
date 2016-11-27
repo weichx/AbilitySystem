@@ -14,7 +14,7 @@ public class MethodPointerDrawerX : PropertyDrawerX {
             Type[] genericTypes = sourceType.GetGenericArguments();
             Type[] args = new Type[genericTypes.Length - 1];
             for (int i = 0; i < args.Length; i++) {
-                args[0] = genericTypes[i + 1];
+                args[i] = genericTypes[i + 1];
             }
             pointableMethods = Reflector.FindMethodPointersWithAttribute(typeof(Pointable), genericTypes[0], args);
         }
