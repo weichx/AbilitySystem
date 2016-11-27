@@ -19,6 +19,7 @@ public partial class Entity : MonoBehaviour {
     [HideInInspector] public AbilityManager abilityManager;
     [HideInInspector] public ResourceManager resourceManager;
     [HideInInspector] public StatusEffectManager statusManager;
+    [HideInInspector] public InventoryItemManager itemManager;
 
     private Vector3 lastPosition;
     private bool movedThisFrame = false;
@@ -34,6 +35,7 @@ public partial class Entity : MonoBehaviour {
         resourceManager = resourceManager ?? new ResourceManager(this);
         statusManager = statusManager ?? new StatusEffectManager(this);
         abilityManager = abilityManager ?? new AbilityManager(this);
+        itemManager = itemManager ?? new InventoryItemManager(this);
         emitter = GetComponent<EventEmitter>();
         EntityManager.Instance.Register(this);
 
@@ -41,7 +43,7 @@ public partial class Entity : MonoBehaviour {
     }
 
     public virtual void Update() {
-                lastPosition = transform.position;
+        lastPosition = transform.position;
         if (abilityManager != null) {
             abilityManager.Update();
         }
@@ -50,6 +52,9 @@ public partial class Entity : MonoBehaviour {
         }
         if (resourceManager != null) {
             //resourceManager.Update();
+        }
+        if (itemManager != null) {
+            itemManager.Update();
         }
     }
 
