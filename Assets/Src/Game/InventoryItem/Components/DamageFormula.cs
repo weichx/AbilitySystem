@@ -5,6 +5,9 @@ using Intelligence;
 public class DamageFormula : InventoryItemComponent {
 
     public int baseDamage;
-    public MethodPointer<float, Context, float> ptr;
 
+    public MethodPointer<float, SingleTargetContext, float> damageFormula;
+
+    public override void OnUse() {
+    }
 }

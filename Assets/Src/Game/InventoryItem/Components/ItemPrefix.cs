@@ -6,4 +6,7 @@ public class ItemPrefix : InventoryItemComponent {
 
     public Prefix prefix;
 
+    public override void OnUse() {
+
+    }
 }

@@ -4,12 +4,9 @@ using UnityEngine;
 //todo make custom inspector and change back to FloatRange
 public partial class Entity {
 
-    public FloatRange Strength;
-    public FloatRange Agility;
-    public FloatRange Stamina;
-    public FloatRange Intelligence;
-    public FloatRange Spirit;
-
+    public CharacterParameters parameters;
+    public CharacterEquipment equipment;
+ 
     [UnitySerialized] [HideInInspector] public string source;
     [NonSerialized] public bool initialized;
     [NonSerialized] public Entity target;
@@ -19,7 +16,7 @@ public partial class Entity {
             initialized = true;
             new AssetDeserializer(source, false).DeserializeInto("__default__", this);
         }
-        Strength.SetModifier("Protein Powder", FloatModifier.Percent(0.2f));
+        parameters.baseParameters.strength.SetModifier("Protein Powder", FloatModifier.Percent(0.2f));
 
     }
 }
