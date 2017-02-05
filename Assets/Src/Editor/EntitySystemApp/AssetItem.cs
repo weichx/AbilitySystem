@@ -17,7 +17,7 @@ public class AssetItem<T> where T : EntitySystemBase, new() {
     }
 
     protected AssetCreator<T> GetAssetCreator() {
-        Type creatorType = typeof(EntitySystemBase).Assembly.GetType(typeof(T).Name + "Creator");
+        Type creatorType = typeof(EntitySystemBase).Assembly.GetType(typeof(T).FullName + "Creator");
         string assetpath = AssetDatabase.GUIDToAssetPath(assetguid);
         AssetCreator<T> creator = AssetDatabase.LoadAssetAtPath(assetpath, creatorType) as AssetCreator<T>;
         return creator;

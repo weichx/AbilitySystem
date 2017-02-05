@@ -109,7 +109,7 @@ public class MasterView<T> where T : EntitySystemBase, new() {
     }
 
     protected virtual void CreateNewItem() {
-        Type creatorType = typeof(EntitySystemBase).Assembly.GetType(typeof(T).Name + "Creator");
+        Type creatorType = typeof(EntitySystemBase).Assembly.GetType(typeof(T).FullName + "Creator");
         if (creatorType == null) {
             Debug.LogError("Cant find creator type: " + typeof(T).Name + "Creator");
             return;
