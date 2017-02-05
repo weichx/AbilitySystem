@@ -36,7 +36,7 @@ namespace EntitySystem {
 	        resourceManager = resourceManager ?? new ResourceManager(this);
 	        statusManager = statusManager ?? new StatusEffectManager(this);
 	        abilityManager = abilityManager ?? new AbilityManager(this);
-        	itemManager = itemManager ?? new InventoryItemManager(this);
+            itemManager = itemManager ?? new InventoryItemManager(this);
 	        emitter = GetComponent<EventEmitter>();
 	        EntityManager.Instance.Register(this);
 
