@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using AbilitySystem;
 using Intelligence;
+using EntitySystem;
 
 public class InventoryItemManager {
 

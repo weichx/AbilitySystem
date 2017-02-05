@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
 using Intelligence;
+using EntitySystem;
 
 public partial class InventoryItem : EntitySystemBase {
 
