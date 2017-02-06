@@ -1,5 +1,6 @@
 using UnityEditor;
 using UnityEngine;
+using EntitySystem;
 
 public class InventoryItemPage_GeneralSection : SectionBase<InventoryItem> {
 

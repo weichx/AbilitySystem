@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using EntitySystem;
 using System.Collections;
 
 public class InventoryItemPage_NameSection : SectionBase<InventoryItem> {
