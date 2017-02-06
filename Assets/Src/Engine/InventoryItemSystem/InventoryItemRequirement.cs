@@ -2,6 +2,8 @@
 using System.Collections;
 using Intelligence;
 
-public abstract class InventoryItemRequirement {
+namespace EntitySystem {
+    public abstract class InventoryItemRequirement {
 
+    }
 }

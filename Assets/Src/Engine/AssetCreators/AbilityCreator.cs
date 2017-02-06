@@ -1,5 +1,4 @@
-﻿
-namespace EntitySystem {
+﻿namespace EntitySystem {
 	
 	public class AbilityCreator : AssetCreator<Ability> {}
 

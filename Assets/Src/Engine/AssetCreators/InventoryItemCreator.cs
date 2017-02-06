@@ -1,2 +1,3 @@
-﻿using EntitySystem;
-public class InventoryItemCreator : AssetCreator<InventoryItem> {}
+﻿namespace EntitySystem {
+    public class InventoryItemCreator : AssetCreator<InventoryItem> {}
+}

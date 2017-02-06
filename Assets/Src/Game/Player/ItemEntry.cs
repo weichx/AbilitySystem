@@ -1,4 +1,5 @@
 using UnityEngine;
+using EntitySystem;
 
 [System.Serializable]
 public class ItemEntry {

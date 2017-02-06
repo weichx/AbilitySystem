@@ -1,4 +1,5 @@
 using UnityEngine;
+using EntitySystem;
 using Intelligence;
 
 public class Consumable : InventoryItemComponent {
