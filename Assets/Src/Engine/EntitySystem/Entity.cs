@@ -20,7 +20,7 @@ namespace EntitySystem {
 	    [HideInInspector] public AbilityManager abilityManager;
 	    [HideInInspector] public ResourceManager resourceManager;
 	    [HideInInspector] public StatusEffectManager statusManager;
-            [HideInInspector] public InventoryItemManager itemManager;
+	    [HideInInspector] public InventoryItemManager itemManager;
 
 	    private Vector3 lastPosition;
 	    private bool movedThisFrame = false;
