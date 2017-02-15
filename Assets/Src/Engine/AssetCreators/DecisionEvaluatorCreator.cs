@@ -1,8 +1,8 @@
 ﻿using System;
-using Intelligence;
 using UnityEngine;
+using EntitySystem;
 
-namespace EntitySystem {
+namespace Intelligence {
 	
 	public class DecisionEvaluatorCreator : AssetCreator<DecisionEvaluator> {
 	    [HideInInspector]
