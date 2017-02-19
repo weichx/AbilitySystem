@@ -18,6 +18,21 @@ namespace EntitySystem {
         public InventoryItemCreator ring1;
         public InventoryItemCreator ring2;
         public InventoryItemCreator weapon;
+
+        [HideInInspector] public Dictionary<int, InventoryItem> equiped = new Dictionary<int, InventoryItem>();
+        [HideInInspector] public Dictionary<int, EquipmentSlot> slots = new Dictionary<int, EquipmentSlot> {
+            { 0, EquipmentSlot.Head },
+            { 1, EquipmentSlot.Shoulder },
+            { 2, EquipmentSlot.Feet },
+            { 3, EquipmentSlot.Body },
+            { 4, EquipmentSlot.Legs },
+            { 5, EquipmentSlot.Neck },
+            { 6, EquipmentSlot.Gloves },
+            { 7, EquipmentSlot.Waist},
+            { 8, EquipmentSlot.Ring },
+            { 9, EquipmentSlot.Ring },
+            { 10, EquipmentSlot.Weapon }
+        };
     }
 
     public class CharacterParameters
@@ -40,6 +55,9 @@ namespace EntitySystem {
     {
         [SerializeField]
         private int level;
+        [SerializeField]
+        public GameClass gameClass;
+
 
         public IntRange strength;
         public IntRange agility;
@@ -47,28 +65,9 @@ namespace EntitySystem {
         public IntRange intelligence;
         public IntRange wisdom;
         public IntRange luck;
-
-        public int[] RollParameters(int min, int max) {
-            System.Random rand = new System.Random();
-            int[] values = new int[6];
-            int total;
-            for (int i = 0; i < 6; i++) {
-                values[i] = rand.Next(min,max);
-            }
-
-            strength.NormalizedValue = values[0];
-            agility.NormalizedValue = values[1];
-            constitution.NormalizedValue = values[2];
-            intelligence.NormalizedValue = values[3];
-            wisdom.NormalizedValue = values[4];
-            luck.NormalizedValue = values[5];
-
-            return values;
-        }
     }
 
     public partial class Character : EntitySystemBase {
-
         public Sprite icon;
         public bool isPlayer;
 
@@ -78,10 +77,9 @@ namespace EntitySystem {
         public CharacterEquipment equipment;
 
         [SerializeField]
-        public List <InventoryItem> items;
-
+        public List <InventoryItemCreator> items;
         [SerializeField]
-        public List <Ability> abilites;
+        public List <AbilityCreator> abilities;
 
         public List<CharacterRequirement> requirements;
         public List<CharacterComponent> components;
@@ -93,9 +91,10 @@ namespace EntitySystem {
             this.contextType = contextType ?? typeof(Context);
         }
 
-
         public Character(string id) {
             Id = id;
+
+
             components = new List<CharacterComponent>();
 	        requirements = new List<CharacterRequirement>();
         }
