@@ -1,17 +1,17 @@
-using UnityEngine;
-using EntitySystem;
+// using UnityEngine;
+// using EntitySystem;
 
-[System.Serializable]
-public class ItemEntry {
-    private bool initialized;
+// [System.Serializable]
+// public class ItemEntry {
+    // private bool initialized;
 
-    private InventoryItem item;
+    // private InventoryItem item;
 
-    [SerializeField] private InventoryItemCreator itemCreator;
+    // [SerializeField] private InventoryItemCreator itemCreator;
 
-    public void Initialize(Entity entity) {
-        if (initialized) return;
-        item = itemCreator.Create();
-        item.Owner = entity;
-    }
-}
+    // public void Initialize(Character c) {
+    //     if (initialized) return;
+    //     item = itemCreator.Create();
+    //     item.Owner = c;
+    // }
+// }
