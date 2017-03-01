@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using System.Collections.Generic;
 using Intelligence;
 
@@ -23,7 +24,7 @@ namespace EntitySystem {
         public EquipmentSlot equipSlot;
         public InventoryItemState itemState;
 
-        protected Entity owner;
+        protected Character owner;
         private Context Context;
 
         public void OnUse() {}
@@ -35,7 +36,7 @@ namespace EntitySystem {
         public void OnLost() {}
         public void OnSoulbound() {}
 
-        public Entity Owner {
+        public Character Owner {
             get { return owner; }
             set { owner = value; }
         }
@@ -58,14 +59,22 @@ namespace EntitySystem {
             return component;
         }
 
+        public T GetInventoryItemComponent<T>() where T : InventoryItemComponent {
+            Type type = typeof(T);
+            for(int i = 0; i < components.Count; i++) {
+                if (type == components[i].GetType()) return components[i] as T;
+            }
+            return null;
+        }
+
+
         public void RemoveInventoryItemComponent(InventoryItemComponent component) {
             components.Remove(component);
         }
 
         public void Equip() {
-            if (itemState == InventoryItemState.InSlot) return;
-
             for(int i = 0 ; i < components.Count; i++) {
+                components[i].item = this;
                 components[i].OnEquip();
             }
         }
