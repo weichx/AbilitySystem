@@ -7,8 +7,6 @@ public class MethodPointerSerializer : TypeSerializer<AbstractMethodPointer> {
     }
 
     public override void Deserialize(AbstractMethodPointer obj, IReader reader) {
-        //ReadResult = reader.ReadField("ptr");
-
+        obj.signature = (string)reader.GetFieldValue("ptr");
     }
 }
-
