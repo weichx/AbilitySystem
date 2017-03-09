@@ -327,8 +327,8 @@ namespace DevConsole{
 			te.cursorIndex = pos;
 			te.selectIndex = pos;
 			#else
-			te.selectPos = pos; 
-			te.pos= pos;
+			//te.selectPos = pos; 
+			//te.pos= pos;
 			#endif
 			GUIUtility.ExitGUI();
 		}
