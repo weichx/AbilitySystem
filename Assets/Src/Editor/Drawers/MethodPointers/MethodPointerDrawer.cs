@@ -13,10 +13,10 @@ public class MethodPointerDrawerX : PropertyDrawerX {
         if (sourceType.IsGenericType) {
             Type[] genericTypes = sourceType.GetGenericArguments();
             Type[] args = new Type[genericTypes.Length - 1];
-            for (int i = 0; i < args.Length; i++) {
-                args[i] = genericTypes[i + 1];
+            for (int i = 0; i < (genericTypes.Length - 1); i++) {
+                args[i] = genericTypes[i];
             }
-            pointableMethods = Reflector.FindMethodPointersWithAttribute(typeof(Pointable), genericTypes[0], args);
+            pointableMethods = Reflector.FindMethodPointersWithAttribute(typeof(Pointable), genericTypes[genericTypes.Length - 1], args);
         }
         else {
             pointableMethods = Reflector.FindMethodPointersWithAttribute(typeof(Pointable), typeof(void), Type.EmptyTypes);
