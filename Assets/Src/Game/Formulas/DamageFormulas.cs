@@ -1,4 +1,5 @@
 ﻿using Intelligence;
+using EntitySystem;
 
 public static class DamageFormulas {
     [Pointable]
@@ -16,4 +17,9 @@ public static class DamageFormulas {
         return 11;
     }
 
+    [Pointable]
+    public static float Strike(SingleTargetContext context, float baseValue) {
+        if (context.target.GetType() == typeof(Character)) {}
+        return (baseValue + 10.0f);
+    }
 }
