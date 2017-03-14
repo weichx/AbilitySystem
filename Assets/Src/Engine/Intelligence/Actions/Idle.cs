@@ -8,7 +8,7 @@ namespace Intelligence {
         public float idleTime;
 
         public override void OnStart() {
-            NavMeshAgent agent = entity.GetComponent<NavMeshAgent>();
+            UnityEngine.AI.NavMeshAgent agent = entity.GetComponent<UnityEngine.AI.NavMeshAgent>();
             agent.ResetPath();
         }
 

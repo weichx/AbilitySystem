@@ -311,7 +311,7 @@ namespace com.ootii.Input
         /// NavMeshAgent we'll use to help manage the AI based
         /// navigation of the actor.
         /// </summary>
-        protected NavMeshAgent mNavMeshAgent = null;
+        protected UnityEngine.AI.NavMeshAgent mNavMeshAgent = null;
 
         /// <summary>
         /// Cache the actor controller
@@ -388,7 +388,7 @@ namespace com.ootii.Input
             mMotionController = gameObject.GetComponent<MotionController>();
 
             // Grab the nav mesh agent
-            mNavMeshAgent = gameObject.GetComponent<NavMeshAgent>();
+            mNavMeshAgent = gameObject.GetComponent<UnityEngine.AI.NavMeshAgent>();
 
             // We don't want the agent updating our position and rotation. That's
             // what the MC will do. We just want the path info

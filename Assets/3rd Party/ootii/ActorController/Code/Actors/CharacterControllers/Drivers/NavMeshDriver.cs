@@ -224,7 +224,7 @@ namespace com.ootii.Actors
         /// NavMeshAgent we'll use to help manage the AI based
         /// navigation of the actor.
         /// </summary>
-        protected NavMeshAgent mNavMeshAgent = null;
+        protected UnityEngine.AI.NavMeshAgent mNavMeshAgent = null;
 
         /// <summary>
         /// Determines if we have a valid waypoint path. This really only watches for
@@ -246,7 +246,7 @@ namespace com.ootii.Actors
             base.Awake();
 
             // Grab the nav mesh agent
-            mNavMeshAgent = gameObject.GetComponent<NavMeshAgent>();
+            mNavMeshAgent = gameObject.GetComponent<UnityEngine.AI.NavMeshAgent>();
 
             // We don't want the agent updating our position and rotation. That's
             // what the MC will do. We just want the path info
@@ -330,7 +330,7 @@ namespace com.ootii.Actors
             if (_UseNavMeshPosition)
             {
                 if (!mNavMeshAgent.pathPending &&
-                    mNavMeshAgent.pathStatus == NavMeshPathStatus.PathComplete &&
+                    mNavMeshAgent.pathStatus == UnityEngine.AI.NavMeshPathStatus.PathComplete &&
                     mNavMeshAgent.remainingDistance == 0f)
                 {
                     ClearTarget();
