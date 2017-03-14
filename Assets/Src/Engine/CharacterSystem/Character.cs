@@ -120,5 +120,10 @@ namespace EntitySystem {
                 Debug.Log("No weapon equiped, attacking with bare hands not supported yet");
             }
         }
+
+        public Context GetContext() {
+            return context;
+        }
+
     }
 }
