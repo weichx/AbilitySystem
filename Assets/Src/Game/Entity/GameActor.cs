@@ -3,7 +3,6 @@ using UnityEngine;
 namespace EntitySystem {
     public class GameActor : Entity {
         [SerializeField] private CharacterCreator characterCreator;
-        private Character character;
         private InventoryItemCreator[] equipTable;
 
         public override void Init() {
@@ -29,8 +28,6 @@ namespace EntitySystem {
                     itemManager.EquipItem(item, (EquipmentSlot)i);
                 }
             }
-
-            character.parameters.baseParameters.strength.SetModifier("Protein Powder", FloatModifier.Percent(50.2f));
         }
     }
 }

@@ -10,8 +10,8 @@ namespace EntitySystem {
 
         protected Entity entity;
 
-        public InventoryItemManager(Entity entiy) {
-            this.entity = entity;
+        public InventoryItemManager(Entity entity) {
+	        this.entity = entity;
             items = new List<InventoryItem>();
             equiped = new Dictionary<int, InventoryItem>();
         }

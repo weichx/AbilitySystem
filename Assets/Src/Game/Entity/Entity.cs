@@ -8,6 +8,7 @@ namespace EntitySystem {
         [UnitySerialized] [HideInInspector] public string source;
         [NonSerialized] public bool initialized;
         [NonSerialized] public Entity target;
+        [NonSerialized] public Character character;
 
         public void Start() {
             if (source != null && source != string.Empty) {
