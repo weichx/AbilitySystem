@@ -84,7 +84,13 @@ namespace EntitySystem {
 	    public bool IsChanneling {
 	        get { return abilityManager.ActiveAbility != null && abilityManager.ActiveAbility.IsChanneled; }
 	    }
-			
+
+        public Dictionary<int, InventoryItem> ActiveEquipment {
+            get {
+                return itemManager.Equipment;
+            }
+        }
+
 		public EventEmitter EventEmitter {
 			get { 
 				return emitter;

@@ -24,7 +24,7 @@ namespace EntitySystem {
         public EquipmentSlot equipSlot;
         public InventoryItemState itemState;
 
-        protected Character owner;
+        protected Entity owner;
         private Context Context;
 
         public void OnUse() {}
@@ -36,7 +36,7 @@ namespace EntitySystem {
         public void OnLost() {}
         public void OnSoulbound() {}
 
-        public Character Owner {
+        public Entity Owner {
             get { return owner; }
             set { owner = value; }
         }

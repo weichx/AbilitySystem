@@ -22,21 +22,15 @@ namespace EntitySystem {
                 character.equipment.weapon,
             };
 
-            for (int i = 0; i < character.equipment.EquipSlotCnt; i++) {
+            for (int i = 0; i < equipTable.Length; i++) {
                 if (equipTable[i] != null) {
                     var item = equipTable[i].Create();
-                    item.Owner = character;
-                    item.isEquipable = true; // For debugging
-                    character.SetEquiped(item, i);
+                    item.isEquipable = true;
+                    itemManager.EquipItem(item, (EquipmentSlot)i);
                 }
             }
 
             character.parameters.baseParameters.strength.SetModifier("Protein Powder", FloatModifier.Percent(50.2f));
-            character.Attack();
-        }
-
-        public void Update () {
-            //Debug.Log(character.equipment.equiped[(int)EquipmentSlot.Head].Id);
         }
     }
 }
