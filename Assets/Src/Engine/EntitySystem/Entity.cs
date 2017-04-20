@@ -92,6 +92,14 @@ namespace EntitySystem {
             }
         }
 
+        public List<Ability> SkillBook {
+            get { return character.skillBook; }
+        }
+
+        public CharacterParameters Parameters {
+            get { return character.parameters; }
+        }
+
 		public EventEmitter EventEmitter {
 			get { 
 				return emitter;
