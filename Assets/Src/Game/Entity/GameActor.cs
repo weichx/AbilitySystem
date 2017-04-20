@@ -1,13 +1,17 @@
 using UnityEngine;
+using Intelligence;
+using EntitySystem;
+using System.Collections.Generic;
 
 namespace EntitySystem {
     public class GameActor : Entity {
         [SerializeField] private CharacterCreator characterCreator;
-        private InventoryItemCreator[] equipTable;
+
+        private PlayerCharacterAction skillAction;
 
         public override void Init() {
             character = characterCreator.Create();
-            equipTable = new InventoryItemCreator[] {
+            var equipTable = new InventoryItemCreator[] {
                 character.equipment.head,
                 character.equipment.shoulder,
                 character.equipment.feet,
@@ -20,6 +24,11 @@ namespace EntitySystem {
                 character.equipment.ring2,
                 character.equipment.weapon,
             };
+
+            for (int i = 0; i < character.abilities.Count; i++) {
+                SkillBook.Add(character.abilities[i].Create());
+                SkillBook[i].Caster = this;
+            }
 
             for (int i = 0; i < equipTable.Length; i++) {
                 if (equipTable[i] != null) {

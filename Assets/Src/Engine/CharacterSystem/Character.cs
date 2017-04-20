@@ -61,11 +61,13 @@ namespace EntitySystem {
 
         [SerializeField] public List <InventoryItemCreator> items;
         [SerializeField] public List <AbilityCreator> abilities;
+        [NonSerialized] public List <Ability> skillBook;
 
         public List<CharacterRequirement> requirements;
         public List<CharacterComponent> components;
 
         [NonSerialized] private Context context;
+
         public Type contextType;
 
         public Character() : this ("") {
@@ -76,6 +78,7 @@ namespace EntitySystem {
             Id = id;
             components = new List<CharacterComponent>();
             requirements = new List<CharacterRequirement>();
+            skillBook = new List<Ability>();
         }
 
         public Context GetContext() {

@@ -15,6 +15,7 @@ namespace EntitySystem {
 	public partial class Entity : MonoBehaviour {
 
 	    public string factionId;
+        public Character character;
 
 	    [HideInInspector] public string id;
 	    [HideInInspector] public AbilityManager abilityManager;
