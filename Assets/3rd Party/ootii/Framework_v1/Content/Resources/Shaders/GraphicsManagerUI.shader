@@ -1,4 +1,6 @@
-﻿Shader "Hidden/GraphicsManagerUI"
+﻿// Upgrade NOTE: replaced 'mul(UNITY_MATRIX_MVP,*)' with 'UnityObjectToClipPos(*)'
+
+Shader "Hidden/GraphicsManagerUI"
 {
 	Properties
 	{
@@ -37,7 +39,7 @@
 	VertOut Vert(VertIn rInput, float3 rNormal : NORMAL)
 	{
 		VertOut lOutput;
-		lOutput.Position = mul(UNITY_MATRIX_MVP, rInput.Vertex);
+		lOutput.Position = UnityObjectToClipPos(rInput.Vertex);
 		lOutput.Color = rInput.Color;
 
 		return lOutput;
