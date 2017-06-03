@@ -55,6 +55,7 @@ namespace EntitySystem {
     public partial class Character : EntitySystemBase {
         public Sprite icon;
         public bool isPlayer;
+        public GameObject prefab;
 
         [SerializeField] public CharacterParameters parameters;
         [SerializeField] public CharacterEquipment equipment;

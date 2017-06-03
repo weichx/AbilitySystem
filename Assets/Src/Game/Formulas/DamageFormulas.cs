@@ -22,4 +22,30 @@ public static class DamageFormulas {
         if (context.target.GetType() == typeof(Character)) {}
         return (baseValue + 10.0f);
     }
+
+    // public void Randomize(int diceCnt, int maxNr) {
+    //     var sum;
+    //     for(int i=0; i < diceCnt; i++) {
+    //         sum += random(1,maxNr);
+    //     }
+    // }
+
+    // [Pointable]
+    // public static float TwoHanded(MultiPointContext context, float baseValue) {
+    //     return baseValue;
+    // }
+
+    // public static float WornModifier(float baseValue) {
+    //     // do something
+    //     return (baseValue - 4)
+    // }
+
+    // [Pointable]
+    // public static float SwordBaseAttack(SingleTargetContext context) {
+    //     var diceValue += damageTable[WeaponType.Sword];
+
+    //     damage = WornModifier(damage);
+
+    // }
 }
+
