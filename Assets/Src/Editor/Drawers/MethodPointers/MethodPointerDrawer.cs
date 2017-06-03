@@ -8,6 +8,24 @@ public class MethodPointerDrawerX : PropertyDrawerX {
 
     protected List<MethodPointer> pointableMethods;
 
+    // Debug button for easier testing of formula outputs
+    // public void CreateTestButton() {
+    //     if (GUILayout.Button("Test formula")) {
+    //         for (int i = 0; i < listRoot.ChildCount; i++) {
+    //             var child = listRoot.GetChildAt(i);
+    //             if (child.Type == typeof(DamageFormula)) {
+    //                 var value = (int)child.FindProperty("baseDamage").Value;
+    //                 var formula = child.FindProperty("damageFormula");
+    //                 var target = (CharacterCreator)child.FindProperty("TargetCharacter").Value;
+    //                 Delegate d = Reflector.FindDelegateWithSignature(formula.Value.ToString());
+    //                 Func<SingleTargetContext, float, float> fn = d as Func<SingleTargetContext, float, float>;
+    //                 var ctx = (SingleTargetContext)target.Create().GetContext();
+    //                 Debug.Log(fn(cntx, value));
+    //             }
+    //         }
+    //     }
+    // }
+
     public override void OnGUI(SerializedPropertyX source, GUIContent label) {
         Type sourceType = source.type;
         if (sourceType.IsGenericType) {

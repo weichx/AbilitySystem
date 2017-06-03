@@ -11,7 +11,7 @@ namespace EntitySystem {
         protected Entity entity;
 
         public InventoryItemManager(Entity entity) {
-	        this.entity = entity;
+            this.entity = entity;
             items = new List<InventoryItem>();
             equiped = new Dictionary<int, InventoryItem>();
         }
@@ -33,6 +33,8 @@ namespace EntitySystem {
 
             equiped[(int)slot] = item;
         }
+
+        public void UnequipItem(EquipmentSlot slot) {}
 
         public List<InventoryItem> Items {
             get { return items; }
