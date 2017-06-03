@@ -17,6 +17,7 @@ namespace EntitySystem {
         public bool isSocketable;
 
         public int charges;
+        public List<ItemType> isType;
 
         public List<InventoryItemRequirement> requirements;
         public List<InventoryItemComponent> components;
@@ -49,6 +50,7 @@ namespace EntitySystem {
             Id = id;
             requirements = new List<InventoryItemRequirement>();
             components = new List<InventoryItemComponent>();
+            isType = new List<ItemType>();
         }
 
         public InventoryItemComponent AddInventoryItemComponent<T>() where T : InventoryItemComponent, new() {
