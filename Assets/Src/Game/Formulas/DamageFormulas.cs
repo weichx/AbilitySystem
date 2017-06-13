@@ -1,7 +1,27 @@
 ﻿using Intelligence;
 using EntitySystem;
+using System.Collections.Generic;
 
 public static class DamageFormulas {
+    public static readonly Dictionary<DiceBase, DiceData> DiceTable = new Dictionary<DiceBase, DiceData> {
+        { DiceBase.BASE_1d2, new DiceData(1, 2) },
+        { DiceBase.BASE_1d4, new DiceData(1, 4) },
+        { DiceBase.BASE_1d6, new DiceData(1, 6) },
+        { DiceBase.BASE_1d8, new DiceData(1, 8) },
+        { DiceBase.BASE_1d10, new DiceData(1, 10) },
+        { DiceBase.BASE_1d12, new DiceData(2, 12) },
+        { DiceBase.BASE_2d6, new DiceData(2, 6) },
+        { DiceBase.BASE_3d6, new DiceData(3, 6) },
+    };
+
+    public static DiceData GenerateDiceResult(DiceData dice) {
+        var r = new System.Random();
+        for(int i = 0; i < dice.RollCnt; i++) {
+            dice.AddRoll(1, r.Next(dice.MinValue, dice.MaxValue));
+        }
+        return dice;
+    }
+
     [Pointable]
     public static float Fn(float f) {
         return 0;
@@ -23,12 +43,12 @@ public static class DamageFormulas {
         return (baseValue + 10.0f);
     }
 
-    // public void Randomize(int diceCnt, int maxNr) {
-    //     var sum;
-    //     for(int i=0; i < diceCnt; i++) {
-    //         sum += random(1,maxNr);
-    //     }
-    // }
+    [Pointable] // sample
+    public static int SwordAttack(SingleTargetContext context, DiceBase diceBase) {
+        var diceRollFirst = GenerateDiceResult(DiceTable[diceBase]);
+        var diceRollSecnond = GenerateDiceResult(DiceTable[diceBase]);
+        return diceRollFirst.Result + diceRollSecnond.Result;
+    }
 
     // [Pointable]
     // public static float TwoHanded(MultiPointContext context, float baseValue) {
