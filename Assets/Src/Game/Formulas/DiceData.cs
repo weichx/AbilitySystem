@@ -35,8 +35,14 @@ public struct DiceData {
         _finalValue = new int[_rollCount];
     }
 
-    public void AddRoll(int idx, int value) {
-        if(_finalValue[idx] > 0) return;
-        _finalValue[idx] = value;
+    public DiceData(int cnt, int max, int min, int[] final) {
+        _minValue =  min;
+        _maxValue = max;
+        _finalValue = final;
+        _rollCount = cnt;
+    }
+
+    public DiceData Final(int[] values) {
+        return new DiceData(_rollCount, _maxValue, _minValue, values);
     }
 }

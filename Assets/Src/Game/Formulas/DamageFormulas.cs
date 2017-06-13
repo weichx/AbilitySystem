@@ -16,10 +16,11 @@ public static class DamageFormulas {
 
     public static DiceData GenerateDiceResult(DiceData dice) {
         var r = new System.Random();
+        int[] results = new int[dice.RollCnt];
         for(int i = 0; i < dice.RollCnt; i++) {
-            dice.AddRoll(1, r.Next(dice.MinValue, dice.MaxValue));
+           results[i] = r.Next(dice.MinValue, dice.MaxValue);
         }
-        return dice;
+        return dice.Final(results);
     }
 
     [Pointable]
