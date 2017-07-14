@@ -31,7 +31,7 @@ public class DamageFormulaDrawer : PropertyDrawerX {
 
             listRenderer = new ListRenderer();
             listRenderer.Initialize();
-            listRenderer.SetTargetProperty(rootProperty, ref listRoot);
+            listRenderer.SetTargetProperty(rootProperty, listRoot);
             listRenderer.SetSearchBox(CreateSearchBox);
             initialized = true;
         }

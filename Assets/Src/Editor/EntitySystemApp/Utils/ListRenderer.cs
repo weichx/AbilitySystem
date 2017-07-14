@@ -23,8 +23,7 @@ public class ListRenderer {
     protected bool useFoldout;
 
     // Delegates used for more overriding behaviors list renderer
-    public delegate void TargetPropertyDel(SerializedPropertyX rootProprty, ref SerializedPropertyX listRoot);
-    public TargetPropertyDel SetTargetProperty { get; set; }
+    public Action<SerializedPropertyX, SerializedPropertyX> SetTargetProperty { get; set; }
     public Action<SerializedPropertyX, int> RenderListItem {get; set; }
     public Func<SerializedPropertyX, RenderData, string> GetItemFoldoutLabel { get; set; }
     public Action<SerializedPropertyX, RenderData, int> RenderHeader { get; set; }
@@ -55,7 +54,7 @@ public class ListRenderer {
         Render = DefaultRender;
     }
 
-    public void DefaultSetTargetProperty(SerializedPropertyX rootProperty, ref SerializedPropertyX listRoot) {
+    public void DefaultSetTargetProperty(SerializedPropertyX rootProperty, SerializedPropertyX listRoot) {
         this.rootProperty = rootProperty;
         if (rootProperty == null) {
             listRoot = null;
