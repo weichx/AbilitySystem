@@ -57,11 +57,11 @@ public abstract class ListSection<T> : SectionBase<T> where T : EntitySystemBase
     }
 
     protected virtual void RenderHeader(SerializedPropertyX property, RenderData data, int index) {
-       
+
         EditorGUILayout.BeginHorizontal();
         GUIStyle style;
             style = new GUIStyle(EditorStyles.foldout);
-          
+
         style.normal.textColor = Color.white;
         style.active.textColor = Color.white;
         style.focused.textColor = Color.white;
@@ -70,7 +70,7 @@ public abstract class ListSection<T> : SectionBase<T> where T : EntitySystemBase
         style.onNormal.textColor = Color.white;
         style.onHover.textColor = Color.white;
         data.isDisplayed = EditorGUILayout.Foldout(data.isDisplayed, GetItemFoldoutLabel(property, data), style);
-      
+
         GUILayout.FlexibleSpace();
 
         GUIStyle miniLeft = GUI.skin.GetStyle("minibuttonleft");
@@ -176,5 +176,4 @@ public abstract class ListSection<T> : SectionBase<T> where T : EntitySystemBase
         renderData[index] = renderData[index + directon];
         renderData[index + directon] = tempData;
     }
-
 }

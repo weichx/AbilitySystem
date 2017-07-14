@@ -3,7 +3,15 @@ using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
+// TODO: this code currently duplicates the code in ListSection<T>
+// either list section should be refactored to use this class or custom
+// drawers needs to be able to import the functions of ListSection<T>
+// another option is to create a IDrawableList interface;
+
 public class ListRenderer {
+    public class RenderData {
+        public bool isDisplayed;
+    }
 
     protected bool shown;
     protected SearchBox searchBox;
@@ -22,13 +30,13 @@ public class ListRenderer {
         skipRenderingFields = new List<string>();
     }
 
-    protected virtual string FoldOutLabel { get { return listRoot.name; } }
+    protected string FoldOutLabel { get { return listRoot.name; } }
 
     public void SetSearchBox (Func<SearchBox> createSearchBox) {
         searchBox = createSearchBox();
     }
 
-    public void SetTargetProperty(SerializedPropertyX rootProperty, SerializedPropertyX listRoot) {
+    public void SetTargetProperty(SerializedPropertyX rootProperty, ref SerializedPropertyX listRoot) {
         this.rootProperty = rootProperty;
         if (rootProperty == null) {
             listRoot = null;
@@ -131,8 +139,6 @@ public class ListRenderer {
         object component = Activator.CreateInstance(type);
         listRoot.ArraySize++;
         SerializedPropertyX newChild = listRoot.GetChildAt(listRoot.ArraySize - 1);
-        Debug.Log(newChild);
-        Debug.Log(component);
         newChild.Value = component;
         renderData.Add(CreateDataInstance(newChild, true));
     }
