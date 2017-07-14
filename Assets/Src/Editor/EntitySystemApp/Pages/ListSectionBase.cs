@@ -4,11 +4,11 @@ using UnityEditor;
 using EntitySystem;
 using System.Collections.Generic;
 
-public abstract class ListSection<T> : SectionBase<T> where T : EntitySystemBase, new() {
+public class RenderData {
+    public bool isDisplayed;
+}
 
-    public class RenderData {
-        public bool isDisplayed;
-    }
+public abstract class ListSection<T> : SectionBase<T> where T : EntitySystemBase, new() {
 
     protected bool shown;
     protected SearchBox searchBox;

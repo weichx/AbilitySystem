@@ -7,8 +7,8 @@ using System;
 using EntitySystem;
 using Intelligence;
 
-[PropertyDrawerFor(typeof(FormulaCalculation))]
-public class FormulaCalculationDrawer : PropertyDrawerX {
+[PropertyDrawerFor(typeof(DamageFormula))]
+public class DamageFormulaDrawer : PropertyDrawerX {
 
     private SerializedPropertyX rootProperty;
     private SerializedPropertyX listRoot;
@@ -30,7 +30,7 @@ public class FormulaCalculationDrawer : PropertyDrawerX {
             listRoot = source["modifiers"];
 
             listRenderer = new ListRenderer();
-            listRenderer.SetTargetProperty(rootProperty, listRoot);
+            listRenderer.SetTargetProperty(rootProperty, ref listRoot);
             listRenderer.SetSearchBox(CreateSearchBox);
             initialized = true;
         }

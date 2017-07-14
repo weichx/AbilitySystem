@@ -3,11 +3,6 @@ using EntitySystem;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class FormulaCalculation : AbilityComponent<Context> {
-    public Context contextType;
-    public List<Modifier> modifiers;
-}
-
 public class ContextModifier : Modifier<Context> {
     public int test;
     public MethodPointer<float> formula;
