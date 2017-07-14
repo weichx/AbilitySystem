@@ -30,6 +30,7 @@ public class DamageFormulaDrawer : PropertyDrawerX {
             listRoot = source["modifiers"];
 
             listRenderer = new ListRenderer();
+            listRenderer.Initialize();
             listRenderer.SetTargetProperty(rootProperty, ref listRoot);
             listRenderer.SetSearchBox(CreateSearchBox);
             initialized = true;

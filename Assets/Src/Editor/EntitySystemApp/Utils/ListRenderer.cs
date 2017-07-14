@@ -22,21 +22,40 @@ public class ListRenderer {
     protected List<string> skipRenderingFields;
     protected bool useFoldout;
 
+    // Delegates used for more overriding behaviors list renderer
+    public delegate void TargetPropertyDel(SerializedPropertyX rootProprty, ref SerializedPropertyX listRoot);
+    public TargetPropertyDel SetTargetProperty { get; set; }
+    public Action<SerializedPropertyX, int> RenderListItem {get; set; }
+    public Func<SerializedPropertyX, RenderData, string> GetItemFoldoutLabel { get; set; }
+    public Action<SerializedPropertyX, RenderData, int> RenderHeader { get; set; }
+    public Action<SerializedPropertyX, RenderData, int> RenderBody { get; set; }
+    public Func<SerializedPropertyX, bool, RenderData> CreateDataInstance { get; set; }
+    public Action<Type> AddListItem { get; set; }
+    public Action Render { get; set; }
+
     public ListRenderer(bool useFoldout = true) {
         this.useFoldout = useFoldout;
-        this.listRoot = listRoot;
-        this.rootProperty = rootProperty;
         shown = true;
         skipRenderingFields = new List<string>();
     }
 
     protected string FoldOutLabel { get { return listRoot.name; } }
-
-    public void SetSearchBox (Func<SearchBox> createSearchBox) {
+    public void SetSearchBox(Func<SearchBox> createSearchBox) {
         searchBox = createSearchBox();
     }
 
-    public void SetTargetProperty(SerializedPropertyX rootProperty, ref SerializedPropertyX listRoot) {
+    public void Initialize() {
+        SetTargetProperty = DefaultSetTargetProperty;
+        RenderListItem = DefaultRenderListItem;
+        GetItemFoldoutLabel = DefaultGetItemFoldoutLabel;
+        RenderHeader = DefaultRenderHeader;
+        RenderBody = DefaultRenderBody;
+        CreateDataInstance = DefaultCreateDataInstance;
+        AddListItem = DefaultAddListItem;
+        Render = DefaultRender;
+    }
+
+    public void DefaultSetTargetProperty(SerializedPropertyX rootProperty, ref SerializedPropertyX listRoot) {
         this.rootProperty = rootProperty;
         if (rootProperty == null) {
             listRoot = null;
@@ -52,7 +71,7 @@ public class ListRenderer {
         }
     }
 
-    public void RenderListItem(SerializedPropertyX item, int index) {
+    public void DefaultRenderListItem(SerializedPropertyX item, int index) {
         var indent = EditorGUI.indentLevel;
         EditorGUILayout.BeginHorizontal();
         GUILayout.Space(EditorGUI.indentLevel * 16f);
@@ -72,11 +91,11 @@ public class ListRenderer {
 
     }
 
-    public string GetItemFoldoutLabel(SerializedPropertyX property, RenderData data) {
+    public string DefaultGetItemFoldoutLabel(SerializedPropertyX property, RenderData data) {
         return Util.SplitAndTitlize(property.Type.Name);
     }
 
-    public void RenderHeader(SerializedPropertyX property, RenderData data, int index) {
+    public void DefaultRenderHeader(SerializedPropertyX property, RenderData data, int index) {
 
         EditorGUILayout.BeginHorizontal();
         GUIStyle style;
@@ -115,7 +134,7 @@ public class ListRenderer {
 
     }
 
-    public void RenderBody(SerializedPropertyX property, RenderData data, int index) {
+    public void DefaultRenderBody(SerializedPropertyX property, RenderData data, int index) {
         EditorGUI.indentLevel++;
         if (Reflector.GetCustomPropertyDrawerFor(property) != null) {
             EditorGUILayoutX.PropertyField(property, property.label, property.isExpanded);
@@ -129,13 +148,13 @@ public class ListRenderer {
         EditorGUI.indentLevel--;
     }
 
-    public RenderData CreateDataInstance(SerializedPropertyX property, bool isNewTarget) {
+    public RenderData DefaultCreateDataInstance(SerializedPropertyX property, bool isNewTarget) {
         RenderData data = new RenderData();
         data.isDisplayed = !isNewTarget;
         return data;
     }
 
-    public void AddListItem(Type type) {
+    public void DefaultAddListItem(Type type) {
         object component = Activator.CreateInstance(type);
         listRoot.ArraySize++;
         SerializedPropertyX newChild = listRoot.GetChildAt(listRoot.ArraySize - 1);
@@ -143,7 +162,7 @@ public class ListRenderer {
         renderData.Add(CreateDataInstance(newChild, true));
     }
 
-    public void Render() {
+    public void DefaultRender() {
         if (rootProperty == null) return;
         EditorGUILayout.BeginVertical();
         if (useFoldout) {
@@ -171,7 +190,6 @@ public class ListRenderer {
 
         }
         EditorGUILayout.EndVertical();
-
     }
 
     protected void Swap(int index, int directon) {
