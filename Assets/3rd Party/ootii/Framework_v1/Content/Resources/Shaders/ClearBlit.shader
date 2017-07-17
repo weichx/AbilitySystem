@@ -1,4 +1,6 @@
-﻿Shader "Hidden/ClearBlit" 
+﻿// Upgrade NOTE: replaced 'mul(UNITY_MATRIX_MVP,*)' with 'UnityObjectToClipPos(*)'
+
+Shader "Hidden/ClearBlit" 
 {
 	Properties 
 	{
@@ -19,7 +21,7 @@
 	VertexStruct vert( appdata_img rInput )
 	{
 		VertexStruct lOutput;
-		lOutput.pos = mul (UNITY_MATRIX_MVP, rInput.vertex);
+		lOutput.pos = UnityObjectToClipPos (rInput.vertex);
 		lOutput.uv = rInput.texcoord.xy;
 		return lOutput;
 	} 
