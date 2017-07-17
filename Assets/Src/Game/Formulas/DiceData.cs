@@ -1,14 +1,14 @@
 using System.Collections.Generic;
 
 public enum DiceBase {
-    BASE_1d2,
-    BASE_1d4,
-    BASE_1d6,
-    BASE_1d8,
-    BASE_1d10,
-    BASE_1d12,
-    BASE_2d6,
-    BASE_3d6
+    BASE_1d2 = 0,
+    BASE_1d4 = 1,
+    BASE_1d6 = 2,
+    BASE_1d8 = 3,
+    BASE_1d10 = 4,
+    BASE_1d12 = 5,
+    BASE_2d6 = 6,
+    BASE_3d6 = 7
 }
 
 public struct DiceData {

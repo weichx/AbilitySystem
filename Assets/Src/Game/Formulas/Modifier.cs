@@ -7,9 +7,8 @@ namespace Intelligence {
     public abstract class Modifier {
 
         [NonSerialized]
-        protected FormulaCalculation formula;
-
         protected Context contextType;
+
         public virtual void ApplyModifier(ref float inValue) { }
 
         public virtual void SetContext(Context context) {

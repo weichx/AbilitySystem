@@ -15,7 +15,7 @@ public class UsableAbility : InventoryItemComponent {
 
         // ability.GetAbilityComponent<SingleTargetDamage>().baseDamage = item
 
-        Debug.Log(ability.Id);
+        ability.Use();
 
         // SetContext(ctx);
         // damageFormula.OnAfterDeserialize();

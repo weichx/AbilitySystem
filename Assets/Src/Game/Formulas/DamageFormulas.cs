@@ -1,6 +1,7 @@
 ﻿using Intelligence;
 using EntitySystem;
 using System.Collections.Generic;
+using UnityEngine;
 
 public static class DamageFormulas {
     public static readonly Dictionary<DiceBase, DiceData> DiceTable = new Dictionary<DiceBase, DiceData> {
@@ -9,15 +10,15 @@ public static class DamageFormulas {
         { DiceBase.BASE_1d6, new DiceData(1, 6) },
         { DiceBase.BASE_1d8, new DiceData(1, 8) },
         { DiceBase.BASE_1d10, new DiceData(1, 10) },
-        { DiceBase.BASE_1d12, new DiceData(2, 12) },
+        { DiceBase.BASE_1d12, new DiceData(1, 12) },
         { DiceBase.BASE_2d6, new DiceData(2, 6) },
         { DiceBase.BASE_3d6, new DiceData(3, 6) },
     };
 
-    public static DiceData GenerateDiceResult(DiceData dice) {
+    public static DiceData GenerateDiceResult(DiceData dice, int extraRoll = 0) {
         var r = new System.Random();
         int[] results = new int[dice.RollCnt];
-        for(int i = 0; i < dice.RollCnt; i++) {
+        for(int i = 0; i < (dice.RollCnt * 2) + extraRoll; i++) {
            results[i] = r.Next(dice.MinValue, dice.MaxValue);
         }
         return dice.Final(results);
@@ -41,6 +42,7 @@ public static class DamageFormulas {
     [Pointable]
     public static float Strike(SingleTargetContext context, float baseValue) {
         if (context.target.GetType() == typeof(Character)) {}
+
         return (baseValue + 10.0f);
     }
 

@@ -37,6 +37,8 @@ namespace EntitySystem {
                     itemManager.EquipItem(item, (EquipmentSlot)i);
                 }
             }
+
+            ActiveEquipment[(int)EquipmentSlot.Weapon].Use();
         }
     }
 }
