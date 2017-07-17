@@ -95,6 +95,11 @@ namespace EntitySystem {
 	        return OffCooldown && CheckRequirements(context, RequirementType.CastStart);
 	    }
 
+      // method used for debugging
+      public void Use() {
+          OnUse();
+      }
+
 	    public bool Use(Context context) {
 	        if (!contextType.IsAssignableFrom(context.GetType())) {
 	            Debug.LogError("Ability `" + Id + "` expects a context type assignable to " + contextType.Name + ", but was used with: " + context.GetType().Name);

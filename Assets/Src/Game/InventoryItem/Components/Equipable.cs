@@ -11,13 +11,8 @@ public class Equipable : InventoryItemComponent {
     public BaseParameters setParamsTo;
 
     public override void OnEquip() {
-        item.equipSlot = equipSlot;
-
-        if(item.Owner.equipment[equipSlot] != null) {
-            item.Owner.equipment[equipSlot].Unequip();
-        }
-
-        item.Owner.equipment[equipSlot] = item;
+        var c = item.Owner.character;
+        c.parameters.baseParameters.strength.SetModifier("Protein Powder", FloatModifier.Percent(50.2f));
     }
 
     public override void OnRemove() {

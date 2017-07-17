@@ -1,14 +1,21 @@
-using UnityEditor;
-using UnityEngine;
-using Intelligence;
-using EntitySystem;
 
-public class DamageFormula : InventoryItemComponent {
+// using UnityEngine;
+// using Intelligence;
+// using EntitySystem;
+// using System;
 
-    public int baseDamage;
+// public class UsableAbility : InventoryItemComponent {
 
-    public MethodPointer<float, SingleTargetContext, float> damageFormula;
+//     public AbilityCreator ability;
+//     // For debuggingx
+//     //public CharacterCreator TargetCharacter;
 
-    public override void OnUse() {
-    }
-}
+//     public override void OnUse() {
+//         ability.Create();
+//         // SetContext(ctx);
+//         // damageFormula.OnAfterDeserialize();
+//         // Debug.Log(damageFormula.Invoke((SingleTargetContext)ctx, baseDamage));
+
+//         //Debug.Log(damageFormula.Invoke(, (SingleTargetContext)ctx));
+//     }
+// }

@@ -18,31 +18,6 @@ namespace EntitySystem {
         public InventoryItemCreator ring1;
         public InventoryItemCreator ring2;
         public InventoryItemCreator weapon;
-
-        public InventoryItem this[EquipmentSlot slot] {
-            get {
-                if(!equiped.ContainsKey((int)slot)) return null;
-                return equiped[(int)slot];
-            }
-            set { equiped[(int)slot] = value; }
-        }
-
-        public int EquipSlotCnt { get { return slots.Length; } }
-
-        [NonSerializedAttribute] public Dictionary<int, InventoryItem> equiped = new Dictionary<int, InventoryItem>();
-        [NonSerializedAttribute] public EquipmentSlot[] slots = new EquipmentSlot[] {
-            EquipmentSlot.Head,
-            EquipmentSlot.Shoulder,
-            EquipmentSlot.Feet,
-            EquipmentSlot.Body,
-            EquipmentSlot.Legs,
-            EquipmentSlot.Neck,
-            EquipmentSlot.Gloves,
-            EquipmentSlot.Waist,
-            EquipmentSlot.Ring,
-            EquipmentSlot.Ring,
-            EquipmentSlot.Weapon
-        };
     }
 
     public class CharacterParameters
@@ -58,7 +33,7 @@ namespace EntitySystem {
         [NonSerialized] public IntRange physicalSave;
         [NonSerialized] public IntRange magicalSave;
         [NonSerialized] public IntRange athleticSave;
-}
+    }
 
     [System.Serializable]
     public class BaseParameters
@@ -80,17 +55,20 @@ namespace EntitySystem {
     public partial class Character : EntitySystemBase {
         public Sprite icon;
         public bool isPlayer;
+        public GameObject prefab;
 
         [SerializeField] public CharacterParameters parameters;
         [SerializeField] public CharacterEquipment equipment;
 
         [SerializeField] public List <InventoryItemCreator> items;
         [SerializeField] public List <AbilityCreator> abilities;
+        [NonSerialized] public List <Ability> skillBook;
 
         public List<CharacterRequirement> requirements;
         public List<CharacterComponent> components;
 
         [NonSerialized] private Context context;
+
         public Type contextType;
 
         public Character() : this ("") {
@@ -101,24 +79,11 @@ namespace EntitySystem {
             Id = id;
             components = new List<CharacterComponent>();
             requirements = new List<CharacterRequirement>();
+            skillBook = new List<Ability>();
         }
 
-        public void SetEquiped (InventoryItem item, int id) {
-            if (!item.isEquipable) return;
-            if (item.GetInventoryItemComponent<Equipable>().equipSlot != equipment.slots[id]) return;
-            if (item.itemState == InventoryItemState.InSlot) return;
-
-            item.Equip();
-        }
-
-        public void Attack() {
-            var weapon = equipment.equiped[(int)EquipmentSlot.Weapon];
-            if(weapon != null) {
-                weapon.Use();
-            }
-            else {
-                Debug.Log("No weapon equiped, attacking with bare hands not supported yet");
-            }
+        public Context GetContext() {
+            return context;
         }
     }
 }

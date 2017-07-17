@@ -1,6 +1,8 @@
 using UnityEngine;
 using UnityEditor;
 using EntitySystem;
+using Intelligence;
+using System;
 
 public class InventoryItemPage_ComponentSection : ListSection<InventoryItem> {
 
@@ -12,6 +14,10 @@ public class InventoryItemPage_ComponentSection : ListSection<InventoryItem> {
 
     protected override string ListRootName {
         get { return "components"; }
+    }
+
+    public override void Render() {
+        base.Render();
     }
 
     protected override SearchBox CreateSearchBox() {

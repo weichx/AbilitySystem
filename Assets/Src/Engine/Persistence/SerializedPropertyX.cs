@@ -187,6 +187,12 @@ public class SerializedPropertyX {
         }
 
     }
+    public SerializedPropertyX GetParent {
+        get {
+            if (parent == null) return null;
+            return parent;
+        }
+    }
 
     public bool IsArrayLike {
         get {

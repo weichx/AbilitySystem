@@ -16,7 +16,9 @@ namespace EntitySystem {
 
 	    public string factionId;
 
+        [HideInInspector] public Character character;
 	    [HideInInspector] public string id;
+
 	    [HideInInspector] public AbilityManager abilityManager;
 	    [HideInInspector] public ResourceManager resourceManager;
 	    [HideInInspector] public StatusEffectManager statusManager;
@@ -84,7 +86,21 @@ namespace EntitySystem {
 	    public bool IsChanneling {
 	        get { return abilityManager.ActiveAbility != null && abilityManager.ActiveAbility.IsChanneled; }
 	    }
-			
+
+        public Dictionary<int, InventoryItem> ActiveEquipment {
+            get {
+                return itemManager.Equipment;
+            }
+        }
+
+        public List<Ability> SkillBook {
+            get { return character.skillBook; }
+        }
+
+        public CharacterParameters Parameters {
+            get { return character.parameters; }
+        }
+
 		public EventEmitter EventEmitter {
 			get { 
 				return emitter;

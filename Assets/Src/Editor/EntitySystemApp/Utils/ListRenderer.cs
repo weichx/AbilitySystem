@@ -1,38 +1,76 @@
-﻿using System;
-using UnityEngine;
-using UnityEditor;
-using EntitySystem;
+using System;
 using System.Collections.Generic;
+using UnityEditor;
+using UnityEngine;
 
-public class RenderData {
-    public bool isDisplayed;
-}
+// TODO: this code currently duplicates the code in ListSection<T>
+// either list section should be refactored to use this class or custom
+// drawers needs to be able to import the functions of ListSection<T>
+// another option is to create a IDrawableList interface;
 
-public abstract class ListSection<T> : SectionBase<T> where T : EntitySystemBase, new() {
+public class ListRenderer {
+    public class RenderData {
+        public bool isDisplayed;
+    }
 
     protected bool shown;
     protected SearchBox searchBox;
     protected List<RenderData> renderData;
     protected SerializedPropertyX listRoot;
+    protected SerializedPropertyX rootProperty;
 
     protected List<string> skipRenderingFields;
     protected bool useFoldout;
 
-    public ListSection(float spacing = 0f, bool useFoldout = true) : base(spacing) {
+    // Delegates used for more overriding behaviors list renderer
+    public Action<SerializedPropertyX, SerializedPropertyX> SetTargetProperty { get; set; }
+    public Action<SerializedPropertyX, int> RenderListItem {get; set; }
+    public Func<SerializedPropertyX, RenderData, string> GetItemFoldoutLabel { get; set; }
+    public Action<SerializedPropertyX, RenderData, int> RenderHeader { get; set; }
+    public Action<SerializedPropertyX, RenderData, int> RenderBody { get; set; }
+    public Func<SerializedPropertyX, bool, RenderData> CreateDataInstance { get; set; }
+    public Action<Type> AddListItem { get; set; }
+    public Action Render { get; set; }
+
+    public ListRenderer(bool useFoldout = true) {
         this.useFoldout = useFoldout;
-        searchBox = CreateSearchBox();
         shown = true;
         skipRenderingFields = new List<string>();
     }
 
-    protected virtual string FoldOutLabel { get { return listRoot.name; } }
-    protected abstract string ListRootName { get; }
-
-    protected virtual SearchBox CreateSearchBox() {
-        return null;
+    protected string FoldOutLabel { get { return listRoot.name; } }
+    public void SetSearchBox(Func<SearchBox> createSearchBox) {
+        searchBox = createSearchBox();
     }
 
-    protected virtual void RenderListItem(SerializedPropertyX item, int index) {
+    public void Initialize() {
+        SetTargetProperty = DefaultSetTargetProperty;
+        RenderListItem = DefaultRenderListItem;
+        GetItemFoldoutLabel = DefaultGetItemFoldoutLabel;
+        RenderHeader = DefaultRenderHeader;
+        RenderBody = DefaultRenderBody;
+        CreateDataInstance = DefaultCreateDataInstance;
+        AddListItem = DefaultAddListItem;
+        Render = DefaultRender;
+    }
+
+    public void DefaultSetTargetProperty(SerializedPropertyX rootProperty, SerializedPropertyX listRoot) {
+        this.rootProperty = rootProperty;
+        if (rootProperty == null) {
+            listRoot = null;
+            renderData = null;
+            return;
+        }
+
+        this.listRoot = listRoot;
+        int count = listRoot.ChildCount;
+        renderData = new List<RenderData>(count);
+        for (int i = 0; i < count; i++) {
+            renderData.Add(CreateDataInstance(listRoot.GetChildAt(i), true));
+        }
+    }
+
+    public void DefaultRenderListItem(SerializedPropertyX item, int index) {
         var indent = EditorGUI.indentLevel;
         EditorGUILayout.BeginHorizontal();
         GUILayout.Space(EditorGUI.indentLevel * 16f);
@@ -52,11 +90,11 @@ public abstract class ListSection<T> : SectionBase<T> where T : EntitySystemBase
 
     }
 
-    protected virtual string GetItemFoldoutLabel(SerializedPropertyX property, RenderData data) {
+    public string DefaultGetItemFoldoutLabel(SerializedPropertyX property, RenderData data) {
         return Util.SplitAndTitlize(property.Type.Name);
     }
 
-    protected virtual void RenderHeader(SerializedPropertyX property, RenderData data, int index) {
+    public void DefaultRenderHeader(SerializedPropertyX property, RenderData data, int index) {
 
         EditorGUILayout.BeginHorizontal();
         GUIStyle style;
@@ -95,7 +133,7 @@ public abstract class ListSection<T> : SectionBase<T> where T : EntitySystemBase
 
     }
 
-    protected virtual void RenderBody(SerializedPropertyX property, RenderData data, int index) {
+    public void DefaultRenderBody(SerializedPropertyX property, RenderData data, int index) {
         EditorGUI.indentLevel++;
         if (Reflector.GetCustomPropertyDrawerFor(property) != null) {
             EditorGUILayoutX.PropertyField(property, property.label, property.isExpanded);
@@ -109,28 +147,13 @@ public abstract class ListSection<T> : SectionBase<T> where T : EntitySystemBase
         EditorGUI.indentLevel--;
     }
 
-    protected virtual RenderData CreateDataInstance(SerializedPropertyX property, bool isNewTarget) {
+    public RenderData DefaultCreateDataInstance(SerializedPropertyX property, bool isNewTarget) {
         RenderData data = new RenderData();
         data.isDisplayed = !isNewTarget;
         return data;
     }
 
-    public override void SetTargetProperty(SerializedPropertyX rootProperty) {
-        this.rootProperty = rootProperty;
-        if (rootProperty == null) {
-            listRoot = null;
-            renderData = null;
-            return;
-        }
-        listRoot = rootProperty[ListRootName];
-        int count = listRoot.ChildCount;
-        renderData = new List<RenderData>(count);
-        for (int i = 0; i < count; i++) {
-            renderData.Add(CreateDataInstance(listRoot.GetChildAt(i), true));
-        }
-    }
-
-    protected virtual void AddListItem(Type type) {
+    public void DefaultAddListItem(Type type) {
         object component = Activator.CreateInstance(type);
         listRoot.ArraySize++;
         SerializedPropertyX newChild = listRoot.GetChildAt(listRoot.ArraySize - 1);
@@ -138,7 +161,7 @@ public abstract class ListSection<T> : SectionBase<T> where T : EntitySystemBase
         renderData.Add(CreateDataInstance(newChild, true));
     }
 
-    public override void Render() {
+    public void DefaultRender() {
         if (rootProperty == null) return;
         EditorGUILayout.BeginVertical();
         if (useFoldout) {
@@ -166,7 +189,6 @@ public abstract class ListSection<T> : SectionBase<T> where T : EntitySystemBase
 
         }
         EditorGUILayout.EndVertical();
-
     }
 
     protected void Swap(int index, int directon) {
