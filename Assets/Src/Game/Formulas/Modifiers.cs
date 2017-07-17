@@ -12,11 +12,15 @@ public class ContextModifier : Modifier<Context> {
 }
 
 public class NoModifier : Modifier<SingleTargetContext> {
-    public int test;
+    public float test;
     public MethodPointer<SingleTargetContext, float, float> formula;
+
     public override void ApplyModifier(ref float value) {
-        value += 10;
+        // while testing
+        formula.OnAfterDeserialize();
+        value = formula.Invoke((SingleTargetContext)this.context, value + test);
     }
+
 }
 
 public class OneModifier : Modifier<MultiPointContext> {
