@@ -17,9 +17,9 @@ public static class DamageFormulas {
 
     public static DiceData GenerateDiceResult(DiceData dice, int extraRoll = 0) {
         var r = new System.Random();
-        int[] results = new int[dice.RollCnt];
+        int[] results = new int[dice.RollCnt * 2];
         for(int i = 0; i < (dice.RollCnt * 2) + extraRoll; i++) {
-           results[i] = r.Next(dice.MinValue, dice.MaxValue);
+           results[i] = r.Next(dice.MinValue, dice.MaxValue + 1);
         }
         return dice.Final(results);
     }
@@ -41,8 +41,7 @@ public static class DamageFormulas {
 
     [Pointable]
     public static float Strike(SingleTargetContext context, float baseValue) {
-        if (context.target.GetType() == typeof(Character)) {}
-
+        // if (context.target.GetType() == typeof(Character)) {}
         return (baseValue + 10.0f);
     }
 
@@ -53,6 +52,10 @@ public static class DamageFormulas {
         return diceRollFirst.Result + diceRollSecnond.Result;
     }
 
+    [Pointable]
+    public static float Test(Context context) {
+        return 0f;
+    }
     // [Pointable]
     // public static float TwoHanded(MultiPointContext context, float baseValue) {
     //     return baseValue;

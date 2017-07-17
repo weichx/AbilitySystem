@@ -39,7 +39,7 @@ namespace EntitySystem {
     public class BaseParameters
     {
         [SerializeField]
-        private int level;
+        public int level;
         [SerializeField]
         public GameClass gameClass;
 

@@ -12,21 +12,28 @@ public class DamageFormulaDrawer : PropertyDrawerX {
 
     private SerializedPropertyX rootProperty;
     private SerializedPropertyX listRoot;
+    private SerializedPropertyX debugMode;
     private bool initialized;
     private ListRenderer listRenderer;
     private List<string> skipRenderingFields;
 
     public override void OnGUI(SerializedPropertyX property, GUIContent label) {
         Initialize(property);
-        EditorGUI.indentLevel++;
-        for (int i = 0; i < property.ChildCount; i++) {
-            SerializedPropertyX child = property.GetChildAt(i);
-            child.isExpanded = true;
-            if (skipRenderingFields.IndexOf(child.name) != -1) continue;
-            EditorGUILayoutX.PropertyField(child, child.label, child.isExpanded);
+        if((bool)debugMode.Value) {
+            EditorGUI.indentLevel++;
+            for (int i = 0; i < property.ChildCount; i++) {
+                SerializedPropertyX child = property.GetChildAt(i);
+                child.isExpanded = true;
+                if (skipRenderingFields.IndexOf(child.name) != -1) continue;
+                EditorGUILayoutX.PropertyField(child, child.label, child.isExpanded);
+            }
+            EditorGUI.indentLevel--;
+            CalculateButton(property);
+        } else {
+            EditorGUI.indentLevel++;
+            EditorGUILayoutX.PropertyField(debugMode, debugMode.label, debugMode.isExpanded);
+            EditorGUI.indentLevel--;
         }
-        EditorGUI.indentLevel--;
-        CalculateButton(property);
 
         listRenderer.Render();
     }
@@ -38,16 +45,17 @@ public class DamageFormulaDrawer : PropertyDrawerX {
                 rootProperty = tmp;
                 tmp = rootProperty.GetParent;
             }
-            listRoot = source["modifiers"];
 
+            listRoot = source["modifiers"];
             listRenderer = new ListRenderer();
             listRenderer.Initialize();
             listRenderer.SetTargetProperty(rootProperty, listRoot);
             listRenderer.SetSearchBox(CreateSearchBox);
-
             skipRenderingFields = new List<string>();
             skipRenderingFields.Add("modifiers");
             skipRenderingFields.Add("contextType");
+
+            debugMode = source.FindProperty("debugMode");
             initialized = true;
         }
     }
