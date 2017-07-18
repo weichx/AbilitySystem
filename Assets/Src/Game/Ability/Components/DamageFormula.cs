@@ -12,8 +12,8 @@ public class DamageFormula : AbilityComponent<Context> {
     public float outputValue;
 
     public override void OnUse() {
-        DiceData diceData = DamageFormulas.GenerateDiceResult(DamageFormulas.DiceTable[inputValue]);
-        var sum = (float)diceData.Result;
+        var diceCreator = new DiceCreator();
+        var sum = (float)diceCreator[inputValue].Result ;
         for(int i = 0; i < modifiers.Count; i++) {
             var j = sum;
             modifiers[i].SetContext(this.context);

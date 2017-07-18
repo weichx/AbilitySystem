@@ -9,7 +9,10 @@ namespace Intelligence {
         [NonSerialized]
         protected Context contextType;
 
-        public virtual void ApplyModifier(ref float inValue) { }
+        [NonSerialized]
+        protected DiceCreator diceCreator;
+
+        public abstract void ApplyModifier(ref float inValue);
 
         public virtual void SetContext(Context context) {
             this.contextType = context;

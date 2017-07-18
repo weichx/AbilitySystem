@@ -48,9 +48,13 @@ public class SpellAttackBonusModifier : Modifier<SingleTargetContext> {
 
 public class OneModifier : Modifier<MultiPointContext> {
     public MethodPointer<MultiPointContext, float, float> formula;
+    public override void ApplyModifier(ref float inValue) {
+    }
 }
 
 public class TwoModifier : Modifier<DirectionalContext> {
     public MethodPointer <DirectionalContext, float, float, float> formula;
+    public override void ApplyModifier(ref float inValue) {
+    }
 }
 
