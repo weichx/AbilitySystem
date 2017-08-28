@@ -1,6 +1,6 @@
-﻿using Intelligence;
+﻿using EntitySystem;
 
-namespace EntitySystem {
+namespace Intelligence {
 	
 	public class DecisionPackageCreator : AssetCreator<DecisionPackage> {}
 

@@ -1,4 +1,6 @@
-﻿Shader "Skin/Post Effects/Film Grain" {
+﻿// Upgrade NOTE: replaced 'mul(UNITY_MATRIX_MVP,*)' with 'UnityObjectToClipPos(*)'
+
+Shader "Skin/Post Effects/Film Grain" {
 Properties {
 	_MainTex ("", 2D) = "white" {}
 	_NoiseTex ("Noise", 2D) = "white" {}
@@ -51,7 +53,7 @@ ZTest Always Cull Off ZWrite Off Fog { Mode Off } //Rendering settings
 		//Our Vertex Shader 
 		v2f vert (appdata_img v){
 			v2f o;
-			o.pos = mul (UNITY_MATRIX_MVP, v.vertex);
+			o.pos = UnityObjectToClipPos (v.vertex);
 			o.uv = MultiplyUV (UNITY_MATRIX_TEXTURE0, v.texcoord.xy);
 			return o; 
 		}   		

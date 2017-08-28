@@ -1,4 +1,7 @@
 ﻿using Intelligence;
+using EntitySystem;
+using System.Collections.Generic;
+using UnityEngine;
 
 public static class DamageFormulas {
     [Pointable]
@@ -16,4 +19,9 @@ public static class DamageFormulas {
         return 11;
     }
 
+    [Pointable]
+    public static float Strike(SingleTargetContext context, float baseValue) {
+        return (baseValue + 10.0f);
+    }
 }
+

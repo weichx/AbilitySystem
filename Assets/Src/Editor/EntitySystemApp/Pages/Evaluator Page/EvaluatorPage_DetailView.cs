@@ -1,4 +1,5 @@
-﻿
+﻿using Intelligence;
+
 public class EvaluatorPage_DetailView : DetailView<DecisionEvaluator> {
 
 	public EvaluatorPage_DetailView() : base() {

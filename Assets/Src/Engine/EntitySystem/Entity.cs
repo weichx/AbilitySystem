@@ -7,7 +7,6 @@ using System.Collections.Generic;
 /// Entity the root of the system, any game object that interacts with
 /// Abilities, Status Effects, or AI needs to have an entity component
 /// </summary>
-
 namespace EntitySystem {
 		
 	[SelectionBase]
@@ -17,10 +16,13 @@ namespace EntitySystem {
 
 	    public string factionId;
 
+        [HideInInspector] public Character character;
 	    [HideInInspector] public string id;
+
 	    [HideInInspector] public AbilityManager abilityManager;
 	    [HideInInspector] public ResourceManager resourceManager;
 	    [HideInInspector] public StatusEffectManager statusManager;
+	    [HideInInspector] public InventoryItemManager itemManager;
 
 	    private Vector3 lastPosition;
 	    private bool movedThisFrame = false;
@@ -36,6 +38,7 @@ namespace EntitySystem {
 	        resourceManager = resourceManager ?? new ResourceManager(this);
 	        statusManager = statusManager ?? new StatusEffectManager(this);
 	        abilityManager = abilityManager ?? new AbilityManager(this);
+            itemManager = itemManager ?? new InventoryItemManager(this);
 	        emitter = GetComponent<EventEmitter>();
 	        EntityManager.Instance.Register(this);
 
@@ -53,6 +56,9 @@ namespace EntitySystem {
 	        if (resourceManager != null) {
 	            //resourceManager.Update();
 	        }
+        	if (itemManager != null) {
+           	     itemManager.Update();
+        	}
 	    }
 
 	    public void LateUpdate() {
@@ -80,7 +86,21 @@ namespace EntitySystem {
 	    public bool IsChanneling {
 	        get { return abilityManager.ActiveAbility != null && abilityManager.ActiveAbility.IsChanneled; }
 	    }
-			
+
+        public Dictionary<int, InventoryItem> ActiveEquipment {
+            get {
+                return itemManager.Equipment;
+            }
+        }
+
+        public List<Ability> SkillBook {
+            get { return character.skillBook; }
+        }
+
+        public CharacterParameters Parameters {
+            get { return character.parameters; }
+        }
+
 		public EventEmitter EventEmitter {
 			get { 
 				return emitter;

@@ -46,6 +46,12 @@ public class EntitySystemWindow : EditorWindow {
                 case "EvaluatorPage":
                     currentPage = new EvaluatorPage();
                     break;
+                case "InventoryItemPage":
+                    currentPage = new InventoryItemPage();
+                    break;
+                case "CharachterPage":
+                    currentPage = new CharacterPage();
+                    break;
             }
         }
         if (currentPage == null) {
@@ -88,7 +94,7 @@ public class EntitySystemWindow : EditorWindow {
         RenderHeaderBar(header);
 
         Rect body = new Rect(window) {
-            y = header.height + window.y + 5,
+            y = header.height + window.y + 6,
             height = window.height - header.height
         };
 
@@ -97,7 +103,7 @@ public class EntitySystemWindow : EditorWindow {
     }
 
     void RenderHeaderBar(Rect rect) {
-        HorizontalRectLayout d = new HorizontalRectLayout(rect, 4);
+        HorizontalRectLayout d = new HorizontalRectLayout(rect, 6);
 
         if (GUI.Button(d, "Abilities", GetStyle(typeof(AbilityPage)))) {
             currentPage = new AbilityPage();
@@ -112,9 +118,18 @@ public class EntitySystemWindow : EditorWindow {
             currentPage.OnEnter();
         }
         else if (GUI.Button(d, "Decision Evaluators", GetStyle(typeof(EvaluatorPage)))) {
-			currentPage = new EvaluatorPage();
-			currentPage.OnEnter();
+            currentPage = new EvaluatorPage();
+            currentPage.OnEnter();
         }
+        else if (GUI.Button(d, "Inventory Items", GetStyle(typeof(InventoryItemPage)))) {
+            currentPage = new InventoryItemPage();
+            currentPage.OnEnter();
+        }
+        else if (GUI.Button(d, "Characters", GetStyle(typeof(CharacterPage)))) {
+            currentPage = new CharacterPage();
+            currentPage.OnEnter();
+        }
+
     }
 
     private GUIStyle GetStyle(Type type) {

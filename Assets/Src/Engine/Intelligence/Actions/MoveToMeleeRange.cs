@@ -6,13 +6,13 @@ namespace Intelligence.Actions {
     public class MoveToMeleeRange : CharacterAction<SingleTargetContext> {
 
         public bool autobreak = true;
-        private NavMeshAgent agent;
+        private UnityEngine.AI.NavMeshAgent agent;
         private Timer timer;
         
         public override void OnStart() {
             timer = new Timer(0.5f);
             //Vector3 location = context.entity.transform;
-            agent = context.entity.GetComponent<NavMeshAgent>();
+            agent = context.entity.GetComponent<UnityEngine.AI.NavMeshAgent>();
             agent.autoBraking = autobreak;
             //agent.SetDestination(location);
 
